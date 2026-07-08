@@ -799,7 +799,11 @@ function renderMap(h,p,tb){
     }
     }
   }
-  s+=`<circle cx="${fPt[0]}" cy="${fPt[1]}" r="${greenView?1.4:2.5}" fill="var(--fcb)"/><circle cx="${bPt[0]}" cy="${bPt[1]}" r="${greenView?1.4:2.5}" fill="var(--fcb)"/>`;
+  s+=`<circle cx="${fPt[0]}" cy="${fPt[1]}" r="${greenView?0.8:2.5}" fill="var(--fcb)"/><circle cx="${bPt[0]}" cy="${bPt[1]}" r="${greenView?0.8:2.5}" fill="var(--fcb)"/>`;
+  if(greenView){ // label front/back up close
+    s+=`<text x="${fPt[0].toFixed(1)}" y="${(fPt[1]+3.1).toFixed(1)}" text-anchor="middle" font-size="2.4" font-weight="700" fill="var(--fcb)" opacity=".85">F</text>`
+      +`<text x="${bPt[0].toFixed(1)}" y="${(bPt[1]-1.7).toFixed(1)}" text-anchor="middle" font-size="2.4" font-weight="700" fill="var(--fcb)" opacity=".85">B</text>`;
+  }
   // tee
   s+=`<rect x="${teePt[0]-5}" y="${teePt[1]-5}" width="10" height="10" rx="2" fill="var(--accent2)"/>`;
   // player + line to center
