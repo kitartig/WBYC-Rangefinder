@@ -456,6 +456,11 @@ function clubStats(){ // median carry per club, all stored rounds
   return CLUBS.map(c=>{ const a=(m[c]||[]).sort((x,y)=>x-y);
     return a.length ? {club:c, n:a.length, med:Math.round(a[(a.length-1)>>1])} : null; }).filter(Boolean);
 }
+const DEFDIST={D:220,'3W':200,'5W':185,'3H':175,'4i':165,'5i':155,'6i':145,'7i':135,'8i':125,'9i':115,PW:105,GW:90,SW:75,LW:60};
+function clubDist(club){ // learned median once trusted (n>=2), stock number until then
+  const st=clubStats().find(x=>x.club===club && x.n>=2);
+  return st ? st.med : (DEFDIST[club]||null);
+}
 function suggestClub(distYds){ // closest learned median within 25 yds, needs >=2 samples
   let best=null, bd=1e9;
   for(const s of clubStats()){ if(s.n<2) continue;
@@ -867,6 +872,19 @@ function renderMap(h,p,tb){
   }
   // tee
   s+=`<rect x="${teePt[0]-5}" y="${teePt[1]-5}" width="10" height="10" rx="2" fill="var(--accent2)"/>`;
+  // carry arcs: selected club + one longer/shorter neighbor, centered on you (hole view only)
+  if(pPt && pNear && !greenView){
+    const ci=CLUBS.indexOf(curClub), ac0=rot(c);
+    const adx=ac0[0]-pPt[0], ady=ac0[1]-pPt[1], adl=Math.hypot(adx,ady)||1;
+    const aux=adx/adl, auy=ady/adl; // toward the green: label arcs along the strike direction
+    [ci-1,ci,ci+1].forEach(ix=>{
+      if(ix<0||ix>=CLUBS.length) return;
+      const club=CLUBS[ix], yd=clubDist(club); if(!yd) return;
+      const r=yd*0.9144, main=ix===ci;
+      s+=`<circle class="carry" cx="${pPt[0]}" cy="${pPt[1]}" r="${r.toFixed(1)}" fill="none" stroke="var(--accent2)" stroke-width="${main?0.9:0.5}" stroke-dasharray="${main?'4 4':'1.5 4'}" opacity="${main?0.5:0.28}"/>`;
+      s+=`<text x="${(pPt[0]+aux*r+2).toFixed(1)}" y="${(pPt[1]+auy*r-1.5).toFixed(1)}" font-size="4.2" font-weight="700" fill="var(--accent2)" opacity="${main?0.85:0.5}">${club} ${yd}</text>`;
+    });
+  }
   // today's shot marks on this hole: dotted trail + numbered dots
   const hShots=shots.filter(q=>q.d===today() && q.h===h.hole_number);
   if(hShots.length){
@@ -1248,7 +1266,7 @@ function init(data){
   $('scClubs').onclick=()=>{ scMode=scMode==='card'?'clubs':'card'; scShow(); };
   // SHOT tracking: club picker + mark button (long-press = undo)
   $('clubSel').innerHTML=CLUBS.map(c=>`<option${c===curClub?' selected':''}>${c}</option>`).join('');
-  $('clubSel').onchange=e=>{ curClub=e.target.value; localStorage.setItem('wbyc_club',curClub); };
+  $('clubSel').onchange=e=>{ curClub=e.target.value; localStorage.setItem('wbyc_club',curClub); render(); };
   const sb=$('shotBtn');
   let slpTimer=null, slpFired=false;
   sb.onclick=()=>{ if(slpFired){ slpFired=false; return; } markShot(); };
