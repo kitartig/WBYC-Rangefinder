@@ -1,5 +1,22 @@
 # WBYC Rangefinder — Quick User Guide
 
+A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, working offline in your pocket.
+
+## Features at a glance
+
+- **Live GPS distances** to the front / center / back of every green, smoothed over your last 5 fixes
+- **"Plays like" numbers** that fold in elevation (USGS 3DEP terrain) and wind — with a per-hole wind arrow
+- **Club hints** learned from your own tracked shots (`plays 152 · 7i`)
+- **Shot tracking** — one tap per shot; builds your real club distances and draws your round on the map
+- **Running scorecard** — strokes, putts, fairways; full 18-hole card with stats (putts, FW, GIR)
+- **Green view (GRN)** — zoom to the green complex with downhill fall-line arrows and micro-contours for reading putts
+- **3D terrain view** of every hole; **SAT** aerial imagery overlay
+- **Auto hole detection** as you walk the course
+- **Hazards & targets panel** — reach / carry distances to every bunker, water hazard, and dogleg
+- **Three themes** (dark / sun / dream) with a high-contrast sun mode for bright days
+- **Works offline** — installs to your home screen as an app; scorecard and shots survive restarts
+- A little hidden whimsy for those who explore
+
 ## One-time setup
 
 1. Deploy the `pwa/` folder to Netlify (drag-and-drop at app.netlify.com/drop works).
@@ -25,6 +42,7 @@
 | GRN | Zoom to the green (fall-line arrows appear here) |
 | 3D | 3D terrain view of the hole (drag to rotate, pinch to zoom) |
 | ☀ / ✦ / ☾ | Cycle theme: dark → sun → dream |
+| SHOT | Mark a shot from where you stand (club picker beside it; long-press = undo) |
 | ± ELEV | Elevation-adjusted "plays like" distances (~1 yd per 3 ft) |
 | WIND | Wind-adjusted "plays like" — tap to toggle, long-press to set wind manually |
 | DEMO MODE | Tap-the-map positioning when GPS is off/unavailable |
