@@ -37,6 +37,10 @@
 - "Plays like" folds in the head/tail component: headwind adds ~1% of the shot per mph, tailwind subtracts ~0.5%/mph. Crosswind doesn't change distance — that part's still your call.
 - **First-round check**: long-press WIND, set something like 10 SW, and sanity-check the arrow against the flag. The live fetch is untested until the Netlify deploy.
 
+## Reading the green
+
+Small dark arrows on each green point **downhill** — longer arrow = steeper slope. They come from USGS 3m elevation data, so treat them as the broad break (the overall tilt and big slopes), not subtle 6-inch reads. Together with the pale micro-contour lines, uphill/downhill putts and general break direction should be readable at a glance. Arrows hide in SAT view.
+
 ## Scorecard
 
 - The strip below the map is your running card for the current hole: **SCORE** and **PUTTS** +/−, and **FW** (tap to cycle ✓ hit → ✗ miss → blank; hidden on par 3s).
