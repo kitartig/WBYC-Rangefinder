@@ -37,6 +37,13 @@
 - "Plays like" folds in the head/tail component: headwind adds ~1% of the shot per mph, tailwind subtracts ~0.5%/mph. Crosswind doesn't change distance — that part's still your call.
 - **First-round check**: long-press WIND, set something like 10 SW, and sanity-check the arrow against the flag. The live fetch is untested until the Netlify deploy.
 
+## Scorecard
+
+- The strip below the map is your running card for the current hole: **SCORE** and **PUTTS** +/−, and **FW** (tap to cycle ✓ hit → ✗ miss → blank; hidden on par 3s).
+- The right side shows your running score vs par (`+2 thru 7`) — **tap it to open the full card**: front/back/total, per-hole results, and a stats line (putts, fairways, GIR).
+- On the full card, **tap any hole row to jump the app to that hole**; NEW ROUND clears the card (with a confirm).
+- The card survives closing the app mid-round (saved on every tap). Red-tee rounds score against women's par automatically.
+
 ## Tournament play
 
 Turn **± ELEV and WIND off** — adjusted distances aren't allowed under USGA/R&A Rule 4.3a. Plain GPS distances are fine.
