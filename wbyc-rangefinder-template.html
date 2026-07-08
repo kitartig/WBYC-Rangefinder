@@ -745,11 +745,41 @@ function renderMap(h,p,tb){
   // green: even radial shading + micro-contour reading lines clipped to the surface
   const gPath=smoothClosed(greenPts);
   s+=`<path class="greenp" d="${gPath}" fill="${satOn?'var(--green-fill)':'url(#ggrad)'}" fill-opacity="${satOn?0.25:1}" stroke="${satOn?'#b6f5c2':'var(--green-stroke)'}" stroke-width="1.6"${dreamFx}/>`;
-  if(!satOn && ctrD.length){
-    const gl = theme==='sun' ? '#dfffe9' : theme==='dream' ? '#aefff1' : '#cdf5d8';
-    s+=`<clipPath id="gclip"><path d="${gPath}"/></clipPath><g clip-path="url(#gclip)">`
-      + ctrD.map(d=>`<path class="ctr" d="${d}" fill="none" stroke="${gl}" stroke-width="0.6" opacity="0.55"/>`).join('')
-      + '</g>';
+  if(!satOn && TOPO){
+    s+=`<clipPath id="gclip"><path d="${gPath}"/></clipPath>`;
+    if(ctrD.length){
+      const gl = theme==='sun' ? '#dfffe9' : theme==='dream' ? '#aefff1' : '#cdf5d8';
+      s+=`<g clip-path="url(#gclip)">`
+        + ctrD.map(d=>`<path class="ctr" d="${d}" fill="none" stroke="${gl}" stroke-width="0.6" opacity="0.55"/>`).join('')
+        + '</g>';
+    }
+    // fall-line arrows: point downhill, longer = steeper (from the 3m green-complex patches)
+    const pip=(x,y,pts)=>{ let inn=false;
+      for(let i=0,j=pts.length-1;i<pts.length;j=i++)
+        if((pts[i][1]>y)!==(pts[j][1]>y) && x<(pts[j][0]-pts[i][0])*(y-pts[i][1])/(pts[j][1]-pts[i][1])+pts[i][0]) inn=!inn;
+      return inn; };
+    let arr='';
+    const gXs=greenPts.map(q=>q[0]), gYs=greenPts.map(q=>q[1]);
+    const gx0=Math.min(...gXs), gx1=Math.max(...gXs), gy0=Math.min(...gYs), gy1=Math.max(...gYs);
+    const step=Math.max(3.2, Math.max(gx1-gx0,gy1-gy0)/6), dd=2;
+    for(let Y=gy0+step/2; Y<gy1; Y+=step) for(let X=gx0+step/2; X<gx1; X+=step){
+      if(!pip(X,Y,greenPts)) continue;
+      const eE=elevFt(unrot(X+dd,Y)), eW=elevFt(unrot(X-dd,Y)), eS=elevFt(unrot(X,Y+dd)), eN=elevFt(unrot(X,Y-dd));
+      if(eE===null||eW===null||eS===null||eN===null) continue;
+      const gvX=(eE-eW)*0.3048/(2*dd), gvY=(eS-eN)*0.3048/(2*dd); // slope vector, screen frame (m/m)
+      const mag=Math.hypot(gvX,gvY), sl=mag*100;
+      if(sl<0.7) continue; // flat / noise
+      const ux=-gvX/mag, uy=-gvY/mag; // downhill
+      const L=Math.min(step*0.85, 1.6+sl*0.9), hw=Math.min(1.6,L*0.3);
+      const tx=X+ux*L/2, ty=Y+uy*L/2, qx=X-ux*L/2, qy=Y-uy*L/2, px=-uy, py=ux;
+      arr+=`<path d="M${qx.toFixed(1)} ${qy.toFixed(1)}L${tx.toFixed(1)} ${ty.toFixed(1)}`
+        +`M${(tx-ux*hw+px*hw).toFixed(1)} ${(ty-uy*hw+py*hw).toFixed(1)}L${tx.toFixed(1)} ${ty.toFixed(1)}`
+        +`L${(tx-ux*hw-px*hw).toFixed(1)} ${(ty-uy*hw-py*hw).toFixed(1)}"/>`;
+    }
+    if(arr){
+      const ac = theme==='sun' ? '#0e6b34' : theme==='dream' ? '#06424d' : '#0d5c30';
+      s+=`<g class="fall" clip-path="url(#gclip)" fill="none" stroke="${ac}" stroke-width="0.75" opacity=".75" stroke-linecap="round" stroke-linejoin="round">${arr}</g>`;
+    }
   }
   s+=`<circle cx="${fPt[0]}" cy="${fPt[1]}" r="2.5" fill="var(--fcb)"/><circle cx="${bPt[0]}" cy="${bPt[1]}" r="2.5" fill="var(--fcb)"/>`;
   // tee
