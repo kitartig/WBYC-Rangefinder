@@ -8,6 +8,7 @@ A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, w
 - **"Plays like" numbers** that fold in elevation (USGS 3DEP terrain) and wind — with a per-hole wind arrow
 - **Club hints** learned from your own tracked shots (`plays 152 · 7i`)
 - **Shot tracking** — one tap per shot; builds your real club distances and draws your round on the map
+- **Carry arcs** — dashed rings showing your selected club's reach (and its neighbors) from where you stand
 - **Running scorecard** — strokes, putts, fairways; full 18-hole card with stats (putts, FW, GIR)
 - **Green view (GRN)** — zoom to the green complex with downhill fall-line arrows and micro-contours for reading putts
 - **3D terrain view** of every hole; **SAT** aerial imagery overlay
@@ -67,6 +68,7 @@ The arrows come from USGS 3m elevation data, so treat them as the broad break (o
 - Standing at your ball, pick the club (bottom-left of the map) and tap **SHOT** just before you hit. That's the whole flow — one tap per shot.
 - Each mark's distance is measured to your next mark on the hole (the last one measures to green center), so the app learns your **real** club distances. Mismarked? **Long-press SHOT to undo.**
 - Today's shots draw on the map as numbered dots with a dotted trail from the tee.
+- **Carry arcs**: dashed rings from your position show what the selected club reaches (bold arc), with one longer and one shorter club as fainter neighbors. Change the club in the picker to move them. They start from stock distances and switch to *your* numbers once a club has 2+ tracked shots. Arcs show raw carry — the plays-like number handles wind/elevation. Hole view only.
 - Open the scorecard and tap **CLUBS** to see your learned median distance per club, across all rounds.
 - Once a club has 2+ tracked shots, a club hint appears after "plays like" under CENTER (e.g. `plays 152 · 7i`). More rounds = smarter hints.
 - Don't bother marking putts — the scorecard putt counter covers those.
