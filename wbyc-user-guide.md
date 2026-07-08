@@ -44,6 +44,15 @@ Tap **GRN** (on the map, next to SAT/3D) to zoom to the green complex. Up close 
 
 The arrows come from USGS 3m elevation data, so treat them as the broad break (overall tilt and big shelves), not subtle 6-inch reads. They only appear in GRN view and hide in SAT.
 
+## Shot tracking
+
+- Standing at your ball, pick the club (bottom-left of the map) and tap **SHOT** just before you hit. That's the whole flow — one tap per shot.
+- Each mark's distance is measured to your next mark on the hole (the last one measures to green center), so the app learns your **real** club distances. Mismarked? **Long-press SHOT to undo.**
+- Today's shots draw on the map as numbered dots with a dotted trail from the tee.
+- Open the scorecard and tap **CLUBS** to see your learned median distance per club, across all rounds.
+- Once a club has 2+ tracked shots, a club hint appears after "plays like" under CENTER (e.g. `plays 152 · 7i`). More rounds = smarter hints.
+- Don't bother marking putts — the scorecard putt counter covers those.
+
 ## Scorecard
 
 - The strip below the map is your running card for the current hole: **SCORE** and **PUTTS** +/−, and **FW** (tap to cycle ✓ hit → ✗ miss → blank; hidden on par 3s).
