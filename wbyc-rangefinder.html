@@ -103,6 +103,12 @@
   #mapwrap{background:var(--card);border:1px solid var(--line);border-radius:12px;
     margin-bottom:10px;overflow:hidden;position:relative}
   #mapbtns{position:absolute;top:8px;right:8px;display:flex;gap:6px}
+  #shotbar{position:absolute;bottom:22px;left:8px;display:flex;gap:6px;align-items:center}
+  #shotbar select{background:rgba(10,16,12,.55);color:#fff;border:2px solid #35c8ff;border-radius:7px;
+    padding:5px 6px;font-size:11px;font-weight:700;backdrop-filter:blur(2px)}
+  #shotbar button{background:rgba(10,16,12,.55);color:#fff;border:2px solid var(--accent2);border-radius:7px;
+    padding:5px 11px;font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;backdrop-filter:blur(2px)}
+  body.sun #shotbar select, body.sun #shotbar button{background:rgba(255,255,255,.75);color:#111}
   #mapbtns button{background:rgba(10,16,12,.55);color:#fff;border:2px solid #35c8ff;border-radius:7px;
     padding:5px 9px;font-size:10px;font-weight:700;letter-spacing:.5px;cursor:pointer;backdrop-filter:blur(2px)}
   body.sun #mapbtns button{background:rgba(255,255,255,.75);color:#111}
@@ -201,6 +207,7 @@
   <div id="mapwrap">
     <svg id="map" xmlns="http://www.w3.org/2000/svg"></svg>
     <div id="mapbtns"><button id="satBtn">SAT</button><button id="grnBtn" title="Zoom to the green">GRN</button><button id="d3Btn">3D</button></div>
+    <div id="shotbar"><select id="clubSel"></select><button id="shotBtn" title="Mark a shot from your current position. Long-press to undo the last mark.">SHOT</button></div>
     <div id="maphint"></div>
   </div>
 
@@ -229,8 +236,8 @@
 </div>
 
 <div id="scorecard">
-  <div id="scbar"><span>SCORECARD</span>
-    <span><button id="scNew">NEW ROUND</button><button id="scClose">CLOSE ✕</button></span></div>
+  <div id="scbar"><span id="scTitle">SCORECARD</span>
+    <span><button id="scClubs">CLUBS</button><button id="scNew">NEW ROUND</button><button id="scClose">CLOSE ✕</button></span></div>
   <div id="sctab"></div>
   <div id="scstats"></div>
 </div>
@@ -413,6 +420,49 @@ function detectHole(){
   if(bd<200 && best!==holeIdx){ holeIdx=best; }
 }
 
+/* ============ SHOT TRACKING ============ */
+const CLUBS=['D','3W','5W','3H','4i','5i','6i','7i','8i','9i','PW','GW','SW','LW'];
+let shots=[]; try{ shots=JSON.parse(localStorage.getItem('wbyc_shots'))||[]; }catch(e){}
+const saveShots=()=>localStorage.setItem('wbyc_shots', JSON.stringify(shots));
+let curClub=localStorage.getItem('wbyc_club'); if(!CLUBS.includes(curClub)) curClub='7i';
+const today=()=>new Date().toISOString().slice(0,10);
+function markShot(){
+  const p=playerPos(); if(!p) return;
+  shots.push({d:today(), h:hole().hole_number, lat:p.lat, lng:p.lng, t:Date.now(), club:curClub});
+  saveShots();
+  $('maphint').textContent=`shot ${shots.filter(s=>s.d===today()&&s.h===hole().hole_number).length} marked (${curClub})`;
+  render();
+}
+function undoShot(){
+  if(!shots.length) return;
+  shots.pop(); saveShots();
+  $('maphint').textContent='last shot mark removed';
+  render();
+}
+function shotDists(){ // each mark's distance: to the next mark on the same hole, else to that green's center
+  const out=[];
+  for(let i=0;i<shots.length;i++){
+    const s=shots[i], nx=shots[i+1];
+    let end=null;
+    if(nx && nx.d===s.d && nx.h===s.h) end={lat:nx.lat,lng:nx.lng};
+    else{ const hh=course.holes.find(x=>x.hole_number===s.h); if(hh) end=hh.green.center; }
+    if(end){ const y=yds(s,end); if(y>15 && y<400) out.push({club:s.club, y}); }
+  }
+  return out;
+}
+function clubStats(){ // median carry per club, all stored rounds
+  const m={};
+  shotDists().forEach(r=>{ (m[r.club]=m[r.club]||[]).push(r.y); });
+  return CLUBS.map(c=>{ const a=(m[c]||[]).sort((x,y)=>x-y);
+    return a.length ? {club:c, n:a.length, med:Math.round(a[(a.length-1)>>1])} : null; }).filter(Boolean);
+}
+function suggestClub(distYds){ // closest learned median within 25 yds, needs >=2 samples
+  let best=null, bd=1e9;
+  for(const s of clubStats()){ if(s.n<2) continue;
+    const d=Math.abs(s.med-distYds); if(d<bd){ bd=d; best=s; } }
+  return bd<=25 ? best : null;
+}
+
 /* ============ SCORECARD ============ */
 const blankCard=()=>({start:new Date().toISOString().slice(0,10), holes:Array.from({length:18},()=>({s:0,p:0,f:null}))});
 let card=blankCard();
@@ -465,6 +515,15 @@ function renderCard(){
     ? `${t.n} holes · ${fmtDiff(t.s-t.par)} · ${t.p} putts · FW ${t.fwH}/${t.fwT} · GIR ${t.gir}`
     : 'no scores yet — use the +/− strip on any hole · tap a row to jump there';
 }
+function renderClubs(){
+  const st=clubStats();
+  $('sctab').innerHTML='<table><tr><th>CLUB</th><th>MEDIAN YDS</th><th>SHOTS</th></tr>'
+    +(st.length ? st.map(x=>`<tr><td>${x.club}</td><td>${x.med}</td><td>${x.n}</td></tr>`).join('')
+                : '<tr><td colspan="3" style="text-align:center;color:var(--dim)">no shots tracked yet — pick a club and tap SHOT at your ball</td></tr>')
+    +'</table>';
+  const tot=shotDists().length;
+  $('scstats').textContent=tot?`${tot} tracked shots, all rounds · medians feed the club hint under CENTER`:'distances learn from your SHOT marks';
+}
 
 /* ============ RENDER ============ */
 function fmt(d){ return d==null ? '–' : String(Math.round(d)); }
@@ -504,6 +563,8 @@ function render(){
       if(Math.abs(dFt)>=3) bits.push(`${dFt>0?'+':''}${dFt} ft`);
       if(Math.abs(wYd)>=1) bits.push(`wind ${wYd>0?'+':''}${wYd}`);
       if(bits.length) plays=`plays ${Math.round(adj)} (${bits.join(', ')})`;
+      const sug=suggestClub(Math.round(adj)); // learned club, once SHOT marks teach it
+      if(sug) plays=(plays||`plays ${Math.round(adj)}`)+` · ${sug.club}`;
     }
     $('playsLike').textContent=plays;
     // dream-mode firefly trail bookkeeping
@@ -806,6 +867,17 @@ function renderMap(h,p,tb){
   }
   // tee
   s+=`<rect x="${teePt[0]-5}" y="${teePt[1]-5}" width="10" height="10" rx="2" fill="var(--accent2)"/>`;
+  // today's shot marks on this hole: dotted trail + numbered dots
+  const hShots=shots.filter(q=>q.d===today() && q.h===h.hole_number);
+  if(hShots.length){
+    const sp=hShots.map(q=>rot(q));
+    const trailPts=[[teePt[0],teePt[1]],...sp];
+    s+=`<path d="M${trailPts.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join('L')}" fill="none" stroke="var(--accent2)" stroke-width="${greenView?0.25:0.9}" stroke-dasharray="${greenView?'1 1.4':'3 3'}" opacity=".55"/>`;
+    sp.forEach((q,i)=>{
+      s+=`<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="${greenView?0.8:2.1}" fill="var(--accent2)" opacity=".9"/>`;
+      if(!greenView) s+=`<text x="${(q[0]+3.2).toFixed(1)}" y="${(q[1]+1.4).toFixed(1)}" font-size="4.5" font-weight="700" fill="var(--accent2)" opacity=".85">${i+1}</text>`;
+    });
+  }
   // player + line to center
   if(pPt){
     const cc=rot(c);
@@ -1167,7 +1239,21 @@ function init(data){
   $('scSp').onclick=()=>bump('s',1);  $('scSm').onclick=()=>bump('s',-1);
   $('scPp').onclick=()=>bump('p',1);  $('scPm').onclick=()=>bump('p',-1);
   $('fwBtn').onclick=()=>{ const e=card.holes[holeIdx]; e.f = e.f===null ? true : e.f===true ? false : null; saveCard(); renderScore(); };
-  $('scTot').onclick=()=>{ renderCard(); $('scorecard').classList.add('open'); };
+  let scMode='card';
+  const scShow=()=>{ scMode==='clubs'?renderClubs():renderCard();
+    $('scTitle').textContent=scMode==='clubs'?'CLUB DISTANCES':'SCORECARD';
+    $('scClubs').textContent=scMode==='clubs'?'CARD':'CLUBS';
+    $('scNew').style.display=scMode==='clubs'?'none':''; };
+  $('scTot').onclick=()=>{ scMode='card'; scShow(); $('scorecard').classList.add('open'); };
+  $('scClubs').onclick=()=>{ scMode=scMode==='card'?'clubs':'card'; scShow(); };
+  // SHOT tracking: club picker + mark button (long-press = undo)
+  $('clubSel').innerHTML=CLUBS.map(c=>`<option${c===curClub?' selected':''}>${c}</option>`).join('');
+  $('clubSel').onchange=e=>{ curClub=e.target.value; localStorage.setItem('wbyc_club',curClub); };
+  const sb=$('shotBtn');
+  let slpTimer=null, slpFired=false;
+  sb.onclick=()=>{ if(slpFired){ slpFired=false; return; } markShot(); };
+  sb.addEventListener('pointerdown',()=>{ slpTimer=setTimeout(()=>{ slpFired=true; undoShot(); },550); });
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>sb.addEventListener(ev,()=>clearTimeout(slpTimer)));
   $('scClose').onclick=()=>$('scorecard').classList.remove('open');
   $('scNew').onclick=()=>{ if(confirm('Start a new round? The current card will be cleared.')){ card=blankCard(); saveCard(); renderCard(); renderScore(); } };
   $('sctab').onclick=ev=>{ // tap a hole row to jump there
