@@ -200,7 +200,7 @@
 
   <div id="mapwrap">
     <svg id="map" xmlns="http://www.w3.org/2000/svg"></svg>
-    <div id="mapbtns"><button id="satBtn">SAT</button><button id="d3Btn">3D</button></div>
+    <div id="mapbtns"><button id="satBtn">SAT</button><button id="grnBtn" title="Zoom to the green">GRN</button><button id="d3Btn">3D</button></div>
     <div id="maphint"></div>
   </div>
 
@@ -353,6 +353,7 @@ function windUI(){
   b.classList.toggle('on', windAdjust && !!wind.src);
 }
 let satMode = localStorage.getItem('wbyc_base')==='sat';
+let greenView=false; // zoom to green complex; session-only, resets on hole change
 const GRAVS=[{name:'Earth',f:1,icon:'± ELEV'},{name:'the Moon',f:6.05,icon:'☾ MOON'},{name:'Mars',f:2.64,icon:'♂ MARS'}];
 let gravIdx=0; // session-only whimsy; never persisted
 let trail=[]; // recent player positions (dream-mode firefly)
@@ -469,6 +470,10 @@ function renderCard(){
 function fmt(d){ return d==null ? '–' : String(Math.round(d)); }
 
 function render(){
+  if(render.lastH!==holeIdx){ // leaving a hole exits green view
+    render.lastH=holeIdx;
+    if(greenView){ greenView=false; $('grnBtn').classList.remove('on'); }
+  }
   const h = hole(), p = playerPos(), tb = teeBox(h);
   $('holeNum').textContent = h.hole_number;
   const par = tee==='Red' ? h.par_women : h.par;
@@ -588,6 +593,16 @@ function renderMap(h,p,tb){
   let minX=Math.min(...xs)-pad, maxX=Math.max(...xs)+pad;
   let minY=Math.min(...ys)-pad, maxY=Math.max(...ys)+pad;
   let w=maxX-minX, ht=maxY-minY;
+  if(greenView){ // reframe to the green complex (+ the ball when it's up there)
+    const zx=greenPts.map(q=>q[0]), zy=greenPts.map(q=>q[1]), gp=13;
+    minX=Math.min(...zx)-gp; maxX=Math.max(...zx)+gp;
+    minY=Math.min(...zy)-gp; maxY=Math.max(...zy)+gp;
+    if(pPt && pPt[0]>minX-18 && pPt[0]<maxX+18 && pPt[1]>minY-18 && pPt[1]<maxY+18){
+      minX=Math.min(minX,pPt[0]-6); maxX=Math.max(maxX,pPt[0]+6);
+      minY=Math.min(minY,pPt[1]-6); maxY=Math.max(maxY,pPt[1]+6);
+    }
+    w=maxX-minX; ht=maxY-minY;
+  }
   // clamp view aspect to portrait: extend the frame with real surrounding terrain
   const RMIN=0.85, RMAX=1.0, r0=w/ht;
   let extAxis=-1, extAmt=0;
@@ -753,7 +768,9 @@ function renderMap(h,p,tb){
         + ctrD.map(d=>`<path class="ctr" d="${d}" fill="none" stroke="${gl}" stroke-width="0.6" opacity="0.55"/>`).join('')
         + '</g>';
     }
-    // fall-line arrows: point downhill, longer = steeper (from the 3m green-complex patches)
+    // fall-line arrows: point downhill, longer = steeper (from the 3m green-complex patches).
+    // Green view only — at whole-hole scale they're clutter.
+    if(greenView){
     const pip=(x,y,pts)=>{ let inn=false;
       for(let i=0,j=pts.length-1;i<pts.length;j=i++)
         if((pts[i][1]>y)!==(pts[j][1]>y) && x<(pts[j][0]-pts[i][0])*(y-pts[i][1])/(pts[j][1]-pts[i][1])+pts[i][0]) inn=!inn;
@@ -761,7 +778,7 @@ function renderMap(h,p,tb){
     let arr='';
     const gXs=greenPts.map(q=>q[0]), gYs=greenPts.map(q=>q[1]);
     const gx0=Math.min(...gXs), gx1=Math.max(...gXs), gy0=Math.min(...gYs), gy1=Math.max(...gYs);
-    const step=Math.max(3.2, Math.max(gx1-gx0,gy1-gy0)/6), dd=2;
+    const step=Math.max(2.2, Math.max(gx1-gx0,gy1-gy0)/9), dd=2;
     for(let Y=gy0+step/2; Y<gy1; Y+=step) for(let X=gx0+step/2; X<gx1; X+=step){
       if(!pip(X,Y,greenPts)) continue;
       const eE=elevFt(unrot(X+dd,Y)), eW=elevFt(unrot(X-dd,Y)), eS=elevFt(unrot(X,Y+dd)), eN=elevFt(unrot(X,Y-dd));
@@ -778,10 +795,11 @@ function renderMap(h,p,tb){
     }
     if(arr){
       const ac = theme==='sun' ? '#0e6b34' : theme==='dream' ? '#06424d' : '#0d5c30';
-      s+=`<g class="fall" clip-path="url(#gclip)" fill="none" stroke="${ac}" stroke-width="0.75" opacity=".75" stroke-linecap="round" stroke-linejoin="round">${arr}</g>`;
+      s+=`<g class="fall" clip-path="url(#gclip)" fill="none" stroke="${ac}" stroke-width="0.55" opacity=".75" stroke-linecap="round" stroke-linejoin="round">${arr}</g>`;
+    }
     }
   }
-  s+=`<circle cx="${fPt[0]}" cy="${fPt[1]}" r="2.5" fill="var(--fcb)"/><circle cx="${bPt[0]}" cy="${bPt[1]}" r="2.5" fill="var(--fcb)"/>`;
+  s+=`<circle cx="${fPt[0]}" cy="${fPt[1]}" r="${greenView?1.4:2.5}" fill="var(--fcb)"/><circle cx="${bPt[0]}" cy="${bPt[1]}" r="${greenView?1.4:2.5}" fill="var(--fcb)"/>`;
   // tee
   s+=`<rect x="${teePt[0]-5}" y="${teePt[1]-5}" width="10" height="10" rx="2" fill="var(--accent2)"/>`;
   // player + line to center
@@ -793,10 +811,11 @@ function renderMap(h,p,tb){
     });
     s+=`<line x1="${pPt[0]}" y1="${pPt[1]}" x2="${cc[0]}" y2="${cc[1]}" stroke="var(--accent)" stroke-width="1.5" opacity=".8"/>`;
     // "my ball": hot gold glow + pulsing gold halo + golf-ball dot (white with dimples)
-    s+=`<circle class="you-glow" cx="${pPt[0]}" cy="${pPt[1]}" r="22" fill="url(#halograd)"/>`;
-    s+=`<circle class="you-pulse" cx="${pPt[0]}" cy="${pPt[1]}" r="10" fill="none" stroke="#ffd21f" stroke-width="2.2"/>`;
-    s+=`<circle cx="${pPt[0]}" cy="${pPt[1]}" r="6.5" fill="url(#ballgrad)" stroke="#f5b512" stroke-width="1.8"${theme==='dream'?' filter="url(#glow)"':''}/>`;
-    s+=`<g fill="#aab8ae" opacity=".8"><circle cx="${(pPt[0]-1.9).toFixed(1)}" cy="${(pPt[1]-1.6).toFixed(1)}" r=".65"/><circle cx="${(pPt[0]+1.4).toFixed(1)}" cy="${(pPt[1]-0.5).toFixed(1)}" r=".65"/><circle cx="${(pPt[0]-0.3).toFixed(1)}" cy="${(pPt[1]+1.8).toFixed(1)}" r=".65"/></g>`;
+    const mk=greenView?0.38:1, mw=greenView?0.7:1; // shrink marker up close so the halo doesn't swallow the green
+    s+=`<circle class="you-glow" cx="${pPt[0]}" cy="${pPt[1]}" r="${(22*mk).toFixed(1)}" fill="url(#halograd)"/>`;
+    s+=`<circle class="you-pulse" cx="${pPt[0]}" cy="${pPt[1]}" r="${(10*mk).toFixed(1)}" fill="none" stroke="#ffd21f" stroke-width="${(2.2*mw).toFixed(1)}"/>`;
+    s+=`<circle cx="${pPt[0]}" cy="${pPt[1]}" r="${(6.5*mk).toFixed(1)}" fill="url(#ballgrad)" stroke="#f5b512" stroke-width="${(1.8*mw).toFixed(1)}"${theme==='dream'?' filter="url(#glow)"':''}/>`;
+    s+=`<g fill="#aab8ae" opacity=".8"><circle cx="${(pPt[0]-1.9*mk).toFixed(1)}" cy="${(pPt[1]-1.6*mk).toFixed(1)}" r="${(.65*mk).toFixed(2)}"/><circle cx="${(pPt[0]+1.4*mk).toFixed(1)}" cy="${(pPt[1]-0.5*mk).toFixed(1)}" r="${(.65*mk).toFixed(2)}"/><circle cx="${(pPt[0]-0.3*mk).toFixed(1)}" cy="${(pPt[1]+1.8*mk).toFixed(1)}" r="${(.65*mk).toFixed(2)}"/></g>`;
   }
   // wind arrow (top-right): points where the wind blows, in this hole's rotated frame
   if(windAdjust && wind.src && wind.spd>=1 && wind.dir!==null){
@@ -1162,6 +1181,11 @@ function init(data){
     satMode=!satMode;
     localStorage.setItem('wbyc_base', satMode?'sat':'map');
     $('satBtn').classList.toggle('on', satMode);
+    render();
+  };
+  $('grnBtn').onclick=()=>{
+    greenView=!greenView;
+    $('grnBtn').classList.toggle('on', greenView);
     render();
   };
   if(!TOPO) $('d3Btn').style.display='none';
