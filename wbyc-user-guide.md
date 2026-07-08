@@ -10,6 +10,7 @@ A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, w
 - **Shot tracking** — one tap per shot; builds your real club distances and draws your round on the map
 - **Carry arcs** — dashed rings showing your selected club's reach (and its neighbors) from where you stand
 - **Running scorecard** — strokes, putts, fairways; full 18-hole card with stats (putts, FW, GIR)
+- **GHIN post helper** — one tap copies your scores and opens ghin.com for posting
 - **Green view (GRN)** — zoom to the green complex with downhill fall-line arrows and micro-contours for reading putts
 - **3D terrain view** of every hole; **SAT** aerial imagery overlay
 - **Auto hole detection** as you walk the course
@@ -79,6 +80,7 @@ The arrows come from USGS 3m elevation data, so treat them as the broad break (o
 - The right side shows your running score vs par (`+2 thru 7`) — **tap it to open the full card**: front/back/total, per-hole results, and a stats line (putts, fairways, GIR).
 - On the full card, **tap any hole row to jump the app to that hole**; NEW ROUND clears the card (with a confirm).
 - The card survives closing the app mid-round (saved on every tap). Red-tee rounds score against women's par automatically.
+- **POST** (on the full card) copies your hole-by-hole scores to the clipboard and opens ghin.com — log in, choose hole-by-hole posting, and paste/enter. GHIN doesn't allow direct posting from personal apps, so this is deliberately a two-tap handoff: your GHIN login never touches this app.
 
 ## Tournament play
 
