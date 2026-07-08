@@ -22,6 +22,7 @@
 | ‹ › | Previous / next hole (disables AUTO) |
 | AUTO | Auto-detect hole from GPS |
 | SAT | Aerial imagery under the map |
+| GRN | Zoom to the green (fall-line arrows appear here) |
 | 3D | 3D terrain view of the hole (drag to rotate, pinch to zoom) |
 | ☀ / ✦ / ☾ | Cycle theme: dark → sun → dream |
 | ± ELEV | Elevation-adjusted "plays like" distances (~1 yd per 3 ft) |
@@ -39,7 +40,9 @@
 
 ## Reading the green
 
-Small dark arrows on each green point **downhill** — longer arrow = steeper slope. They come from USGS 3m elevation data, so treat them as the broad break (the overall tilt and big slopes), not subtle 6-inch reads. Together with the pale micro-contour lines, uphill/downhill putts and general break direction should be readable at a glance. Arrows hide in SAT view.
+Tap **GRN** (on the map, next to SAT/3D) to zoom to the green complex. Up close you get fall-line arrows: small dark arrows pointing **downhill**, longer = steeper, plus the pale micro-contour lines and your ball if you're on or near the green. Tap GRN again — or change holes — to jump back to the whole hole.
+
+The arrows come from USGS 3m elevation data, so treat them as the broad break (overall tilt and big shelves), not subtle 6-inch reads. They only appear in GRN view and hide in SAT.
 
 ## Scorecard
 
