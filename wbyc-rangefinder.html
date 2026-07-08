@@ -237,7 +237,7 @@
 
 <div id="scorecard">
   <div id="scbar"><span id="scTitle">SCORECARD</span>
-    <span><button id="scClubs">CLUBS</button><button id="scPost" title="Copy hole-by-hole scores and open GHIN">POST</button><button id="scNew">NEW ROUND</button><button id="scClose">CLOSE ✕</button></span></div>
+    <span><button id="scStats">STATS</button><button id="scClubs">CLUBS</button><button id="scPost" title="Copy hole-by-hole scores and open GHIN">POST</button><button id="scNew" title="Bank this round to your history and start fresh">NEW</button><button id="scClose">✕</button></span></div>
   <div id="sctab"></div>
   <div id="scstats"></div>
 </div>
@@ -470,6 +470,14 @@ function suggestClub(distYds){ // closest learned median within 25 yds, needs >=
 
 /* ============ SCORECARD ============ */
 const blankCard=()=>({start:new Date().toISOString().slice(0,10), holes:Array.from({length:18},()=>({s:0,p:0,f:null}))});
+let rounds=[]; try{ rounds=JSON.parse(localStorage.getItem('wbyc_rounds'))||[]; }catch(e){}
+const saveRounds=()=>localStorage.setItem('wbyc_rounds', JSON.stringify(rounds));
+function archiveRound(){ // bank the current card into history (called before NEW ROUND clears it)
+  const t=cardTotals(); if(!t.n) return;
+  rounds.push({date:card.start, tee, n:t.n, s:t.s, par:t.par, p:t.p, fwH:t.fwH, fwT:t.fwT, gir:t.gir,
+               holes:card.holes.map(e=>({s:e.s,p:e.p,f:e.f}))});
+  saveRounds();
+}
 let card=blankCard();
 try{ const c=JSON.parse(localStorage.getItem('wbyc_card')); if(c&&c.holes&&c.holes.length===18) card=c; }catch(e){}
 const saveCard=()=>localStorage.setItem('wbyc_card', JSON.stringify(card));
@@ -528,6 +536,32 @@ function renderClubs(){
     +'</table>';
   const tot=shotDists().length;
   $('scstats').textContent=tot?`${tot} tracked shots, all rounds · medians feed the club hint under CENTER`:'distances learn from your SHOT marks';
+}
+function renderStats(){
+  const full=rounds.filter(r=>r.n===18);
+  let html='';
+  if(rounds.length>=2){ // vs-par trend, last 10 rounds (9-hole rounds normalized)
+    const pts=rounds.slice(-10).map(r=>(r.s-r.par)*(r.n?18/r.n:1));
+    const mn=Math.min(...pts), spn=Math.max(Math.max(...pts)-mn,1), W=260, H=40;
+    const xy=pts.map((v,i)=>[(i/(pts.length-1)*W).toFixed(0), (H-4-(v-mn)/spn*(H-8)).toFixed(0)]);
+    html+=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:340px;height:44px;display:block;margin:0 auto 8px">`
+      +`<polyline points="${xy.map(q=>q.join(',')).join(' ')}" fill="none" stroke="var(--accent2)" stroke-width="2" opacity=".9"/>`
+      +xy.map(q=>`<circle cx="${q[0]}" cy="${q[1]}" r="2.5" fill="var(--accent2)"/>`).join('')+'</svg>';
+  }
+  const row=r=>`<tr><td>${r.date}</td><td>${r.tee}</td>`
+    +`<td>${r.s}${r.n===18?` <small>${fmtDiff(r.s-r.par)}</small>`:` <small>(${r.n}h)</small>`}</td>`
+    +`<td>${r.p||''}</td><td>${r.fwT?Math.round(100*r.fwH/r.fwT)+'%':''}</td><td>${r.gir||''}</td></tr>`;
+  html+='<table><tr><th>DATE</th><th>TEE</th><th>SCORE</th><th>PUTTS</th><th>FW</th><th>GIR</th></tr>'
+    +(rounds.length ? rounds.slice().reverse().slice(0,20).map(row).join('')
+                    : '<tr><td colspan="6" style="text-align:center;color:var(--dim)">no rounds banked yet — finish a round, then tap NEW to save it here</td></tr>')
+    +'</table>';
+  $('sctab').innerHTML=html;
+  if(full.length){
+    const best=full.reduce((a,r)=>(r.s-r.par)<(a.s-a.par)?r:a);
+    const l5=full.slice(-5), av=k=>l5.reduce((s2,r)=>s2+r[k],0)/l5.length;
+    $('scstats').textContent=`${rounds.length} round${rounds.length>1?'s':''} · best ${best.s} (${fmtDiff(best.s-best.par)}) ${best.date}`
+      +` · last ${l5.length}: avg ${av('s').toFixed(1)}, ${av('p').toFixed(1)} putts, GIR ${av('gir').toFixed(1)}`;
+  } else $('scstats').textContent = rounds.length ? 'averages & bests unlock with a full 18-hole round' : 'your game over time, banked automatically at NEW';
 }
 
 /* ============ RENDER ============ */
@@ -1258,11 +1292,13 @@ function init(data){
   $('scPp').onclick=()=>bump('p',1);  $('scPm').onclick=()=>bump('p',-1);
   $('fwBtn').onclick=()=>{ const e=card.holes[holeIdx]; e.f = e.f===null ? true : e.f===true ? false : null; saveCard(); renderScore(); };
   let scMode='card';
-  const scShow=()=>{ scMode==='clubs'?renderClubs():renderCard();
-    $('scTitle').textContent=scMode==='clubs'?'CLUB DISTANCES':'SCORECARD';
+  const scShow=()=>{
+    ({card:renderCard, clubs:renderClubs, stats:renderStats})[scMode]();
+    $('scTitle').textContent={card:'SCORECARD', clubs:'CLUB DISTANCES', stats:'YOUR GAME'}[scMode];
     $('scClubs').textContent=scMode==='clubs'?'CARD':'CLUBS';
-    $('scNew').style.display=scMode==='clubs'?'none':'';
-    $('scPost').style.display=scMode==='clubs'?'none':''; };
+    $('scStats').textContent=scMode==='stats'?'CARD':'STATS';
+    const off=scMode!=='card'?'none':'';
+    $('scNew').style.display=off; $('scPost').style.display=off; };
   // POST: copy hole-by-hole scores, open GHIN for manual posting (no credentials stored)
   $('scPost').onclick=async()=>{
     const t=cardTotals();
@@ -1279,7 +1315,8 @@ function init(data){
     if(typeof window.open==='function') window.open('https://www.ghin.com','_blank');
   };
   $('scTot').onclick=()=>{ scMode='card'; scShow(); $('scorecard').classList.add('open'); };
-  $('scClubs').onclick=()=>{ scMode=scMode==='card'?'clubs':'card'; scShow(); };
+  $('scClubs').onclick=()=>{ scMode=scMode==='clubs'?'card':'clubs'; scShow(); };
+  $('scStats').onclick=()=>{ scMode=scMode==='stats'?'card':'stats'; scShow(); };
   // SHOT tracking: club picker + mark button (long-press = undo)
   $('clubSel').innerHTML=CLUBS.map(c=>`<option${c===curClub?' selected':''}>${c}</option>`).join('');
   $('clubSel').onchange=e=>{ curClub=e.target.value; localStorage.setItem('wbyc_club',curClub); render(); };
@@ -1289,7 +1326,7 @@ function init(data){
   sb.addEventListener('pointerdown',()=>{ slpTimer=setTimeout(()=>{ slpFired=true; undoShot(); },550); });
   ['pointerup','pointerleave','pointercancel'].forEach(ev=>sb.addEventListener(ev,()=>clearTimeout(slpTimer)));
   $('scClose').onclick=()=>$('scorecard').classList.remove('open');
-  $('scNew').onclick=()=>{ if(confirm('Start a new round? The current card will be cleared.')){ card=blankCard(); saveCard(); renderCard(); renderScore(); } };
+  $('scNew').onclick=()=>{ if(confirm('Start a new round? This card will be saved to your history.')){ archiveRound(); card=blankCard(); saveCard(); scShow(); renderScore(); } };
   $('sctab').onclick=ev=>{ // tap a hole row to jump there
     const tr=ev.target && ev.target.closest ? ev.target.closest('tr[data-h]') : null;
     if(!tr) return;
