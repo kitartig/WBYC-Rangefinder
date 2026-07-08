@@ -128,6 +128,35 @@
   .hazrow .nums{font-variant-numeric:tabular-nums;color:var(--dim);font-size:13px}
   .hazrow .nums b{color:var(--text);font-size:15px;font-weight:700}
 
+  /* ---- running scorecard ---- */
+  #scstrip{display:flex;justify-content:space-between;align-items:center;gap:6px;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-bottom:10px}
+  #scstrip .grp{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--dim);letter-spacing:.5px}
+  #scstrip .grp b{font-size:17px;color:var(--text);min-width:22px;text-align:center;font-variant-numeric:tabular-nums}
+  #scstrip button{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:none;
+    color:var(--text);font-size:16px;font-weight:700;cursor:pointer;flex:none}
+  #fwBtn{width:auto !important;padding:0 8px;font-size:10px !important;letter-spacing:.5px}
+  #fwBtn.hit{color:var(--accent);border-color:var(--accent)}
+  #fwBtn.miss{color:var(--red);border-color:var(--red)}
+  #scTot{text-align:right;font-size:10px;color:var(--dim);cursor:pointer;line-height:1.45;flex:none}
+  #scTot b{color:var(--accent2);font-size:15px}
+  #scorecard{position:fixed;inset:0;background:var(--bg);z-index:60;display:none;flex-direction:column;padding:12px}
+  #scorecard.open{display:flex}
+  #scbar{display:flex;justify-content:space-between;align-items:center;padding:2px 2px 10px}
+  #scbar span{font-size:13px;font-weight:700;letter-spacing:.5px}
+  #scbar button{background:var(--card);border:1px solid var(--line);color:var(--text);border-radius:8px;
+    padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;margin-left:6px}
+  #sctab{flex:1;overflow-y:auto}
+  #sctab table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+  #sctab th,#sctab td{padding:5px 2px;text-align:center;border-bottom:1px solid var(--line)}
+  #sctab th{color:var(--dim);font-weight:600;font-size:10px;letter-spacing:.5px}
+  #sctab td:first-child,#sctab th:first-child{text-align:left;padding-left:6px}
+  #sctab td small{color:var(--dim);font-size:10px}
+  #sctab tr.cur td{color:var(--accent);font-weight:700}
+  #sctab tr.tot td{font-weight:700;border-top:2px solid var(--line)}
+  #sctab tr[data-h]{cursor:pointer}
+  #scstats{padding:10px 4px;font-size:11px;color:var(--dim);text-align:center}
+
   #gps{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--dim);padding:0 4px}
   #gps .dot{width:8px;height:8px;border-radius:50%;background:#666;display:inline-block;margin-right:6px}
   #gps .dot.ok{background:var(--accent)} #gps .dot.bad{background:var(--red)} #gps .dot.demo{background:var(--accent2)}
@@ -175,6 +204,13 @@
     <div id="maphint"></div>
   </div>
 
+  <div id="scstrip">
+    <span class="grp">SCORE <button id="scSm">−</button><b id="scS">·</b><button id="scSp">+</button></span>
+    <span class="grp">PUTTS <button id="scPm">−</button><b id="scP">·</b><button id="scPp">+</button></span>
+    <button id="fwBtn">FW ·</button>
+    <span id="scTot">card ▸<br><b id="scTotV">—</b> <span id="scThru"></span></span>
+  </div>
+
   <div class="panel">
     <h2>HAZARDS &amp; TARGETS <span style="float:right;font-weight:400">reach / carry (yds)</span></h2>
     <div id="hazList"></div>
@@ -190,6 +226,13 @@
   </div>
 
   <footer id="attribution"></footer>
+</div>
+
+<div id="scorecard">
+  <div id="scbar"><span>SCORECARD</span>
+    <span><button id="scNew">NEW ROUND</button><button id="scClose">CLOSE ✕</button></span></div>
+  <div id="sctab"></div>
+  <div id="scstats"></div>
 </div>
 
 <div id="threeD">
@@ -369,6 +412,59 @@ function detectHole(){
   if(bd<200 && best!==holeIdx){ holeIdx=best; }
 }
 
+/* ============ SCORECARD ============ */
+const blankCard=()=>({start:new Date().toISOString().slice(0,10), holes:Array.from({length:18},()=>({s:0,p:0,f:null}))});
+let card=blankCard();
+try{ const c=JSON.parse(localStorage.getItem('wbyc_card')); if(c&&c.holes&&c.holes.length===18) card=c; }catch(e){}
+const saveCard=()=>localStorage.setItem('wbyc_card', JSON.stringify(card));
+const holePar=h=> tee==='Red' ? h.par_women : h.par;
+const fmtDiff=d=> d===0 ? 'E' : (d>0?'+':'')+d;
+function cardTotals(){
+  let s=0,p=0,par=0,n=0,fwH=0,fwT=0,gir=0;
+  card.holes.forEach((e,i)=>{
+    if(e.s>0){
+      const hp=holePar(course.holes[i]);
+      s+=e.s; p+=e.p; par+=hp; n++;
+      if(hp>3){ fwT++; if(e.f===true) fwH++; }
+      if(e.s-e.p<=hp-2) gir++;
+    }
+  });
+  return {s,p,par,n,fwH,fwT,gir};
+}
+function renderScore(){
+  const e=card.holes[holeIdx];
+  $('scS').textContent=e.s||'·';
+  $('scP').textContent=e.p||'·';
+  const fb=$('fwBtn');
+  fb.style.visibility = holePar(hole())===3 ? 'hidden' : 'visible';
+  fb.textContent='FW '+(e.f===true?'✓':e.f===false?'✗':'·');
+  fb.className=e.f===true?'hit':e.f===false?'miss':'';
+  const t=cardTotals();
+  $('scTotV').textContent = t.n ? fmtDiff(t.s-t.par) : '—';
+  $('scThru').textContent = t.n ? `thru ${t.n}` : '';
+}
+function renderCard(){
+  const row=i=>{
+    const h=course.holes[i], e=card.holes[i], hp=holePar(h), d=e.s?e.s-hp:0;
+    return `<tr class="${i===holeIdx?'cur':''}" data-h="${i}"><td>${h.hole_number}</td><td>${hp}</td>`
+      +`<td>${e.s?e.s+(d?` <small>${d>0?'+':''}${d}</small>`:''):''}</td><td>${e.p||''}</td>`
+      +`<td>${hp===3?'—':e.f===true?'✓':e.f===false?'✗':''}</td></tr>`;
+  };
+  const half=(a,b,label)=>{
+    let s=0,p=0,par=0;
+    for(let i=a;i<b;i++){ par+=holePar(course.holes[i]); const e=card.holes[i]; if(e.s>0){s+=e.s;p+=e.p;} }
+    return `<tr class="tot"><td>${label}</td><td>${par}</td><td>${s||''}</td><td>${p||''}</td><td></td></tr>`;
+  };
+  let html='<table><tr><th>HOLE</th><th>PAR</th><th>SCORE</th><th>PUTTS</th><th>FW</th></tr>';
+  for(let i=0;i<9;i++) html+=row(i);  html+=half(0,9,'OUT');
+  for(let i=9;i<18;i++) html+=row(i); html+=half(9,18,'IN'); html+=half(0,18,'TOTAL');
+  $('sctab').innerHTML=html+'</table>';
+  const t=cardTotals();
+  $('scstats').textContent = t.n
+    ? `${t.n} holes · ${fmtDiff(t.s-t.par)} · ${t.p} putts · FW ${t.fwH}/${t.fwT} · GIR ${t.gir}`
+    : 'no scores yet — use the +/− strip on any hole · tap a row to jump there';
+}
+
 /* ============ RENDER ============ */
 function fmt(d){ return d==null ? '–' : String(Math.round(d)); }
 
@@ -413,6 +509,7 @@ function render(){
   }
   renderHazards(h,p,g);
   renderMap(h,p,tb);
+  renderScore();
 }
 
 function renderHazards(h,p,g){
@@ -1012,6 +1109,21 @@ function init(data){
   });
   ['pointerup','pointerleave','pointercancel'].forEach(ev=>wb.addEventListener(ev,()=>clearTimeout(wlpTimer)));
   windUI(); fetchWind(); setInterval(fetchWind, 15*60*1000);
+  // SCORECARD: +/− strip, FW cycle, full-card overlay
+  const bump=(k,d)=>{ const e=card.holes[holeIdx]; e[k]=Math.max(0,Math.min(15,(e[k]||0)+d)); saveCard(); renderScore(); };
+  $('scSp').onclick=()=>bump('s',1);  $('scSm').onclick=()=>bump('s',-1);
+  $('scPp').onclick=()=>bump('p',1);  $('scPm').onclick=()=>bump('p',-1);
+  $('fwBtn').onclick=()=>{ const e=card.holes[holeIdx]; e.f = e.f===null ? true : e.f===true ? false : null; saveCard(); renderScore(); };
+  $('scTot').onclick=()=>{ renderCard(); $('scorecard').classList.add('open'); };
+  $('scClose').onclick=()=>$('scorecard').classList.remove('open');
+  $('scNew').onclick=()=>{ if(confirm('Start a new round? The current card will be cleared.')){ card=blankCard(); saveCard(); renderCard(); renderScore(); } };
+  $('sctab').onclick=ev=>{ // tap a hole row to jump there
+    const tr=ev.target && ev.target.closest ? ev.target.closest('tr[data-h]') : null;
+    if(!tr) return;
+    autoHole=false; $('autoBtn').classList.remove('on');
+    holeIdx=+tr.dataset.h; snapDemo();
+    $('scorecard').classList.remove('open'); render();
+  };
   $('map').addEventListener('click',mapTap);
   // SAT + 3D controls
   if(!AERIALS) $('satBtn').style.display='none';
