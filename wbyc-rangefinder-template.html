@@ -795,7 +795,7 @@ function renderMap(h,p,tb){
     }
     if(arr){
       const ac = theme==='sun' ? '#0e6b34' : theme==='dream' ? '#06424d' : '#0d5c30';
-      s+=`<g class="fall" clip-path="url(#gclip)" fill="none" stroke="${ac}" stroke-width="0.55" opacity=".75" stroke-linecap="round" stroke-linejoin="round">${arr}</g>`;
+      s+=`<g class="fall" clip-path="url(#gclip)" fill="none" stroke="${ac}" stroke-width="0.28" opacity=".75" stroke-linecap="round" stroke-linejoin="round">${arr}</g>`;
     }
     }
   }
@@ -809,9 +809,9 @@ function renderMap(h,p,tb){
       const q=rot(tp);
       s+=`<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="${(2+i*0.8).toFixed(1)}" fill="var(--accent)" opacity="${((i+1)/trail.length*0.35).toFixed(2)}"/>`;
     });
-    s+=`<line x1="${pPt[0]}" y1="${pPt[1]}" x2="${cc[0]}" y2="${cc[1]}" stroke="var(--accent)" stroke-width="1.5" opacity=".8"/>`;
+    s+=`<line x1="${pPt[0]}" y1="${pPt[1]}" x2="${cc[0]}" y2="${cc[1]}" stroke="var(--accent)" stroke-width="${greenView?0.5:1.5}" opacity=".8"/>`;
     // "my ball": hot gold glow + pulsing gold halo + golf-ball dot (white with dimples)
-    const mk=greenView?0.38:1, mw=greenView?0.7:1; // shrink marker up close so the halo doesn't swallow the green
+    const mk=greenView?0.26:1, mw=greenView?0.5:1; // shrink marker up close so the halo doesn't swallow the green
     s+=`<circle class="you-glow" cx="${pPt[0]}" cy="${pPt[1]}" r="${(22*mk).toFixed(1)}" fill="url(#halograd)"/>`;
     s+=`<circle class="you-pulse" cx="${pPt[0]}" cy="${pPt[1]}" r="${(10*mk).toFixed(1)}" fill="none" stroke="#ffd21f" stroke-width="${(2.2*mw).toFixed(1)}"/>`;
     s+=`<circle cx="${pPt[0]}" cy="${pPt[1]}" r="${(6.5*mk).toFixed(1)}" fill="url(#ballgrad)" stroke="#f5b512" stroke-width="${(1.8*mw).toFixed(1)}"${theme==='dream'?' filter="url(#glow)"':''}/>`;
