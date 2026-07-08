@@ -237,7 +237,7 @@
 
 <div id="scorecard">
   <div id="scbar"><span id="scTitle">SCORECARD</span>
-    <span><button id="scClubs">CLUBS</button><button id="scNew">NEW ROUND</button><button id="scClose">CLOSE ✕</button></span></div>
+    <span><button id="scClubs">CLUBS</button><button id="scPost" title="Copy hole-by-hole scores and open GHIN">POST</button><button id="scNew">NEW ROUND</button><button id="scClose">CLOSE ✕</button></span></div>
   <div id="sctab"></div>
   <div id="scstats"></div>
 </div>
@@ -1261,7 +1261,23 @@ function init(data){
   const scShow=()=>{ scMode==='clubs'?renderClubs():renderCard();
     $('scTitle').textContent=scMode==='clubs'?'CLUB DISTANCES':'SCORECARD';
     $('scClubs').textContent=scMode==='clubs'?'CARD':'CLUBS';
-    $('scNew').style.display=scMode==='clubs'?'none':''; };
+    $('scNew').style.display=scMode==='clubs'?'none':'';
+    $('scPost').style.display=scMode==='clubs'?'none':''; };
+  // POST: copy hole-by-hole scores, open GHIN for manual posting (no credentials stored)
+  $('scPost').onclick=async()=>{
+    const t=cardTotals();
+    if(!t.n){ $('scstats').textContent='nothing to post yet — enter some scores first'; return; }
+    let out=0, inn=0;
+    const hbh=card.holes.map((e,i)=>{ if(e.s){ if(i<9) out+=e.s; else inn+=e.s; } return e.s||'-'; });
+    const txt=`WBYC ${card.start} (${tee} tees) — Out ${out} In ${inn} Total ${t.s}`
+      +(t.n<18?` (${t.n}/18 holes)`:'')
+      +`\nHBH: ${hbh.slice(0,9).join(' ')} | ${hbh.slice(9).join(' ')}`;
+    let copied=false;
+    try{ if(navigator.clipboard){ await navigator.clipboard.writeText(txt); copied=true; } }catch(e){}
+    if(!copied && typeof prompt==='function') prompt('Copy your scores for GHIN:', txt);
+    $('scstats').textContent = copied ? 'scores copied — paste into GHIN hole-by-hole posting' : 'copy the scores above, then post on ghin.com';
+    if(typeof window.open==='function') window.open('https://www.ghin.com','_blank');
+  };
   $('scTot').onclick=()=>{ scMode='card'; scShow(); $('scorecard').classList.add('open'); };
   $('scClubs').onclick=()=>{ scMode=scMode==='card'?'clubs':'card'; scShow(); };
   // SHOT tracking: club picker + mark button (long-press = undo)
