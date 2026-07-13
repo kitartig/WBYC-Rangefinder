@@ -818,7 +818,14 @@ function renderMap(h,p,tb){
   // hypsometric tint: always rendered (sits under the photo in SAT so extended margins stay complete)
   if(TOPO){
     try{
-      const cw=180, chh=Math.max(60, Math.round(180*ht/w));
+      // sharper tint: DPR-scaled raster (extra resolution in green view), cached per frame
+      const tintKey=[h.hole_number,theme,greenView?1:0,minX.toFixed(1),minY.toFixed(1),w.toFixed(1),ht.toFixed(1)].join('|');
+      if(renderMap._tk===tintKey && renderMap._turl){
+        s+=`<image href="${renderMap._turl}" x="${minX.toFixed(1)}" y="${minY.toFixed(1)}" width="${w.toFixed(1)}" height="${ht.toFixed(1)}" preserveAspectRatio="none"/>`;
+      } else {
+      const dprT=(typeof window!=='undefined'&&window.devicePixelRatio)||1;
+      const cw=greenView?380:Math.min(380,Math.max(200,Math.round(180*Math.min(2.1,dprT))));
+      const chh=Math.max(60, Math.round(cw*ht/w));
       const cv=document.createElement('canvas'); cv.width=cw; cv.height=chh;
       const ctx=cv.getContext('2d'), img=ctx.createImageData(cw,chh);
       const es=new Float32Array(cw*chh); let lo=Infinity, hi=-Infinity;
@@ -858,7 +865,9 @@ function renderMap(h,p,tb){
         img.data[i*4+3]=255;
       }
       ctx.putImageData(img,0,0);
-      s+=`<image href="${cv.toDataURL()}" x="${minX.toFixed(1)}" y="${minY.toFixed(1)}" width="${w.toFixed(1)}" height="${ht.toFixed(1)}" preserveAspectRatio="none"/>`;
+      renderMap._tk=tintKey; renderMap._turl=cv.toDataURL();
+      s+=`<image href="${renderMap._turl}" x="${minX.toFixed(1)}" y="${minY.toFixed(1)}" width="${w.toFixed(1)}" height="${ht.toFixed(1)}" preserveAspectRatio="none"/>`;
+      }
     }catch(e){/* no canvas (e.g. tests) — skip tint */}
   }
   // aerial photo base layer (NAIP, public domain) — affine-transformed over the tint
@@ -1248,6 +1257,33 @@ function draw3D(){
         ctx.beginPath(); ctx.arc(hd[0],hd[1],4+age*14,0,6.2832); ctx.stroke();
       }
     }
+    // small yardage stats pinned near the apex (fade in past mid-flight, persist after)
+    if(tr.stats && k>0.45){
+      const ap=proj(tr.pts[tr.apexI]);
+      const al=Math.min(1,(k-0.45)/0.4);
+      const right=ap[0]>cw*0.6;
+      ctx.textAlign=right?'right':'left';
+      const tx=ap[0]+(right?-12:12);
+      const l2=[];
+      if(tr.stats.plays!==tr.stats.yds) l2.push('plays '+tr.stats.plays);
+      if(tr.stats.dFt) l2.push((tr.stats.dFt>0?'+':'')+tr.stats.dFt+' ft');
+      if(tr.stats.wYd) l2.push('wind '+(tr.stats.wYd>0?'+':'')+tr.stats.wYd);
+      if(tr.stats.club) l2.push(tr.stats.club);
+      const halo=sunMode?`rgba(255,255,255,${(al*.8).toFixed(2)})`:`rgba(8,12,18,${(al*.75).toFixed(2)})`;
+      ctx.lineWidth=3; ctx.lineJoin='round';
+      ctx.font='700 13px system-ui,sans-serif';
+      ctx.strokeStyle=halo;
+      ctx.strokeText(tr.stats.yds+' yds', tx, ap[1]-6);
+      ctx.fillStyle=sunMode?`rgba(190,0,150,${al.toFixed(2)})`:`rgba(255,165,235,${al.toFixed(2)})`;
+      ctx.fillText(tr.stats.yds+' yds', tx, ap[1]-6);
+      ctx.font='600 10px system-ui,sans-serif';
+      const l2s=l2.join(' · '), l3='apex '+tr.stats.apexFt+' ft';
+      ctx.fillStyle=sunMode?`rgba(45,45,55,${al.toFixed(2)})`:`rgba(232,238,246,${al.toFixed(2)})`;
+      if(l2s){ ctx.strokeText(l2s, tx, ap[1]+8); ctx.fillText(l2s, tx, ap[1]+8); }
+      ctx.strokeText(l3, tx, ap[1]+(l2s?21:8));
+      ctx.fillText(l3, tx, ap[1]+(l2s?21:8));
+      ctx.textAlign='left';
+    }
   }
 }
 function open3D(){
@@ -1299,8 +1335,19 @@ function startTracer(h){
     const t=i/48, d2=t*t;
     pts.push([a[0]+dx*t+cwx*d2, a[1]+dy*t+cwy*d2, a[2]+(b[2]-a[2])*t+apx*arcZ(t)]);
   }
+  let apexI=24, bestH=-1; // highest point of the lift profile, for stat placement
+  for(let i=0;i<=48;i++){ const hh=apx*arcZ(i/48); if(hh>bestH){ bestH=hh; apexI=i; } }
+  // flight stats: same math as the plays-like readout, pinned to the arc
+  const dcY=yds(from,c);
+  let adj=dcY, dFt=0;
+  if(elevAdjust){ const pe=elevFt(from), ge=elevFt(c);
+    if(pe!==null && ge!==null){ dFt=Math.round(ge-pe); adj+=dFt/3; } }
+  const wYd=Math.round(windYds(from,c,dcY)); adj+=wYd;
+  const sug=suggestClub(Math.round(adj));
+  const stats={yds:Math.round(dcY), plays:Math.round(adj), dFt, wYd,
+               club:sug?sug.club:null, apexFt:Math.round(apx/0.3048)};
   const t0=(typeof performance!=='undefined'?performance.now():Date.now());
-  D3.tracer={pts, t0, dur:900+dm*2.2};
+  D3.tracer={pts, t0, dur:900+dm*2.2, apexI, stats};
   const loop=()=>{ if(!D3.open||!D3.tracer) return;
     const el2=(typeof performance!=='undefined'?performance.now():Date.now())-t0;
     draw3D();
