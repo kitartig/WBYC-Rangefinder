@@ -123,6 +123,10 @@
   #d3hint{text-align:center;font-size:10px;color:var(--dim);padding:8px}
   #map{display:block;width:100%;height:auto;max-height:66vh;margin:0 auto;touch-action:manipulation}
   #maphint{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:10px;color:var(--dim);pointer-events:none}
+  #profile{display:none;background:var(--card);border-radius:10px;margin:8px 0 2px;padding:6px 8px 3px}
+  #profile.on{display:block}
+  #profile svg{width:100%;display:block}
+  .dist .box.center{cursor:pointer}
 
   .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}
   .panel h2{font-size:11px;color:var(--dim);letter-spacing:1px;font-weight:600;margin-bottom:6px}
@@ -211,6 +215,8 @@
     <div id="maphint"></div>
   </div>
 
+  <div id="profile"></div>
+
   <div id="scstrip">
     <span class="grp">SCORE <button id="scSm">−</button><b id="scS">·</b><button id="scSp">+</button></span>
     <span class="grp">PUTTS <button id="scPm">−</button><b id="scP">·</b><button id="scPp">+</button></span>
@@ -246,6 +252,7 @@
   <div id="threeDbar"><span id="d3Title"></span>
     <span style="display:flex;align-items:center;gap:8px;font-size:10px;color:var(--dim)">EXAG
       <input id="d3ex" type="range" min="1" max="10" step="0.1" value="1.6">
+      <button id="d3Trace" title="Replay the ball flight">TRACE</button>
       <button id="d3Close">CLOSE ✕</button>
     </span>
   </div>
@@ -334,6 +341,11 @@ function brg(a,b){ // compass bearing a→b, flat-earth approx (fine at course s
   const dx=(b.lng-a.lng)*Math.cos((a.lat+b.lat)*Math.PI/360), dy=b.lat-a.lat;
   return (Math.atan2(dx,dy)*180/Math.PI+360)%360;
 }
+/* ---- ball-flight trajectory (shared by the map arc, profile inset, and 3D tracer) ---- */
+const TRACER={main:'#8fabe0', bright:'#dce8fb'}; // light navy
+function arcZ(t){ const u=Math.pow(t,1.25); return 4*u*(1-u); } // lift profile: apex past halfway, steeper descent
+function apexM(dm){ return Math.min(38, 6+dm*0.14); } // apex height (m) for a carry of dm meters
+
 function windYds(p,target,dist){ // adjustment in yds; + = plays longer. ~1%/mph headwind, ~0.5%/mph tailwind
   if(!windAdjust || !wind.src || wind.spd<1 || wind.dir===null) return 0;
   const hw = wind.spd*Math.cos((wind.dir-brg(p,target))*Math.PI/180); // + = headwind component
@@ -614,6 +626,7 @@ function render(){
   }
   renderHazards(h,p,g);
   renderMap(h,p,tb);
+  renderProfile(h,p);
   renderScore();
 }
 
@@ -640,6 +653,61 @@ function renderHazards(h,p,g){
   rows.push({sort:1e9, html:
     `<span>Green depth</span><span class="nums"><b>${g.depth_yds}</b> yds</span>`});
   $('hazList').innerHTML = rows.map(r=>`<div class="hazrow">${r.html}</div>`).join('');
+}
+
+/* ---- flight profile inset: terrain cross-section + trajectory (tap CENTER to toggle) ---- */
+let profOn = localStorage.getItem('wbyc_prof')==='on';
+function renderProfile(h,p){
+  const el=$('profile');
+  const hide=()=>{ el.classList.remove('on'); el.innerHTML=''; };
+  if(!profOn || !p || !TOPO){ hide(); return; }
+  const c=h.green.center, dTot=yds(p,c);
+  if(dTot<12){ hide(); return; }
+  const N=44, es=[];
+  for(let i=0;i<=N;i++){
+    const t=i/N;
+    es.push(elevFt({lat:p.lat+(c.lat-p.lat)*t, lng:p.lng+(c.lng-p.lng)*t}));
+  }
+  if(es[0]===null || es[N]===null){ hide(); return; }
+  for(let i=1;i<N;i++) if(es[i]===null){ // bridge interior gaps in the grid
+    let j=i+1; while(j<N && es[j]===null) j++;
+    for(let k2=i;k2<j;k2++) es[k2]=es[i-1]+(es[j]-es[i-1])*(k2-i+1)/(j-i+1);
+    i=j;
+  }
+  const dm=dTot*0.9144, apxFt=apexM(dm)/0.3048;
+  const arcAt=t=>es[0]+(es[N]-es[0])*t + apxFt*arcZ(t);
+  let lo=Infinity, hi=-Infinity;
+  for(let i=0;i<=N;i++){
+    if(es[i]<lo)lo=es[i]; if(es[i]>hi)hi=es[i];
+    const az2=arcAt(i/N); if(az2>hi)hi=az2;
+  }
+  const W=340,H=72,pt2=10,pb=8;
+  const sy=(H-pt2-pb)/Math.max(hi-lo,6);
+  const X=i=>(i/N*W).toFixed(1), Y=v=>(H-pb-(v-lo)*sy).toFixed(1);
+  let terr='M0 '+H;
+  for(let i=0;i<=N;i++) terr+=`L${X(i)} ${Y(es[i])}`;
+  terr+=`L${W} ${H}Z`;
+  // green surface span along the line of play
+  const dF=yds(p,h.green.front), dB=yds(p,h.green.back);
+  const t0g=Math.max(0,Math.min(dF,dB)/dTot), t1g=Math.min(1,Math.max(dF,dB)/dTot);
+  let gseg='';
+  for(let i=Math.ceil(t0g*N); i<=Math.floor(t1g*N); i++) gseg+=(gseg?'L':'M')+X(i)+' '+Y(es[i]);
+  let arc='';
+  for(let i=0;i<=N;i++) arc+=(i?'L':'M')+X(i)+' '+Y(arcAt(i/N));
+  const dFt=Math.round(es[N]-es[0]);
+  const pinY=+Y(es[N]);
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:${H}px">`
+    +`<path class="pterr" d="${terr}" fill="var(--topo)" fill-opacity=".28" stroke="var(--topo-index)" stroke-width="1" stroke-opacity=".6"/>`
+    +(gseg?`<path d="${gseg}" fill="none" stroke="var(--green-stroke)" stroke-width="2.4" opacity=".9"/>`:'')
+    +`<path class="parc" d="${arc}" fill="none" stroke="${TRACER.main}" stroke-width="3" opacity=".25"/>`
+    +`<path d="${arc}" fill="none" stroke="${TRACER.bright}" stroke-width="1.3" opacity=".95"/>`
+    +`<circle cx="3" cy="${Y(es[0])}" r="2.6" fill="#fff" stroke="#f5b512" stroke-width="1"/>`
+    +`<line x1="${W-2}" y1="${pinY}" x2="${W-2}" y2="${pinY-13}" stroke="var(--fcb)" stroke-width="1.2"/>`
+    +`<path d="M${W-2} ${pinY-13}L${W-9} ${pinY-10.5}L${W-2} ${pinY-8}Z" fill="var(--fcb)"/>`
+    +`<text x="4" y="9" font-size="8" fill="var(--dim)">${Math.round(dTot)} yds</text>`
+    +`<text x="${W-4}" y="9" text-anchor="end" font-size="8" fill="var(--dim)">${dFt>=0?'+':''}${dFt} ft</text>`
+    +'</svg>';
+  el.classList.add('on');
 }
 
 /* ---- SVG map ---- */
@@ -937,7 +1005,24 @@ function renderMap(h,p,tb){
       const q=rot(tp);
       s+=`<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="${(2+i*0.8).toFixed(1)}" fill="var(--accent)" opacity="${((i+1)/trail.length*0.35).toFixed(2)}"/>`;
     });
-    s+=`<line x1="${pPt[0]}" y1="${pPt[1]}" x2="${cc[0]}" y2="${cc[1]}" stroke="var(--accent)" stroke-width="${greenView?0.28:1.5}" opacity=".8"/>`;
+    // ground line player → center; in hole view it doubles as the flight arc's shadow
+    s+=`<line x1="${pPt[0]}" y1="${pPt[1]}" x2="${cc[0]}" y2="${cc[1]}" stroke="var(--accent)" stroke-width="${greenView?0.28:1.5}" opacity="${greenView?'.8':'.45'}"/>`;
+    if(!greenView){ // pseudo-3D flight arc: bows off the ground line, apex leader ties it back down
+      const fdx=cc[0]-pPt[0], fdy=cc[1]-pPt[1], fdl=Math.hypot(fdx,fdy);
+      if(fdl>30){
+        const fpx=-fdy/fdl, fpy=fdx/fdl;
+        const fmx=(pPt[0]+cc[0])/2, fmy=(pPt[1]+cc[1])/2;
+        const sgn=((minX+w/2-fmx)*fpx+(minY+ht/2-fmy)*fpy)>=0?1:-1; // bow toward frame center so it never clips
+        const off=sgn*Math.min(fdl*0.16, w*0.22);
+        const qx=fmx+fpx*off, qy=fmy+fpy*off, apx2=fmx+fpx*off/2, apy2=fmy+fpy*off/2;
+        const fd=`M${pPt[0].toFixed(1)} ${pPt[1].toFixed(1)}Q${qx.toFixed(1)} ${qy.toFixed(1)} ${cc[0].toFixed(1)} ${cc[1].toFixed(1)}`;
+        s+=`<linearGradient id="arcgrad" gradientUnits="userSpaceOnUse" x1="${pPt[0].toFixed(1)}" y1="${pPt[1].toFixed(1)}" x2="${cc[0].toFixed(1)}" y2="${cc[1].toFixed(1)}"><stop offset="0%" stop-color="${TRACER.main}" stop-opacity=".2"/><stop offset="50%" stop-color="${TRACER.bright}" stop-opacity=".95"/><stop offset="100%" stop-color="${TRACER.main}" stop-opacity=".3"/></linearGradient>`
+          +`<path class="flight" d="${fd}" fill="none" stroke="${TRACER.main}" stroke-width="2.6" opacity=".26"/>`
+          +`<path class="flight" d="${fd}" fill="none" stroke="url(#arcgrad)" stroke-width="1.2"/>`
+          +`<line x1="${apx2.toFixed(1)}" y1="${apy2.toFixed(1)}" x2="${fmx.toFixed(1)}" y2="${fmy.toFixed(1)}" stroke="${TRACER.main}" stroke-width=".5" stroke-dasharray="1.5 2" opacity=".55"/>`
+          +`<circle class="flight-apex" cx="${apx2.toFixed(1)}" cy="${apy2.toFixed(1)}" r="1.7" fill="${TRACER.bright}"/>`;
+      }
+    }
     // "my ball": hot gold glow + pulsing gold halo + golf-ball dot (white with dimples)
     const mk=greenView?0.21:1, mw=greenView?0.42:1; // shrink marker up close so the halo doesn't swallow the green
     s+=`<circle class="you-glow" cx="${pPt[0]}" cy="${pPt[1]}" r="${(22*mk).toFixed(1)}" fill="url(#halograd)"/>`;
@@ -1031,7 +1116,11 @@ function build3D(h){
     for(let i=0;i<cls.length;i++) if(cls[i]===1){
       const d=Math.hypot(verts[i][0]-gC[0],verts[i][1]-gC[1]); if(d>gR)gR=d; } }
   return {NX,NY,verts,zs,cls,frs,zlo,zhi,cdf:cdf3,gPoly:h.green.polygon,radius:Math.hypot(W,H)/2,
-          gC,gR,hasWater:cls.includes(3)};
+          gC,gR,hasWater:cls.includes(3),
+          // lat/lng → mesh world coords (meters, z relative to zmid) for overlays like the tracer
+          toWorld:(ll,zFt)=>{ const q=rot(ll); const e=(zFt!=null)?zFt:elevFt(ll);
+            return [q[0]-(minX+W/2), q[1]-(minY+H/2), ((e==null?zmid:e)-zmid)*0.3048]; },
+          rotV:(ex,ny)=>[ex*cos-ny*sin, ex*sin+ny*cos]};
 }
 function draw3D(){
   const m=D3.mesh; if(!m) return;
@@ -1133,6 +1222,33 @@ function draw3D(){
     ctx.beginPath(); ctx.moveTo(t[0],t[1]); ctx.lineTo(t[0]+13,t[1]+4); ctx.lineTo(t[0],t[1]+8);
     ctx.closePath(); ctx.fill();
   }
+  // TV-style tracer: light-navy ball flight, animated draw-on with comet head + landing pulse
+  if(D3.tracer){
+    const now=(typeof performance!=='undefined'?performance.now():Date.now());
+    const tr=D3.tracer, k=Math.min(1,(now-tr.t0)/tr.dur);
+    const ease=1-Math.pow(1-k,2.2);
+    const n=Math.max(2,Math.round(tr.pts.length*ease));
+    const Q=[]; for(let i=0;i<n;i++) Q.push(proj(tr.pts[i]));
+    ctx.lineJoin='round'; ctx.lineCap='round';
+    for(const wc of [[5,'rgba(125,158,220,.30)'],[1.8,'#c9dbf7']]){
+      ctx.strokeStyle=wc[1]; ctx.lineWidth=wc[0];
+      ctx.beginPath(); ctx.moveTo(Q[0][0],Q[0][1]);
+      for(let i=1;i<Q.length;i++) ctx.lineTo(Q[i][0],Q[i][1]);
+      ctx.stroke();
+    }
+    const hd=Q[Q.length-1];
+    if(k<1){ // comet head
+      ctx.fillStyle='#eaf2ff';
+      ctx.beginPath(); ctx.arc(hd[0],hd[1],3,0,6.2832); ctx.fill();
+    } else { // landing pulse
+      const age=(now-tr.t0-tr.dur)/900;
+      if(age<1){
+        ctx.strokeStyle=`rgba(160,190,240,${(0.7*(1-age)).toFixed(2)})`;
+        ctx.lineWidth=1.6;
+        ctx.beginPath(); ctx.arc(hd[0],hd[1],4+age*14,0,6.2832); ctx.stroke();
+      }
+    }
+  }
 }
 function open3D(){
   const h=hole();
@@ -1150,6 +1266,7 @@ function open3D(){
   $('threeD').classList.add('open');
   D3.open=true;
   requestAnimationFrame(draw3D);
+  startTracer(h);
   if(D3.mesh.hasWater){ // gentle shimmer loop (~18 fps), only on holes with water
     D3.lastT=0;
     const loop=ts=>{ if(!D3.open) return;
@@ -1158,7 +1275,39 @@ function open3D(){
     requestAnimationFrame(loop);
   }
 }
-function close3D(){ $('threeD').classList.remove('open'); D3.open=false; D3.mesh=null; }
+function close3D(){ $('threeD').classList.remove('open'); D3.open=false; D3.mesh=null; D3.tracer=null; }
+function startTracer(h){
+  D3.tracer=null;
+  const m=D3.mesh; if(!m||!m.toWorld) return;
+  const p=playerPos(), c=h.green.center, tb=teeBox(h);
+  const holeLen=yds({lat:tb.lat,lng:tb.lng},c);
+  const from=(p && yds(p,c)<holeLen*1.6+120)?p:tb; // your ball if you're on the hole, else the tee
+  const a=m.toWorld(from), b=D3.flagWorld||m.toWorld(c);
+  const dx=b[0]-a[0], dy=b[1]-a[1], dm=Math.hypot(dx,dy);
+  if(dm<15) return; // already on the green — nothing to trace
+  const apx=apexM(dm);
+  let cwx=0, cwy=0; // crosswind drift, grows late in flight
+  if(windAdjust && wind.src && wind.spd>=1 && wind.dir!==null){
+    const br=(wind.dir+180)*Math.PI/180;            // blowing-to bearing
+    const wv=m.rotV(Math.sin(br), Math.cos(br));    // into the hole frame
+    const px=-dy/dm, py=dx/dm;
+    const drift=(wv[0]*px+wv[1]*py)*Math.min(wind.spd,30)*0.35; // meters, capped
+    cwx=px*drift; cwy=py*drift;
+  }
+  const pts=[];
+  for(let i=0;i<=48;i++){
+    const t=i/48, d2=t*t;
+    pts.push([a[0]+dx*t+cwx*d2, a[1]+dy*t+cwy*d2, a[2]+(b[2]-a[2])*t+apx*arcZ(t)]);
+  }
+  const t0=(typeof performance!=='undefined'?performance.now():Date.now());
+  D3.tracer={pts, t0, dur:900+dm*2.2};
+  const loop=()=>{ if(!D3.open||!D3.tracer) return;
+    const el2=(typeof performance!=='undefined'?performance.now():Date.now())-t0;
+    draw3D();
+    if(el2<D3.tracer.dur+950) requestAnimationFrame(loop); // linger for the landing pulse
+  };
+  requestAnimationFrame(loop);
+}
 function wire3D(){
   const cv=$('d3c');
   let drag=null, pinch=null;
@@ -1183,6 +1332,7 @@ function wire3D(){
     D3.zoom=Math.max(0.5,Math.min(3,D3.zoom*d/pinch)); pinch=d;
     requestAnimationFrame(draw3D); } },{passive:true});
   $('d3Close').onclick=close3D;
+  $('d3Trace').onclick=()=>{ if(D3.open) startTracer(hole()); };
   $('d3ex').addEventListener('input',e=>{ D3.ex=+e.target.value; requestAnimationFrame(draw3D); });
   window.addEventListener('resize',()=>{ if(D3.open) requestAnimationFrame(draw3D); });
 }
@@ -1236,6 +1386,10 @@ function init(data){
   $('autoBtn').onclick=()=>{autoHole=!autoHole;$('autoBtn').classList.toggle('on',autoHole);if(autoHole){detectHole();render();}};
   $('autoBtn').classList.toggle('on',autoHole);
   $('demoBtn').onclick=()=>setDemo(!demo);
+  // flight profile inset: tap the CENTER box to toggle
+  const cbx=document.querySelector('.dist .box.center');
+  if(cbx){ cbx.title='tap: side-profile of the shot';
+    cbx.onclick=()=>{ profOn=!profOn; localStorage.setItem('wbyc_prof', profOn?'on':'off'); render(); }; }
   const eb=$('elevBtn');
   eb.classList.toggle('on', elevAdjust && !!TOPO);
   if(!TOPO) eb.style.display='none';
