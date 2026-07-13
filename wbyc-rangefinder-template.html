@@ -342,7 +342,7 @@ function brg(a,b){ // compass bearing a→b, flat-earth approx (fine at course s
   return (Math.atan2(dx,dy)*180/Math.PI+360)%360;
 }
 /* ---- ball-flight trajectory (shared by the map arc, profile inset, and 3D tracer) ---- */
-const TRACER={main:'#8fabe0', bright:'#dce8fb'}; // light navy
+const TRACER={main:'#ff1fd4', bright:'#ffc9f3'}; // neon hot pink
 function arcZ(t){ const u=Math.pow(t,1.25); return 4*u*(1-u); } // lift profile: apex past halfway, steeper descent
 function apexM(dm){ return Math.min(38, 6+dm*0.14); } // apex height (m) for a carry of dm meters
 
@@ -1230,7 +1230,7 @@ function draw3D(){
     const n=Math.max(2,Math.round(tr.pts.length*ease));
     const Q=[]; for(let i=0;i<n;i++) Q.push(proj(tr.pts[i]));
     ctx.lineJoin='round'; ctx.lineCap='round';
-    for(const wc of [[5,'rgba(125,158,220,.30)'],[1.8,'#c9dbf7']]){
+    for(const wc of [[5,'rgba(255,31,212,.32)'],[1.8,'#ffaef0']]){
       ctx.strokeStyle=wc[1]; ctx.lineWidth=wc[0];
       ctx.beginPath(); ctx.moveTo(Q[0][0],Q[0][1]);
       for(let i=1;i<Q.length;i++) ctx.lineTo(Q[i][0],Q[i][1]);
@@ -1238,12 +1238,12 @@ function draw3D(){
     }
     const hd=Q[Q.length-1];
     if(k<1){ // comet head
-      ctx.fillStyle='#eaf2ff';
+      ctx.fillStyle='#ffe4fa';
       ctx.beginPath(); ctx.arc(hd[0],hd[1],3,0,6.2832); ctx.fill();
     } else { // landing pulse
       const age=(now-tr.t0-tr.dur)/900;
       if(age<1){
-        ctx.strokeStyle=`rgba(160,190,240,${(0.7*(1-age)).toFixed(2)})`;
+        ctx.strokeStyle=`rgba(255,110,228,${(0.7*(1-age)).toFixed(2)})`;
         ctx.lineWidth=1.6;
         ctx.beginPath(); ctx.arc(hd[0],hd[1],4+age*14,0,6.2832); ctx.stroke();
       }
