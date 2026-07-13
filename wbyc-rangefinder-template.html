@@ -14,8 +14,8 @@
     --bg:#0e1512; --card:#17211c; --card2:#1d2a23; --line:#2b3a31;
     --text:#e8f0ea; --dim:#8fa398; --accent:#7dd87d; --accent2:#e8c468;
     --blue:#5b9bd5; --white-tee:#e8f0ea; --gold:#f1c40f; --red:#fb637e;
-    --water:#3a6ea5; --sand:#f0dfb8; --green-fill:#3ecf7a;
-    --cl:#4a5c51; --green-stroke:#7eec9e; --fcb:#cfe8d5; --chiptext:#0e1512;
+    --water:#3a6ea5; --sand:#f0dfb8; --green-fill:#1fee75;
+    --cl:#4a5c51; --green-stroke:#6bff96; --fcb:#cfe8d5; --chiptext:#0e1512;
     --topo:#4db3f5; --topo-index:#8ad4ff;
   }
   /* SUN MODE — max contrast for direct sunlight */
@@ -23,8 +23,8 @@
     --bg:#f7f5f0; --card:#ffffff; --card2:#e9efe4; --line:#c9c2b2;
     --text:#111111; --dim:#4a4a42; --accent:#1b5e20; --accent2:#b45309;
     --blue:#1e4d8c; --white-tee:#cfd4da; --gold:#b45309; --red:#fb637e;
-    --water:#1e4d8c; --sand:#e8c878; --green-fill:#34b868;
-    --cl:#6b6555; --green-stroke:#5ede82; --fcb:#ffffff; --chiptext:#ffffff;
+    --water:#1e4d8c; --sand:#e8c878; --green-fill:#17d562;
+    --cl:#6b6555; --green-stroke:#43f976; --fcb:#ffffff; --chiptext:#ffffff;
     --topo:#5aa8f0; --topo-index:#1f6fe0;
   }
   body.sun .tees button.sel.White{color:#111}
@@ -34,8 +34,8 @@
     --bg:#0b0b2a; --card:#131338; --card2:#1a1a4a; --line:#2b2b5e;
     --text:#e6e6ff; --dim:#9a9ac4; --accent:#6ee7ff; --accent2:#e879f9;
     --blue:#818cf8; --white-tee:#cdd3f5; --gold:#fbbf24; --red:#fb637e;
-    --water:#4c6ef5; --sand:#ecdff8; --green-fill:#2dd9a8;
-    --cl:#5b5b9e; --green-stroke:#6ffcd0; --fcb:#ffffff; --chiptext:#0b0b2a;
+    --water:#4c6ef5; --sand:#ecdff8; --green-fill:#09fdb8;
+    --cl:#5b5b9e; --green-stroke:#6cffd1; --fcb:#ffffff; --chiptext:#0b0b2a;
     --topo:#4de0ff; --topo-index:#b088ff;
   }
   body.dream #map .ctr{stroke-dasharray:5 9;animation:ctrflow 7s linear infinite}
@@ -342,7 +342,7 @@ function brg(a,b){ // compass bearing a→b, flat-earth approx (fine at course s
   return (Math.atan2(dx,dy)*180/Math.PI+360)%360;
 }
 /* ---- ball-flight trajectory (shared by the map arc, profile inset, and 3D tracer) ---- */
-const TRACER={main:'#ff1fd4', bright:'#ffc9f3'}; // neon hot pink
+const TRACER={main:'#f000c2', bright:'#ffa5eb'}; // deep neon pink
 function arcZ(t){ const u=Math.pow(t,1.25); return 4*u*(1-u); } // lift profile: apex past halfway, steeper descent
 function apexM(dm){ return Math.min(38, 6+dm*0.14); } // apex height (m) for a carry of dm meters
 
@@ -801,7 +801,7 @@ function renderMap(h,p,tb){
     if(extAxis===0){ minX+=bestS; maxX+=bestS; } else { minY+=bestS; maxY+=bestS; }
   }
 
-  const GCOL={dark:['#7eec9e','#3ecf7a'],sun:['#5ede82','#34b868'],dream:['#6ffcd0','#2dd9a8']}[theme]||['#7eec9e','#3ecf7a'];
+  const GCOL={dark:['#6bff96','#1fee75'],sun:['#43f976','#17d562'],dream:['#6cffd1','#09fdb8']}[theme]||['#6bff96','#1fee75'];
   const WCOL={dark:['#4a7fb5','#2f5781'],sun:['#3b7cc0','#1c4a80'],dream:['#6f86ff','#3d55d6']}[theme]||['#4a7fb5','#2f5781'];
   let s='<defs><filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
     +`<radialGradient id="ggrad" cx="42%" cy="38%" r="78%"><stop offset="0%" stop-color="${GCOL[0]}"/><stop offset="100%" stop-color="${GCOL[1]}"/></radialGradient>`
@@ -927,7 +927,7 @@ function renderMap(h,p,tb){
   }
   // green: even radial shading + micro-contour reading lines clipped to the surface
   const gPath=smoothClosed(greenPts);
-  s+=`<path class="greenp" d="${gPath}" fill="${satOn?'var(--green-fill)':'url(#ggrad)'}" fill-opacity="${satOn?0.25:1}" stroke="${satOn?'#b6f5c2':'var(--green-stroke)'}" stroke-width="1.6"${dreamFx}/>`;
+  s+=`<path class="greenp" d="${gPath}" fill="${satOn?'var(--green-fill)':'url(#ggrad)'}" fill-opacity="${satOn?0.25:1}" stroke="${satOn?'#acffbc':'var(--green-stroke)'}" stroke-width="1.6"${dreamFx}/>`;
   if(!satOn && TOPO){
     s+=`<clipPath id="gclip"><path d="${gPath}"/></clipPath>`;
     if(ctrD.length){
@@ -1140,9 +1140,9 @@ function draw3D(){
   };
   const P=new Array(m.verts.length);
   for(let i=0;i<m.verts.length;i++) P[i]=proj(m.verts[i]);
-  const ramp3d = theme==='sun' ? [[244,248,220],[152,204,100]]
+  const ramp3d = theme==='sun' ? [[248,254,214],[152,227,77]]
               : theme==='dream' ? [[32,22,96],[28,164,192],[224,72,255]]
-              : [[56,76,40],[168,214,108]];
+              : [[55,85,31],[171,237,85]];
   const cells=[];
   const st = D3.fast ? 2 : 1; // adaptive quality: coarser mesh while dragging
   for(let iy=0;iy<m.NY-st;iy+=st) for(let ix=0;ix<m.NX-st;ix+=st){
@@ -1169,7 +1169,7 @@ function draw3D(){
     col=rampCol(ramp3d, m.cdf ? m.cdf[Math.min(95,(tl3*96)|0)]*0.65+tl3*0.35 : tl3);
     if(cl>0){
       const f=(m.frs?m.frs[i00]:255)/255;
-      const fc = cl===1 ? (theme==='dream'?[16,214,188]:[46,176,84])
+      const fc = cl===1 ? (theme==='dream'?[0,230,200]:[18,204,72])
                : cl===2 ? (theme==='dream'?[214,186,255]:[236,206,138])
                :          (theme==='dream'?[96,116,255]:[42,124,235]);
       col=[col[0]+(fc[0]-col[0])*f, col[1]+(fc[1]-col[1])*f, col[2]+(fc[2]-col[2])*f];
@@ -1230,7 +1230,7 @@ function draw3D(){
     const n=Math.max(2,Math.round(tr.pts.length*ease));
     const Q=[]; for(let i=0;i<n;i++) Q.push(proj(tr.pts[i]));
     ctx.lineJoin='round'; ctx.lineCap='round';
-    for(const wc of [[5,'rgba(255,31,212,.32)'],[1.8,'#ffaef0']]){
+    for(const wc of [[5,'rgba(240,0,194,.35)'],[1.8,'#ff8ae9']]){
       ctx.strokeStyle=wc[1]; ctx.lineWidth=wc[0];
       ctx.beginPath(); ctx.moveTo(Q[0][0],Q[0][1]);
       for(let i=1;i<Q.length;i++) ctx.lineTo(Q[i][0],Q[i][1]);
@@ -1238,12 +1238,12 @@ function draw3D(){
     }
     const hd=Q[Q.length-1];
     if(k<1){ // comet head
-      ctx.fillStyle='#ffe4fa';
+      ctx.fillStyle='#ffcaf5';
       ctx.beginPath(); ctx.arc(hd[0],hd[1],3,0,6.2832); ctx.fill();
     } else { // landing pulse
       const age=(now-tr.t0-tr.dur)/900;
       if(age<1){
-        ctx.strokeStyle=`rgba(255,110,228,${(0.7*(1-age)).toFixed(2)})`;
+        ctx.strokeStyle=`rgba(235,60,196,${(0.7*(1-age)).toFixed(2)})`;
         ctx.lineWidth=1.6;
         ctx.beginPath(); ctx.arc(hd[0],hd[1],4+age*14,0,6.2832); ctx.stroke();
       }
@@ -1518,9 +1518,9 @@ let theme = (() => {
   return (h >= 10 && h < 17) ? 'sun' : 'dark';
 })();
 let sunMode = theme === 'sun'; // kept in sync by applyTheme
-const RAMPS = { // bright, pastel greens
-  sun:   [[240,252,240],[168,232,190]],
-  dark:  [[90,180,130],[178,245,200]],
+const RAMPS = { // bright, saturated 'lush' greens
+  sun:   [[237,255,237],[154,246,186]],
+  dark:  [[68,202,128],[168,255,197]],
   dream: [[10,12,42],[20,110,130],[152,52,192]]  // aurora: indigo → teal → magenta
 };
 const rampCol = (stops, t) => {
