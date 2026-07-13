@@ -92,6 +92,17 @@ Course
 
 Session 2026-07-03 additions beyond the data work: sun + dream themes (3-way toggle), hillshading + histogram-equalized hypsometric tint, smooth Bézier features, water ripples/gradients, on-green micro-contour reading lines, NAIP SAT layer (rotation-proof enlarged photos), dependency-free 3D terrain view (EXAG slider, anti-aliased features, shimmering water, hairline contours), portrait view clamp with interior-nudge, whole-course neighbor-feature rendering, moon/Mars gravity long-press, demo-dot snap-to-tee. See `wbyc-surreal-roadmap.md` for pending Phases 3–4 (AI art layer, flyovers) and their asset checklist.
 
+## Pitch Deck (added 2026-07-12)
+
+**`WBYC-Rangefinder-Pitch.pptx`** — 12-slide draft proposing to license the app to WBYC in trade for annual dues, with free reasonable revisions/updates included. Kit's goal: establish an estimated value and present the elegance of the build.
+
+- **Fonts:** Didot (headers) + Raleway (body), per Kit. Didot ships with macOS; Raleway is a free Google Font — install it on the presenting machine, or embed fonts on save / present the PDF if using a Windows PC (it has neither).
+- **Palette:** the app's own — dark forest `#0E2A1C`, lush green `#1E7A4A`, hot pink tracer `#F000C2`. Motif: the pink tracer arc; on the title slide its apex dot lands as a period after "RANGEFINDER" (intentional).
+- **Valuation anchors (researched 2026-07-12):** consumer golf apps $50–100/yr (Golfshot Pro, 18Birdies, GolfLogix, Arccos — ScoringZone/Birvix surveys); custom GPS app build $45K–$75K (Business of Apps, TopFlight, USM Systems guides); WBYC dues from public reporting only — 2020 tiers $374–$960/mo (Press Publications), initiation raised $50K→$65K in 2025 after the $6M renovation (MSPBJ). Ask framed as est. $8K–$12K/yr dues in trade.
+- **Placeholders Kit must replace before presenting:** actual annual dues figure (slide 8) and real golfing-member count (slides 6 & 8 assume ~300 × $60/yr ≈ $18K/yr member value).
+- **Honesty features:** barter-tax caveat (slide 9); rounds are stored per-device, phone-to-iPad sync listed on the 2027 roadmap (slides 5 & 11); slide 5 sells the zero-signup loop — score a hole or mark a shot and the round saves itself, home replay is the reward.
+- **Regenerating:** built with pptxgenjs + sharp (SVG art rasterized). Generator scripts live in `deck-src/` (`art.js` builds the three PNGs, `deck.js` builds the .pptx — adjust the path constants at the top, see `deck-src/README.md`). Possible next pass: replace slide 4's stylized three-view art with real app screenshots.
+
 ## Working Agreements
 
 - Never fabricate coordinates and present them as real — flag data quality explicitly, per-hole (`measured_yds` / `yardage_delta` serve this now).
