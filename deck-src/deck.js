@@ -283,7 +283,52 @@ qa.forEach((q,i)=>{
 s.addNotes('Lead with the stewardship line before taking questions. The data answer is a shield, not the pitch — use it only when liability comes up.');
 s.addText('WBYC Rangefinder · a member-built proposal · 12',{x:0.55,y:7.08,w:6,h:0.3,fontFace:BF,fontSize:9,color:DIM,margin:0});
 
-// ---------- S13 CLOSE ----------
+// ---------- S13 FULL FEATURE INVENTORY ----------
+s = pres.addSlide();
+s.background = {color:WHT};
+s.addText('Appendix: the full inventory', {x:0.55,y:0.42,w:10,h:0.75,fontFace:HF,fontSize:36,bold:true,color:INK,margin:0});
+s.addText('Everything in the box today — the breadth a commissioned build would be quoted on.',
+  {x:0.57,y:1.18,w:11,h:0.4,fontFace:BF,fontSize:14.5,italic:true,color:DIM,margin:0});
+const inv=[
+  ['ON THE COURSE',[
+    'Live GPS front / center / back, 5-fix smoothing',
+    '“Plays like” — elevation + live or manual wind',
+    'Per-hole wind arrow, oriented to the shot',
+    'Hazards & targets: reach/carry to every bunker, water, dogleg',
+    'Carry arcs for the selected club ± neighbors',
+    'Auto hole detection as you walk',
+    'Ball-flight tracer: map arc, side profile, 3D flyover + stats',
+    'Tournament switch: one tap to legal raw yardages']],
+  ['SCORING & YOUR GAME',[
+    'Running strokes / putts / fairways strip',
+    'Full 18-hole card with OUT/IN/total & GIR',
+    'Round history: trend line, bests, last-5 averages',
+    'Club distances learned from marked shots',
+    'Club hints inside the plays-like readout',
+    'Shot map: numbered dots + trail per hole',
+    'One-tap GHIN posting helper',
+    'Women’s par handled automatically from the Red tees']],
+  ['CRAFT & PLATFORM',[
+    '2-ft contours; fall-line arrows on every green',
+    'Hypsometric terrain tint with hillshading',
+    'NAIP aerial layer (SAT), geo-aligned',
+    '3D terrain with adjustable exaggeration',
+    'Three themes, incl. a bright-sunlight mode',
+    'Offline PWA: home-screen install, wake lock',
+    'No accounts, ads, or data collection',
+    'A little hidden whimsy for those who explore']],
+];
+inv.forEach((c2,ci)=>{
+  const x=0.55+ci*4.18;
+  s.addText(c2[0],{x:x,y:1.8,w:3.9,h:0.35,fontFace:BF,fontSize:12,bold:true,charSpacing:2,color:ci===2?PINK:GRN,margin:0});
+  s.addText(c2[1].map((t,i)=>({text:t,options:{bullet:{code:'2022',indent:10},breakLine:i<c2[1].length-1,paraSpaceAfter:7}})),
+    {x:x,y:2.25,w:3.95,h:4.4,fontFace:BF,fontSize:10.5,color:'33463C',margin:0,valign:'top'});
+});
+s.addText('Full walkthrough: wbyc-user-guide.md ships with the app.',
+  {x:0.57,y:6.72,w:11,h:0.3,fontFace:BF,fontSize:10,italic:true,color:DIM,margin:0});
+s.addText('WBYC Rangefinder · a member-built proposal · 13',{x:0.55,y:7.08,w:6,h:0.3,fontFace:BF,fontSize:9,color:DIM,margin:0});
+
+// ---------- S14 CLOSE ----------
 s = pres.addSlide();
 s.background = {path: P+'hero.png'};
 s.addShape('rect',{x:0,y:0,w:13.33,h:7.5,fill:{color:'071F13',transparency:35}});
