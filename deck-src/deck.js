@@ -48,6 +48,7 @@ s.addText([
   {text:'Zero member data leaves the phone. ',options:{bold:true,color:INK}},
   {text:'No tracking, no vendor lock-in, no per-member fees — the opposite of every commercial golf app.',options:{color:'33463C'}},
 ],{x:0.85,y:6.42,w:11.7,h:0.48,fontFace:BF,fontSize:13,margin:0});
+s.addNotes('If "too much detail" comes up: the home screen is three big numbers, like the sprinkler heads. Everything else is opt-in taps. It passes the grandparent test on the first tee.');
 foot(s,'02');
 
 // ---------- S3 PROVENANCE ----------
@@ -136,6 +137,7 @@ s.addText([{text:'WBYC Rangefinder: $0 to every member.',options:{fontSize:26,bo
   {x:0.95,y:4.3,w:11.4,h:1.6,fontFace:BF,margin:0});
 s.addText('Consumer pricing: ScoringZone & Birvix app-pricing surveys, 2026. Member count is an assumption — replace with the club’s roster.',
   {x:0.55,y:6.55,w:12,h:0.3,fontFace:BF,fontSize:9,color:DIM,margin:0});
+s.addNotes('The "who cares" answer lives here: members are already using outside golf apps on our fairways — paying for them, and feeding them location data. The question is not whether an app is used at WBYC; it is whose.');
 foot(s,'06');
 
 // ---------- S6 REPLACEMENT COST ----------
@@ -208,6 +210,7 @@ s.addText([
 ],{x:7.23,y:2.3,w:5.25,h:3.5,fontFace:BF,fontSize:14.5,margin:0});
 s.addText('Structured as a barter of services — both sides should confirm tax treatment with their accountants.',
   {x:0.57,y:6.45,w:11.5,h:0.35,fontFace:BF,fontSize:11,italic:true,color:DIM,margin:0});
+s.addNotes('If asked "why not one-time?": a one-time sale hands the club a depreciating asset; the annual trade buys a living service — seasonal re-survey, fixes, roadmap — and the ask sits below the $18K/yr member-value ceiling. Either side can walk at renewal.');
 foot(s,'09');
 
 // ---------- S9 INCLUDED SERVICES ----------
@@ -254,7 +257,33 @@ phases.forEach((p2,i)=>{
 });
 foot(s,'11');
 
-// ---------- S11 CLOSE ----------
+// ---------- S12 ANTICIPATED QUESTIONS ----------
+s = pres.addSlide();
+s.background = {color:GRNXL};
+s.addText('Anticipated questions', {x:0.55,y:0.42,w:10,h:0.75,fontFace:HF,fontSize:36,bold:true,color:INK,margin:0});
+s.addText('This is a stewardship project — the Ross course documented to two feet. A yardage book that happens to fit in a pocket.',
+  {x:0.57,y:1.18,w:11.6,h:0.4,fontFace:BF,fontSize:14.5,italic:true,color:DIM,margin:0});
+const qa=[
+  ['“Isn’t this too much detail for a traditional club?”',
+   'The front page is three big numbers — front, center, back — same as the sprinkler heads. Every layer beyond that is optional and waits for a tap. Clubs commission yardage books and course portraits without blinking; this is both.'],
+  ['“Who cares? Will anyone actually use it?”',
+   'Members already do — on our fairways, today, paying $60–100/yr to outside apps for fuzzy generic maps that harvest their location. The club can’t stop that. The only open question is whether the default app at WBYC is a stranger’s or the club’s own.'],
+  ['“What about member data?”',
+   'There is none. No accounts, no sign-up, no analytics; rounds live on the member’s own phone and nothing leaves it. That is less data liability than any vendor app the club could buy.'],
+  ['“Why annual, not one-time?”',
+   'Because it’s a living service, not a purchase: greens re-surveyed each season, fixes within days, a roadmap the club steers. Renewal is annual and either side can walk — the club never holds a depreciating asset.'],
+];
+qa.forEach((q,i)=>{
+  const col=i%2, row=(i-col)/2;
+  const x=0.55+col*6.35, y=1.85+row*2.35;
+  s.addShape('roundRect',{x:x,y:y,w:5.88,h:2.1,rectRadius:0.14,fill:{color:WHT},line:{color:'D5E8DC',width:1}});
+  s.addText(q[0],{x:x+0.3,y:y+0.2,w:5.3,h:0.55,fontFace:HF,fontSize:14.5,bold:true,italic:true,color:i===1?PINK:GRN,margin:0});
+  s.addText(q[1],{x:x+0.3,y:y+0.78,w:5.3,h:1.2,fontFace:BF,fontSize:11,color:'33463C',margin:0});
+});
+s.addNotes('Lead with the stewardship line before taking questions. The data answer is a shield, not the pitch — use it only when liability comes up.');
+s.addText('WBYC Rangefinder · a member-built proposal · 12',{x:0.55,y:7.08,w:6,h:0.3,fontFace:BF,fontSize:9,color:DIM,margin:0});
+
+// ---------- S13 CLOSE ----------
 s = pres.addSlide();
 s.background = {path: P+'hero.png'};
 s.addShape('rect',{x:0,y:0,w:13.33,h:7.5,fill:{color:'071F13',transparency:35}});

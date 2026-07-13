@@ -94,7 +94,7 @@ Session 2026-07-03 additions beyond the data work: sun + dream themes (3-way tog
 
 ## Pitch Deck (added 2026-07-12)
 
-**`WBYC-Rangefinder-Pitch.pptx`** — 12-slide draft proposing to license the app to WBYC in trade for annual dues, with free reasonable revisions/updates included. Kit's goal: establish an estimated value and present the elegance of the build.
+**`WBYC-Rangefinder-Pitch.pptx`** — 13-slide draft (incl. "Anticipated questions" appendix: detail objection → sprinkler-heads answer; "who cares" → members already pay outside apps on our fairways; data → none stored; why annual → living service. Speaker notes on slides 2, 6, 9, 12 carry the same arguments; stewardship framing — "the Ross course documented to two feet" — is the lead angle for a traditional board, data-privacy is the shield) proposing to license the app to WBYC in trade for annual dues, with free reasonable revisions/updates included. Kit's goal: establish an estimated value and present the elegance of the build.
 
 - **Fonts:** Didot (headers) + Raleway (body), per Kit. Didot ships with macOS; Raleway is a free Google Font — install it on the presenting machine, or embed fonts on save / present the PDF if using a Windows PC (it has neither).
 - **Palette:** the app's own — dark forest `#0E2A1C`, lush green `#1E7A4A`, hot pink tracer `#F000C2`. Motif: the pink tracer arc; on the title slide its apex dot lands as a period after "RANGEFINDER" (intentional).
