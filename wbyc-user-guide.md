@@ -13,6 +13,7 @@ A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, w
 - **GHIN post helper** — one tap copies your scores and opens ghin.com for posting
 - **Your game (STATS)** — round history, best round, averages, and a trend line across rounds
 - **Green view (GRN)** — zoom to the green complex with downhill fall-line arrows and micro-contours for reading putts
+- **Ball-flight tracer** — a TV-style pink arc of your shot: on the hole map, in a tap-for-it side profile, and animated over 3D terrain with yardage stats at the apex
 - **3D terrain view** of every hole; **SAT** aerial imagery overlay
 - **Auto hole detection** as you walk the course
 - **Hazards & targets panel** — reach / carry distances to every bunker, water hazard, and dogleg
@@ -43,7 +44,8 @@ A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, w
 | AUTO | Auto-detect hole from GPS |
 | SAT | Aerial imagery under the map |
 | GRN | Zoom to the green (fall-line arrows appear here) |
-| 3D | 3D terrain view of the hole (drag to rotate, pinch to zoom) |
+| 3D | 3D terrain view with animated shot tracer (drag to rotate, pinch to zoom, TRACE to replay) |
+| CENTER box | Tap the big CENTER number to toggle the side-profile flight view |
 | ☀ / ✦ / ☾ | Cycle theme: dark → sun → dream |
 | SHOT | Mark a shot from where you stand (club picker beside it; long-press = undo) |
 | ± ELEV | Elevation-adjusted "plays like" distances (~1 yd per 3 ft) |
@@ -58,6 +60,16 @@ A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, w
 - **Map arrow** (top-right) points where the wind blows *relative to the hole* — arrow pointing up = tailwind toward the green.
 - "Plays like" folds in the head/tail component: headwind adds ~1% of the shot per mph, tailwind subtracts ~0.5%/mph. Crosswind doesn't change distance — that part's still your call.
 - **First-round check**: long-press WIND, set something like 10 SW, and sanity-check the arrow against the flag. The live fetch is untested until the Netlify deploy.
+
+## Ball flight (the pink arc)
+
+Your shot to the green shows three ways, all in hot pink:
+
+- **On the hole map**, a pink arc bows off the straight line from your ball to the center. The straight line is the ground path (the arc's "shadow"); the small dashed tick ties the arc's high point back to the ground so you can tell it's height, not a hook. It's illustrative — the arc always curves toward the middle of the frame, whichever side that is.
+- **Side profile**: tap the big **CENTER** number to open a strip under the map showing the actual terrain cross-section between you and the green — the green's surface highlighted, elevation change labeled (`+12 ft`), and the flight arc over it. This is the picture behind the "plays like" number. Tap CENTER again to hide it; the choice sticks.
+- **In 3D**, opening the view fires an animated tracer from your ball (or the tee) to the flag, with small stats pinned at the arc's peak: the raw yardage, the plays-like number with its elevation/wind parts, your suggested club once shot tracking knows you, and apex height. Tap **TRACE** to replay it. With WIND on, a crosswind visibly bends the flight late — just like it does outside.
+
+The profile and 3D stats respect your ± ELEV and WIND toggles, so what they show always matches the numbers up top.
 
 ## Reading the green
 
@@ -87,6 +99,8 @@ The arrows come from USGS 3m elevation data, so treat them as the broad break (o
 ## Your game (STATS)
 
 Tap **STATS** on the scorecard for your profile page: every banked round (date, tee, score vs par, putts, FW%, GIR), a trend line of your last 10 rounds vs par, and a stats footer — best round, plus averages over your last five full rounds. Nine-hole outings are listed and tagged (`(9h)`); bests and averages use full 18s only. The **CLUBS** view next to it is the other half of your profile: your learned distance for every club in the bag.
+
+**Reviewing at home:** the same link works on an iPad or laptop — replay any hole's 3D flyover, walk the card, and browse your stats from the couch. One catch: rounds live on the device that recorded them (there are no accounts, by design), so review your round on the phone that scored it, or use the big screen for course study and replays.
 
 ## Tournament play
 
