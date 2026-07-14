@@ -89,7 +89,7 @@ The arrows come from USGS 3m elevation data, so treat them as the broad break (o
 
 ## Scorecard
 
-- The strip below the map is your running card for the current hole: **SCORE** and **PUTTS** +/−, and **FW** (tap to cycle ✓ hit → ✗ miss → blank; hidden on par 3s).
+- The strip below the map is your running card for the current hole: **TOTAL SCORE** (all strokes on the hole, putts included) and **PUTTS** +/−, and **FW** — fairway hit (tap to cycle ✓ hit → ✗ miss → blank; hidden on par 3s).
 - The right side shows your running score vs par (`+2 thru 7`) — **tap it to open the full card**: front/back/total, per-hole results, and a stats line (putts, fairways, GIR).
 - On the full card, **tap any hole row to jump the app to that hole**; NEW ROUND clears the card (with a confirm).
 - The card survives closing the app mid-round (saved on every tap). Red-tee rounds score against women's par automatically.
