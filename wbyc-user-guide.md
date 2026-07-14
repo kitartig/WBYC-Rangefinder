@@ -33,7 +33,7 @@ A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, w
 - **Just stand over your ball.** The white golf ball with the glowing gold halo is you. The app averages your last 5 GPS fixes, so stand still a few seconds for best accuracy (±3–5 m typical).
 - **AUTO** (on by default) switches holes for you as you walk — it picks whichever hole's centerline you're nearest. Use **‹ ›** to browse manually (this turns AUTO off; tap AUTO to re-enable).
 - **Distances** update live: front / **CENTER** / back of green. Under CENTER, the "plays like" line stacks everything the app knows: elevation, wind, and (once shot tracking has data) your club — e.g. `plays 152 (+6 ft, wind +4) · 7i`.
-- **Tee buttons** (Blue/White/Gold/Red) set the scorecard yardage shown and demo-mode start point.
+- **Tee buttons** (Blue/White/Gold/Red/Green) set the scorecard yardage shown and demo-mode start point. Red and Green score against women's par and use their own handicap allocations from the 4/2026 card. Heads-up: most Green tee positions are estimated on the line of play until they're GPS-captured — yardages match the card, but the dot on the map may sit a pace or two off the actual pad.
 - The screen stays awake during a round (wake lock) — expect battery drain; start charged.
 
 ## Buttons

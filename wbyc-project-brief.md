@@ -20,9 +20,14 @@ A GPS rangefinder app for White Bear Yacht Club (Dellwood, MN), built as an ince
 | Blue | 6,471 | 72.1 / 132 (M) |
 | White | 6,266 | 71.2 / 131 (M) |
 | Gold | 5,823 | 69.0 / 127 (M) |
-| Red | 5,658 | 73.3 / 134 (W) |
+| Red | 5,636 | 73.3 / 134 (W) — rating predates the 4/2026 re-measure |
+| Green | 4,779 | not yet published |
 
 > Historical note: an earlier version of this brief labeled the 5,823 yardages as "Men's tees" — they are the **Gold** tees.
+
+### 4/2026 scorecard update (photo from Kit, ingested 2026-07-14)
+
+New **Green** tee set (4,779) added, plus a Red/Green combo on the card (5,636→4,976 mixes — combo NOT ingested; per-hole arrows ambiguous). Corrections vs. the 2026-07-03 data: Red hole 10 282→260 (total 5,658→5,636); women's Red handicaps changed on holes 1, 5, 9. New per-tee handicap fields: `handicap_index_gold` (men's Gold) and `handicap_index_women_green` (women's Green/combo). Green tee coordinates: 3 holes matched existing OSM pads (4, 6, 17); **15 holes are centerline-interpolated estimates flagged `estimated:true`** — placed at the card's exact yardage along the line of play, pending GPS capture on foot. App scores Green (like Red) against women's par — flip `fwdTee()` if the club rules otherwise.
 
 ---
 

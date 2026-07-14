@@ -99,6 +99,7 @@
     border-radius:8px;width:32px;height:32px;font-size:16px;cursor:pointer;line-height:1}
   .tees button.sel.Blue{background:var(--blue)} .tees button.sel.White{background:var(--white-tee)}
   .tees button.sel.Gold{background:var(--gold);color:#161616} .tees button.sel.Red{background:var(--red);color:#fff}
+  .tees button.sel.Green{background:#2fbf71;color:#0e1512}
 
   .dist{display:flex;gap:8px;margin-bottom:10px}
   .dist .box{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;
@@ -510,7 +511,12 @@ function archiveRound(){ // bank the current card into history (called before NE
 let card=blankCard();
 try{ const c=JSON.parse(localStorage.getItem('wbyc_card')); if(c&&c.holes&&c.holes.length===18) card=c; }catch(e){}
 const saveCard=()=>localStorage.setItem('wbyc_card', JSON.stringify(card));
-const holePar=h=> tee==='Red' ? h.par_women : h.par;
+const fwdTee=()=> tee==='Red'||tee==='Green'; // forward sets score against women's par
+const holePar=h=> fwdTee() ? h.par_women : h.par;
+const holeHcp=h=> tee==='Green' ? (h.handicap_index_women_green ?? h.handicap_index_women)
+             : tee==='Red'   ? h.handicap_index_women
+             : tee==='Gold'  ? (h.handicap_index_gold ?? h.handicap_index)
+             : h.handicap_index;
 const fmtDiff=d=> d===0 ? 'E' : (d>0?'+':'')+d;
 function cardTotals(){
   let s=0,p=0,par=0,n=0,fwH=0,fwT=0,gir=0;
@@ -603,8 +609,8 @@ function render(){
   }
   const h = hole(), p = playerPos(), tb = teeBox(h);
   $('holeNum').textContent = 'Hole ' + h.hole_number;
-  const par = tee==='Red' ? h.par_women : h.par;
-  const hcp = tee==='Red' ? h.handicap_index_women : h.handicap_index;
+  const par = holePar(h);
+  const hcp = holeHcp(h);
   $('holeMeta').innerHTML = `Par ${par} · ${tb.yardage} yds<br>Hcp ${hcp}`;
   document.querySelectorAll('.tees button').forEach(b=>{
     b.className = (b.dataset.tee===tee?'sel ':'')+(b.dataset.tee===tee?b.dataset.tee:'');
@@ -1416,7 +1422,7 @@ function open3D(){
   }
   D3.flagWorld=best;
   const pn3=pinFor(h); if(pn3) D3.flagWorld=D3.mesh.toWorld(pn3); // flag + tracer land on today's pin
-  $('d3Title').textContent=`HOLE ${h.hole_number} · PAR ${tee==='Red'?h.par_women:h.par} · 3D TERRAIN`;
+  $('d3Title').textContent=`HOLE ${h.hole_number} · PAR ${holePar(h)} · 3D TERRAIN`;
   $('threeD').classList.add('open');
   D3.open=true;
   requestAnimationFrame(draw3D);
