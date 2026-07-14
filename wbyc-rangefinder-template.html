@@ -14,7 +14,7 @@
   :root{
     --bg:#0e1512; --card:#17211c; --card2:#1d2a23; --line:#2b3a31;
     --text:#e8f0ea; --dim:#8fa398; --accent:#7dd87d; --accent2:#e8c468;
-    --blue:#5b9bd5; --white-tee:#e8f0ea; --gold:#f1c40f; --red:#fb637e;
+    --blue:#85b9ea; --white-tee:#e8f0ea; --gold:#ffc72c; --red:#fb637e;
     --water:#3a6ea5; --sand:#f0dfb8; --green-fill:#1fee75;
     --cl:#4a5c51; --green-stroke:#6bff96; --fcb:#cfe8d5; --chiptext:#0e1512;
     --topo:#4db3f5; --topo-index:#8ad4ff;
@@ -23,7 +23,7 @@
   body.sun{
     --bg:#f7f5f0; --card:#ffffff; --card2:#e9efe4; --line:#c9c2b2;
     --text:#111111; --dim:#4a4a42; --accent:#1b5e20; --accent2:#b45309;
-    --blue:#1e4d8c; --white-tee:#cfd4da; --gold:#b45309; --red:#fb637e;
+    --blue:#4d84c4; --white-tee:#cfd4da; --gold:#ffc72c; --red:#fb637e;
     --water:#1e4d8c; --sand:#e8c878; --green-fill:#17d562;
     --cl:#6b6555; --green-stroke:#43f976; --fcb:#ffffff; --chiptext:#ffffff;
     --topo:#5aa8f0; --topo-index:#1f6fe0;
@@ -34,7 +34,7 @@
   body.dream{
     --bg:#0b0b2a; --card:#131338; --card2:#1a1a4a; --line:#2b2b5e;
     --text:#e6e6ff; --dim:#9a9ac4; --accent:#6ee7ff; --accent2:#e879f9;
-    --blue:#818cf8; --white-tee:#cdd3f5; --gold:#fbbf24; --red:#fb637e;
+    --blue:#9daafa; --white-tee:#cdd3f5; --gold:#ffc72c; --red:#fb637e;
     --water:#4c6ef5; --sand:#ecdff8; --green-fill:#09fdb8;
     --cl:#5b5b9e; --green-stroke:#6cffd1; --fcb:#ffffff; --chiptext:#0b0b2a;
     --topo:#4de0ff; --topo-index:#b088ff;
@@ -93,7 +93,7 @@
   #sunBtn{background:var(--card);border:1px solid var(--line);color:var(--text);
     border-radius:8px;width:32px;height:32px;font-size:16px;cursor:pointer;line-height:1}
   .tees button.sel.Blue{background:var(--blue)} .tees button.sel.White{background:var(--white-tee)}
-  .tees button.sel.Gold{background:var(--gold)} .tees button.sel.Red{background:var(--red);color:#fff}
+  .tees button.sel.Gold{background:var(--gold);color:#161616} .tees button.sel.Red{background:var(--red);color:#fff}
 
   .dist{display:flex;gap:8px;margin-bottom:10px}
   .dist .box{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;
@@ -1153,6 +1153,29 @@ function build3D(h){
       if(n2){ zs[i]=sum/n2; filled[i]=1; missing--; }
     }
   }
+  // sub-classify feature-edge quads 3×3 so bunker/water/green boundaries don't stair-step
+  const edge={};
+  {
+    const dX=W/(NX-1), dY=H/(NY-1), o1=dX/6, o2=dY/6;
+    for(let iy=0;iy<NY-1;iy++) for(let ix=0;ix<NX-1;ix++){
+      const i00=iy*NX+ix, i10=i00+1, i01=i00+NX, i11=i01+1;
+      const c0=cls[i00];
+      if(c0===cls[i10] && c0===cls[i01] && c0===cls[i11] &&
+         (c0===0 || (frs[i00]>239&&frs[i10]>239&&frs[i01]>239&&frs[i11]>239))) continue;
+      const c9=new Uint8Array(9), f9=new Uint8Array(9);
+      for(let b=0;b<3;b++) for(let a2=0;a2<3;a2++){
+        const X=minX+(ix+(a2+0.5)/3)*dX, Y=minY+(iy+(b+0.5)/3)*dY;
+        const cnt={};
+        for(const q of [[-o1,-o2],[o1,-o2],[-o1,o2],[o1,o2]]){
+          const c2=classAt(unrotLL(X+q[0],Y+q[1])); if(c2) cnt[c2]=(cnt[c2]||0)+1;
+        }
+        let cl2=0,best=0;
+        for(const k in cnt) if(cnt[k]>best){best=cnt[k];cl2=+k;}
+        c9[b*3+a2]=cl2; f9[b*3+a2]=Math.round(best*63.75);
+      }
+      edge[i00]={c:c9,f:f9};
+    }
+  }
   const zmid=(zlo+zhi)/2;
   const verts=[]; // world coords per grid vertex: [x, y, z] (meters, z exaggerated)
   for(let iy=0;iy<NY;iy++) for(let ix=0;ix<NX;ix++){
@@ -1174,7 +1197,7 @@ function build3D(h){
     for(let i=0;i<cls.length;i++) if(cls[i]===1){
       const d=Math.hypot(verts[i][0]-gC[0],verts[i][1]-gC[1]); if(d>gR)gR=d; } }
   return {NX,NY,verts,zs,cls,frs,zlo,zhi,cdf:cdf3,gPoly:h.green.polygon,radius:Math.hypot(W,H)/2,
-          gC,gR,hasWater:cls.includes(3),filled,
+          gC,gR,hasWater:cls.includes(3),filled,edge,
           // lat/lng → mesh world coords (meters, z relative to zmid) for overlays like the tracer
           toWorld:(ll,zFt)=>{ const q=rot(ll); const e=(zFt!=null)?zFt:elevFt(ll);
             return [q[0]-(minX+W/2), q[1]-(minY+H/2), ((e==null?zmid:e)-zmid)*0.3048]; },
@@ -1223,13 +1246,19 @@ function draw3D(){
     // terrain base color (histogram-equalized), then feature color blended by coverage
     const tl3=(z-m.zlo)/span;
     col=rampCol(ramp3d, m.cdf ? m.cdf[Math.min(95,(tl3*96)|0)]*0.65+tl3*0.35 : tl3);
+    // feature colors = the hole view's CSS vars (--green-fill / --sand / --water) per theme
+    const fcOf = c2 => c2===1 ? (theme==='dream'?[9,253,184]:theme==='sun'?[23,213,98]:[31,238,117])
+               : c2===2 ? (theme==='dream'?[236,223,248]:theme==='sun'?[232,200,120]:[240,223,184])
+               :          (theme==='dream'?[76,110,245]:theme==='sun'?[30,77,140]:[58,110,165]);
+    // edge quads get 3×3 sub-resolution — only at full quality and when big enough on screen to matter
+    const qArea=Math.abs((p1[0]-p0[0])*(p3[1]-p0[1])-(p3[0]-p0[0])*(p1[1]-p0[1]));
+    const eq=(st===1 && m.edge && qArea>9) ? m.edge[i00] : undefined;
     if(cl>0){
       const f=(m.frs?m.frs[i00]:255)/255;
-      // feature colors = the hole view's CSS vars (--green-fill / --sand / --water) per theme
-      const fc = cl===1 ? (theme==='dream'?[9,253,184]:theme==='sun'?[23,213,98]:[31,238,117])
-               : cl===2 ? (theme==='dream'?[236,223,248]:theme==='sun'?[232,200,120]:[240,223,184])
-               :          (theme==='dream'?[76,110,245]:theme==='sun'?[30,77,140]:[58,110,165]);
-      col=[col[0]+(fc[0]-col[0])*f, col[1]+(fc[1]-col[1])*f, col[2]+(fc[2]-col[2])*f];
+      if(!eq){
+        const fc=fcOf(cl);
+        col=[col[0]+(fc[0]-col[0])*f, col[1]+(fc[1]-col[1])*f, col[2]+(fc[2]-col[2])*f];
+      }
       if(cl===3){ // animated water shimmer, scaled by coverage
         li += (Math.sin((v0[0]+v0[1])*0.35 + D3.time*2.2)*0.07
              + Math.sin((v0[0]-v0[1])*0.22 - D3.time*1.7)*0.05)*f;
@@ -1238,11 +1267,24 @@ function draw3D(){
         li *= 1 + (0.10 - 0.18*Math.min(1, d/m.gR))*f;
       }
     }
-    ctx.fillStyle=`rgb(${Math.min(255,col[0]*li)|0},${Math.min(255,col[1]*li)|0},${Math.min(255,col[2]*li)|0})`;
-    ctx.strokeStyle=ctx.fillStyle; ctx.lineWidth=1;
-    ctx.beginPath();
-    ctx.moveTo(p0[0],p0[1]); ctx.lineTo(p1[0],p1[1]); ctx.lineTo(p2[0],p2[1]); ctx.lineTo(p3[0],p3[1]);
-    ctx.closePath(); ctx.fill(); ctx.stroke();
+    const paint=(c3,q)=>{
+      ctx.fillStyle=`rgb(${Math.min(255,c3[0]*li)|0},${Math.min(255,c3[1]*li)|0},${Math.min(255,c3[2]*li)|0})`;
+      ctx.strokeStyle=ctx.fillStyle; ctx.lineWidth=1;
+      ctx.beginPath();
+      ctx.moveTo(q[0][0],q[0][1]); ctx.lineTo(q[1][0],q[1][1]); ctx.lineTo(q[2][0],q[2][1]); ctx.lineTo(q[3][0],q[3][1]);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+    };
+    if(eq){
+      const bl=(u,v)=>[ p0[0]*(1-u)*(1-v)+p1[0]*u*(1-v)+p3[0]*(1-u)*v+p2[0]*u*v,
+                        p0[1]*(1-u)*(1-v)+p1[1]*u*(1-v)+p3[1]*(1-u)*v+p2[1]*u*v ];
+      for(let b=0;b<3;b++) for(let a2=0;a2<3;a2++){
+        const c2=eq.c[b*3+a2], f2=eq.f[b*3+a2]/255;
+        let c3=col;
+        if(c2&&f2){ const fc=fcOf(c2);
+          c3=[col[0]+(fc[0]-col[0])*f2, col[1]+(fc[1]-col[1])*f2, col[2]+(fc[2]-col[2])*f2]; }
+        paint(c3,[bl(a2/3,b/3), bl((a2+1)/3,b/3), bl((a2+1)/3,(b+1)/3), bl(a2/3,(b+1)/3)]);
+      }
+    } else paint(col,[p0,p1,p2,p3]);
     // fine solid contour hairlines: exact 2-ft level crossings across this quad
     // (skipped on inpainted cells — synthetic elevations would draw phantom contours)
     const zc=[m.zs[i00],m.zs[i10],m.zs[i11],m.zs[i01]];
