@@ -22,6 +22,10 @@ A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, w
 - **Works offline** — installs to your home screen as an app; scorecard and shots survive restarts
 - A little hidden whimsy for those who explore
 
+## Your name
+
+Tap **+ your name** (top right, next to the Bar/Dining button) and enter it once. It signs your scorecard title and your GHIN post text, and stays on the device. Tap it again anytime to change it; clear it to go anonymous.
+
 ## One-time setup
 
 1. Deploy the `pwa/` folder to Netlify (drag-and-drop at app.netlify.com/drop works).

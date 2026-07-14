@@ -71,7 +71,11 @@
   header{display:flex;align-items:center;justify-content:space-between;padding:2px 2px 0}
   header h1{font-size:15px;font-weight:600;letter-spacing:.4px}
   header .sub{font-size:11px;color:var(--dim)}
-  #tagline{text-align:left;margin:2px 0 8px}
+  #tagline{display:flex;justify-content:space-between;align-items:center;margin:2px 0 8px}
+  #pname{font-family:'EB Garamond',Garamond,Baskerville,'Times New Roman',serif;font-style:italic;
+    font-weight:500;font-size:14px;color:var(--text);cursor:pointer;padding:4px 6px 4px 12px;
+    letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%}
+  #pname.unset{color:var(--dim);opacity:.75}
   #tagline a{display:inline-block;font-family:'EB Garamond',Garamond,Baskerville,'Times New Roman',serif;
     font-weight:500;font-style:italic;font-size:13.5px;color:#3a2405;text-decoration:none;
     background:linear-gradient(135deg,#fbe9b8 0%,#f6d47c 55%,#eeb86a 100%);
@@ -199,7 +203,7 @@
       <button id="sunBtn" title="Toggle sunlight mode">☀</button>
     </span>
   </header>
-  <div id="tagline"><a href="tel:651-429-8052" title="Golf House Restaurant (seasonal) — off-season, call the clubhouse: 651-429-4567">☎ Contact Bar/Dining</a></div>
+  <div id="tagline"><a href="tel:651-429-8052" title="Golf House Restaurant (seasonal) — off-season, call the clubhouse: 651-429-4567">☎ Contact Bar/Dining</a><span id="pname" title="Tap to put your name on the card"></span></div>
 
   <div class="holebar">
     <button id="prevBtn" aria-label="Previous hole">‹</button>
@@ -346,6 +350,7 @@ let elevAdjust = localStorage.getItem('wbyc_elev')!=='off';
 /* ---- wind: live from Open-Meteo when served over http(s); manual long-press entry anywhere ---- */
 let windAdjust = localStorage.getItem('wbyc_wind')!=='off';
 /* ---- pin sheet: today's tapped pin positions, per hole (pins move daily — date-scoped) ---- */
+let pname = localStorage.getItem('wbyc_name') || '';
 let pins = {d:'', p:{}}, pinArm = false;
 try{ const s2=JSON.parse(localStorage.getItem('wbyc_pins')||'null'); if(s2 && s2.p) pins=s2; }catch(e){}
 function freshPins(){ if(pins.d !== today()) pins = {d: today(), p: {}}; } // pins expire at midnight
@@ -1568,6 +1573,24 @@ function init(data){
   $('autoBtn').onclick=()=>{autoHole=!autoHole;$('autoBtn').classList.toggle('on',autoHole);if(autoHole){detectHole();render();}};
   $('autoBtn').classList.toggle('on',autoHole);
   $('demoBtn').onclick=()=>setDemo(!demo);
+  // player name: tap the header chip to set; signs the scorecard title + GHIN post text
+  {
+    const pnEl=$('pname');
+    const drawName=()=>{
+      pnEl.textContent = pname || '+ your name';
+      pnEl.classList.toggle('unset', !pname);
+      $('scTitle').textContent = pname ? `${pname.toUpperCase()} — SCORECARD` : 'SCORECARD';
+    };
+    pnEl.onclick=()=>{
+      if(typeof prompt==='undefined') return;
+      const v=prompt('Name on the card:', pname||'');
+      if(v===null) return;
+      pname=v.trim().slice(0,24);
+      localStorage.setItem('wbyc_name', pname);
+      drawName();
+    };
+    drawName();
+  }
   // PIN sheet: tap arms the next map tap; long-press clears today's pin on this hole
   {
     const pb=$('pinBtn');
@@ -1662,7 +1685,7 @@ function init(data){
     if(!t.n){ $('scstats').textContent='nothing to post yet — enter some scores first'; return; }
     let out=0, inn=0;
     const hbh=card.holes.map((e,i)=>{ if(e.s){ if(i<9) out+=e.s; else inn+=e.s; } return e.s||'-'; });
-    const txt=`WBYC ${card.start} (${tee} tees) — Out ${out} In ${inn} Total ${t.s}`
+    const txt=`WBYC ${card.start} (${tee} tees)${pname?` — ${pname}`:''} — Out ${out} In ${inn} Total ${t.s}`
       +(t.n<18?` (${t.n}/18 holes)`:'')
       +`\nHBH: ${hbh.slice(0,9).join(' ')} | ${hbh.slice(9).join(' ')}`;
     let copied=false;
