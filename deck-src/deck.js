@@ -28,7 +28,7 @@ s = pres.addSlide();
 s.background = {color:WHT};
 s.addText('What the club would own', {x:0.55,y:0.42,w:9,h:0.75,fontFace:HF,fontSize:36,bold:true,color:INK,margin:0});
 const feats = [
-  ['GPS rangefinder', 'Front / center / back to every green, live hazard carries, dogleg targets — tuned to our 18 and nothing else.'],
+  ['GPS rangefinder', 'Front / center / back to every green — or tap in today’s actual pin and every number re-keys to it. Live hazard carries, dogleg targets.'],
   ['“Plays like” physics', 'USGS lidar elevation (+ live wind) adjusts every number. One tap returns it to tournament-legal raw yardage.'],
   ['3D flyover + shot tracer', 'TV-style ball flight over real terrain, with yardage, apex and club stats pinned to the arc.'],
   ['Scorecard & stats', 'Strokes, putts, fairways, GIR, club distances learned from real shots, and a one-tap GHIN posting helper.'],
@@ -244,7 +244,7 @@ s.background = {color:WHT};
 s.addText('Already moving: the roadmap', {x:0.55,y:0.42,w:11,h:0.75,fontFace:HF,fontSize:36,bold:true,color:INK,margin:0});
 s.addImage({path:P+'motif.png', x:8.6, y:0.25, w:4.2, h:1.54, transparency:12});
 const phases=[
-  ['NOW — shipping','Shot tracer with flight stats, plays-like profile view, green fall-lines, club-distance learning, scorecard + GHIN helper, offline install',GRN],
+  ['NOW — shipping','Shot tracer with flight stats, pin-sheet mode, plays-like profile view, green fall-lines, club-distance learning, all five tee sets incl. the new Greens, scorecard + GHIN helper, offline install',GRN],
   ['FALL 2026','Member beta round, GPS capture of the one unmapped tee (Hole 5 Red), back-tee refinements, feedback sweep',GRN],
   ['2027','AI-illustrated hole art, cinematic hole flyovers, phone-to-iPad round sync, practice-round mode — club input steers the order',PINK],
 ];
@@ -298,6 +298,7 @@ const inv=[
     'Carry arcs for the selected club ± neighbors',
     'Auto hole detection as you walk',
     'Ball-flight tracer: map arc, side profile, 3D flyover + stats',
+    'Pin sheet: tap today’s pin — every number re-keys to it',
     'Tournament switch: one tap to legal raw yardages']],
   ['SCORING & YOUR GAME',[
     'Running strokes / putts / fairways strip',

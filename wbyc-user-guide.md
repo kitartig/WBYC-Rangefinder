@@ -5,6 +5,7 @@ A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, w
 ## Features at a glance
 
 - **Live GPS distances** to the front / center / back of every green, smoothed over your last 5 fixes
+- **Pin sheet (PIN)** — tap where today's pin actually is; every distance, arc, and the 3D flag re-key to it (resets at midnight)
 - **"Plays like" numbers** that fold in elevation (USGS 3DEP terrain) and wind — with a per-hole wind arrow
 - **Club hints** learned from your own tracked shots (`plays 152 · 7i`)
 - **Shot tracking** — one tap per shot; builds your real club distances and draws your round on the map
