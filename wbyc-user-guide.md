@@ -44,6 +44,7 @@ A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, w
 | AUTO | Auto-detect hole from GPS |
 | SAT | Aerial imagery under the map |
 | GRN | Zoom to the green (fall-line arrows appear here) |
+| PIN | Drop today's pin: tap PIN, then tap the green — every number re-keys to the actual pin. Long-press to clear. Pins reset at midnight |
 | 3D | 3D terrain view with animated shot tracer (drag to rotate, pinch to zoom, TRACE to replay) |
 | CENTER box | Tap the big CENTER number to toggle the side-profile flight view |
 | ☀ / ✦ / ☾ | Cycle theme: dark → sun → dream |
@@ -60,6 +61,10 @@ A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, w
 - **Map arrow** (top-right) points where the wind blows *relative to the hole* — arrow pointing up = tailwind toward the green.
 - "Plays like" folds in the head/tail component: headwind adds ~1% of the shot per mph, tailwind subtracts ~0.5%/mph. Crosswind doesn't change distance — that part's still your call.
 - **First-round check**: long-press WIND, set something like 10 SW, and sanity-check the arrow against the flag. The live fetch is untested until the Netlify deploy.
+
+## Pin sheet (PIN)
+
+Green-center numbers are good; today's-pin numbers are better. Tap **PIN**, then tap where the pin actually is (GRN view makes this precise) — a white-and-pink flag appears there, the big CENTER box relabels to **PIN**, and everything follows: plays-like, the flight arc and its stats, carry-arc aiming, the profile view, and the 3D flagstick and tracer. FRONT and BACK stay what they are. Long-press PIN to go back to center; pins clear themselves at midnight since the greenkeeper moves them anyway. Set all 18 while your partner putts out and you're carrying a real pin sheet.
 
 ## Ball flight (the pink arc)
 

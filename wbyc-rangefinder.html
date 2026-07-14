@@ -71,7 +71,7 @@
   header{display:flex;align-items:center;justify-content:space-between;padding:2px 2px 0}
   header h1{font-size:15px;font-weight:600;letter-spacing:.4px}
   header .sub{font-size:11px;color:var(--dim)}
-  #tagline{text-align:center;margin:2px 0 8px}
+  #tagline{text-align:left;margin:2px 0 8px}
   #tagline a{display:inline-block;font-family:'EB Garamond',Garamond,Baskerville,'Times New Roman',serif;
     font-weight:500;font-style:italic;font-size:13.5px;color:var(--text);text-decoration:none;
     background:var(--card);border:1px solid var(--line);border-radius:999px;
@@ -212,13 +212,13 @@
 
   <div class="dist">
     <div class="box"><div class="lbl">FRONT</div><div class="val" id="dFront">–</div></div>
-    <div class="box center"><div class="lbl">CENTER</div><div class="val" id="dCenter">–</div><div class="plays" id="playsLike"></div></div>
+    <div class="box center"><div class="lbl" id="dCLbl">CENTER</div><div class="val" id="dCenter">–</div><div class="plays" id="playsLike"></div></div>
     <div class="box"><div class="lbl">BACK</div><div class="val" id="dBack">–</div></div>
   </div>
 
   <div id="mapwrap">
     <svg id="map" xmlns="http://www.w3.org/2000/svg"></svg>
-    <div id="mapbtns"><button id="satBtn">SAT</button><button id="grnBtn" title="Zoom to the green">GRN</button><button id="d3Btn">3D</button></div>
+    <div id="mapbtns"><button id="satBtn">SAT</button><button id="grnBtn" title="Zoom to the green">GRN</button><button id="pinBtn" title="Tap, then tap the green to drop today's pin. All distances re-key to it. Long-press to clear.">PIN</button><button id="d3Btn">3D</button></div>
     <div id="shotbar"><select id="clubSel"></select><button id="shotBtn" title="Mark a shot from your current position. Long-press to undo the last mark.">SHOT</button></div>
     <div id="maphint"></div>
   </div>
@@ -342,6 +342,13 @@ let autoHole=true, demo=false, demoPos=null;
 let elevAdjust = localStorage.getItem('wbyc_elev')!=='off';
 /* ---- wind: live from Open-Meteo when served over http(s); manual long-press entry anywhere ---- */
 let windAdjust = localStorage.getItem('wbyc_wind')!=='off';
+/* ---- pin sheet: today's tapped pin positions, per hole (pins move daily — date-scoped) ---- */
+let pins = {d:'', p:{}}, pinArm = false;
+try{ const s2=JSON.parse(localStorage.getItem('wbyc_pins')||'null'); if(s2 && s2.p) pins=s2; }catch(e){}
+function freshPins(){ if(pins.d !== today()) pins = {d: today(), p: {}}; } // pins expire at midnight
+function pinFor(h){ freshPins(); return pins.p[h.hole_number] || null; }
+function target(h){ return pinFor(h) || h.green.center; } // every distance re-keys to the pin when set
+function savePins(){ localStorage.setItem('wbyc_pins', JSON.stringify(pins)); }
 let wind = {spd:0, dir:null, gust:0, src:null}; // dir = degrees wind blows FROM (meteorological); src: 'live'|'manual'
 const DIRS=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
 const dirName = d => DIRS[Math.round(d/22.5)%16];
@@ -602,18 +609,21 @@ function render(){
   });
 
   const g = h.green;
+  $('dCLbl').textContent = pinFor(h) ? 'PIN' : 'CENTER';
+  $('pinBtn').classList.toggle('on', !!pinFor(h));
   if(p){
-    const dc = yds(p,g.center);
+    const tgt = target(h);
+    const dc = yds(p,tgt);
     $('dFront').textContent  = fmt(yds(p,g.front));
     $('dCenter').textContent = fmt(dc);
     $('dBack').textContent   = fmt(yds(p,g.back));
     // "plays like": elevation (~1 yd per 3 ft) + wind (head/tail component)
     let plays='', adj=dc, dFt=0;
     if(elevAdjust){
-      const pe=elevFt(p), ge=elevFt(g.center);
+      const pe=elevFt(p), ge=elevFt(tgt);
       if(pe!==null && ge!==null){ dFt=Math.round(ge-pe); adj=dc+dFt/3; }
     }
-    const wYd=Math.round(windYds(p,g.center,dc));
+    const wYd=Math.round(windYds(p,tgt,dc));
     adj+=wYd;
     const grav=GRAVS[gravIdx];
     if(gravIdx>0) plays=`plays ${Math.round(adj/grav.f)} on ${grav.name}`;
@@ -669,7 +679,7 @@ function renderProfile(h,p){
   const el=$('profile');
   const hide=()=>{ el.classList.remove('on'); el.innerHTML=''; };
   if(!profOn || !p || !TOPO){ hide(); return; }
-  const c=h.green.center, dTot=yds(p,c);
+  const c=target(h), dTot=yds(p,c);
   if(dTot<12){ hide(); return; }
   const N=44, es=[];
   for(let i=0;i<=N;i++){
@@ -995,7 +1005,7 @@ function renderMap(h,p,tb){
   s+=`<rect x="${teePt[0]-5}" y="${teePt[1]-5}" width="10" height="10" rx="2" fill="var(--accent2)"/>`;
   // carry arcs: selected club + one longer/shorter neighbor, centered on you (hole view only)
   if(pPt && pNear && !greenView){
-    const ci=CLUBS.indexOf(curClub), ac0=rot(c);
+    const ci=CLUBS.indexOf(curClub), ac0=rot(target(h));
     const adx=ac0[0]-pPt[0], ady=ac0[1]-pPt[1], adl=Math.hypot(adx,ady)||1;
     const aux=adx/adl, auy=ady/adl; // toward the green: label arcs along the strike direction
     [ci-1,ci,ci+1].forEach(ix=>{
@@ -1017,9 +1027,17 @@ function renderMap(h,p,tb){
       if(!greenView) s+=`<text x="${(q[0]+3.2).toFixed(1)}" y="${(q[1]+1.4).toFixed(1)}" font-size="4.5" font-weight="700" fill="var(--accent2)" opacity=".85">${i+1}</text>`;
     });
   }
-  // player + line to center
+  // today's pin flag (from the PIN sheet), drawn over the green
+  const pnLL=pinFor(h);
+  if(pnLL){
+    const pp=rot(pnLL), fh=greenView?4.2:9;
+    s+=`<g class="pinflag"><line x1="${pp[0].toFixed(1)}" y1="${pp[1].toFixed(1)}" x2="${pp[0].toFixed(1)}" y2="${(pp[1]-fh).toFixed(1)}" stroke="#fff" stroke-width="${greenView?0.35:1}"/>`
+      +`<path d="M${pp[0].toFixed(1)} ${(pp[1]-fh).toFixed(1)}L${(pp[0]-fh*0.55).toFixed(1)} ${(pp[1]-fh*0.72).toFixed(1)}L${pp[0].toFixed(1)} ${(pp[1]-fh*0.45).toFixed(1)}Z" fill="${TRACER.main}"/>`
+      +`<circle cx="${pp[0].toFixed(1)}" cy="${pp[1].toFixed(1)}" r="${greenView?0.5:1.3}" fill="#fff"/></g>`;
+  }
+  // player + line to the target (today's pin when set, else green center)
   if(pPt){
-    const cc=rot(c);
+    const cc=rot(target(h));
     if(theme==='dream') trail.slice(0,-1).forEach((tp,i)=>{
       const q=rot(tp);
       s+=`<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="${(2+i*0.8).toFixed(1)}" fill="var(--accent)" opacity="${((i+1)/trail.length*0.35).toFixed(2)}"/>`;
@@ -1041,11 +1059,12 @@ function renderMap(h,p,tb){
           +`<line x1="${apx2.toFixed(1)}" y1="${apy2.toFixed(1)}" x2="${fmx.toFixed(1)}" y2="${fmy.toFixed(1)}" stroke="${TRACER.main}" stroke-width=".5" stroke-dasharray="1.5 2" opacity=".55"/>`
           +`<circle class="flight-apex" cx="${apx2.toFixed(1)}" cy="${apy2.toFixed(1)}" r="1.7" fill="${TRACER.bright}"/>`;
         // flight stats at the apex — same data as the 3D tracer, scaled to the map
-        const dcY=yds(p,c);
+        const tgt2=target(h);
+        const dcY=yds(p,tgt2);
         let adj=dcY, dFt=0;
-        if(elevAdjust){ const pe=elevFt(p), ge=elevFt(c);
+        if(elevAdjust){ const pe=elevFt(p), ge=elevFt(tgt2);
           if(pe!==null && ge!==null){ dFt=Math.round(ge-pe); adj+=dFt/3; } }
-        const wYd=Math.round(windYds(p,c,dcY)); adj+=wYd;
+        const wYd=Math.round(windYds(p,tgt2,dcY)); adj+=wYd;
         const sug=suggestClub(Math.round(adj));
         const bits=[];
         if(Math.round(adj)!==Math.round(dcY)) bits.push('plays '+Math.round(adj));
@@ -1091,7 +1110,8 @@ function renderMap(h,p,tb){
   svg.style.aspectRatio = `${w.toFixed(1)} / ${ht.toFixed(1)}`; // element matches viewBox: no letterbox
   svg.innerHTML=s;
   mapTransform={unrot, svg};
-  $('maphint').textContent = demo ? 'tap anywhere to move' : `hole ${h.hole_number} — ${tee} tee`;
+  $('maphint').textContent = pinArm ? 'tap the green to drop today’s pin'
+    : demo ? 'tap anywhere to move' : `hole ${h.hole_number} — ${tee} tee`;
 }
 
 /* ============ 3D HOLE VIEW: canvas heightfield, no dependencies ============ */
@@ -1393,6 +1413,7 @@ function open3D(){
     if(d<bd){bd=d;best=v;}
   }
   D3.flagWorld=best;
+  const pn3=pinFor(h); if(pn3) D3.flagWorld=D3.mesh.toWorld(pn3); // flag + tracer land on today's pin
   $('d3Title').textContent=`HOLE ${h.hole_number} · PAR ${tee==='Red'?h.par_women:h.par} · 3D TERRAIN`;
   $('threeD').classList.add('open');
   D3.open=true;
@@ -1482,12 +1503,23 @@ function wire3D(){
 /* tap-to-move in demo mode */
 function mapTap(ev){
   if(!mapTransform) return;
-  if(!demo) setDemo(true,'tap');            // first tap on the map enters demo mode
   const svg=mapTransform.svg, r=svg.getBoundingClientRect();
   const vb=svg.viewBox.baseVal;
   const X=vb.x + (ev.clientX-r.left)/r.width*vb.width;
   const Y=vb.y + (ev.clientY-r.top)/r.height*vb.height;
-  demoPos=mapTransform.unrot(X,Y);
+  const ll=mapTransform.unrot(X,Y);
+  if(pinArm){ // this tap drops today's pin instead of moving the player
+    const h=hole();
+    if(yds(ll, h.green.center) <= 60){
+      freshPins();
+      pins.p[h.hole_number]={lat:ll.lat, lng:ll.lng}; savePins();
+      pinArm=false; render();
+      $('maphint').textContent='⛳ pin set for today';
+    } else $('maphint').textContent='closer to the green, please';
+    return;
+  }
+  if(!demo) setDemo(true,'tap');            // first tap on the map enters demo mode
+  demoPos=ll;
   // easter egg: land the tap on the pin (≤3 yds) on all 18 holes
   if(yds(demoPos, hole().green.center) <= 3){
     aced.add(hole().hole_number);
@@ -1528,6 +1560,27 @@ function init(data){
   $('autoBtn').onclick=()=>{autoHole=!autoHole;$('autoBtn').classList.toggle('on',autoHole);if(autoHole){detectHole();render();}};
   $('autoBtn').classList.toggle('on',autoHole);
   $('demoBtn').onclick=()=>setDemo(!demo);
+  // PIN sheet: tap arms the next map tap; long-press clears today's pin on this hole
+  {
+    const pb=$('pinBtn');
+    let plt=null, plFired=false;
+    pb.onclick=()=>{
+      if(plFired){ plFired=false; return; }
+      pinArm=!pinArm;
+      pb.style.color=pinArm?'var(--accent2)':'';
+      pb.style.borderColor=pinArm?'var(--accent2)':'';
+      render();
+    };
+    pb.addEventListener('pointerdown',()=>{
+      plt=setTimeout(()=>{ plFired=true; pinArm=false;
+        pb.style.color=''; pb.style.borderColor='';
+        delete pins.p[hole().hole_number]; savePins(); render();
+        $('maphint').textContent='pin cleared — distances to green center';
+      },550);
+    });
+    pb.addEventListener('pointerup',()=>clearTimeout(plt));
+    pb.addEventListener('pointerleave',()=>clearTimeout(plt));
+  }
   // flight profile inset: tap the CENTER box to toggle
   const cbx=document.querySelector('.dist .box.center');
   if(cbx){ cbx.title='tap: side-profile of the shot';
