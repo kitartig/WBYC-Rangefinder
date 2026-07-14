@@ -1030,6 +1030,32 @@ function renderMap(h,p,tb){
           +`<path class="flight" d="${fd}" fill="none" stroke="url(#arcgrad)" stroke-width="1.2"/>`
           +`<line x1="${apx2.toFixed(1)}" y1="${apy2.toFixed(1)}" x2="${fmx.toFixed(1)}" y2="${fmy.toFixed(1)}" stroke="${TRACER.main}" stroke-width=".5" stroke-dasharray="1.5 2" opacity=".55"/>`
           +`<circle class="flight-apex" cx="${apx2.toFixed(1)}" cy="${apy2.toFixed(1)}" r="1.7" fill="${TRACER.bright}"/>`;
+        // flight stats at the apex — same data as the 3D tracer, scaled to the map
+        const dcY=yds(p,c);
+        let adj=dcY, dFt=0;
+        if(elevAdjust){ const pe=elevFt(p), ge=elevFt(c);
+          if(pe!==null && ge!==null){ dFt=Math.round(ge-pe); adj+=dFt/3; } }
+        const wYd=Math.round(windYds(p,c,dcY)); adj+=wYd;
+        const sug=suggestClub(Math.round(adj));
+        const bits=[];
+        if(Math.round(adj)!==Math.round(dcY)) bits.push('plays '+Math.round(adj));
+        if(sug) bits.push(sug.club);
+        const fs1=Math.max(9,w*0.05), fs2=fs1*0.6;
+        const halo=sunMode?'rgba(255,255,255,.85)':'rgba(8,14,10,.75)';
+        const pcol=sunMode?'#be0096':TRACER.bright;
+        const scol=sunMode?'#2d2d37':'#e8eef6';
+        const lines=[['apex '+Math.round(apexM(fdl)/0.3048)+' ft',fs2,scol]];
+        if(bits.length) lines.push([bits.join(' · '),fs2,scol]);
+        lines.push([Math.round(dcY)+' yds',fs1,pcol]);
+        // stack upward from the apex dot; flip below it when the frame top is too close
+        const blockH=lines.reduce((s2,l)=>s2+l[1]*1.4,0);
+        const flip=(apy2-fs1-blockH)<minY+2;
+        let ty=flip? apy2+fs1*1.5 : apy2-fs1*0.9;
+        const bx=Math.max(minX+fs1*2.2, Math.min(maxX-fs1*2.2, apx2));
+        for(const [txt,fs,col] of (flip? lines.slice().reverse() : lines)){
+          s+=`<text class="fstat" x="${bx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" font-size="${fs.toFixed(1)}" font-weight="700" fill="${col}" paint-order="stroke" stroke="${halo}" stroke-width="${(fs*0.22).toFixed(1)}" stroke-linejoin="round">${txt}</text>`;
+          ty += flip? fs*1.4 : -fs*1.4;
+        }
       }
     }
     // "my ball": hot gold glow + pulsing gold halo + golf-ball dot (white with dimples)

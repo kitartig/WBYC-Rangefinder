@@ -65,7 +65,7 @@ A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, w
 
 Your shot to the green shows three ways, all in hot pink:
 
-- **On the hole map**, a pink arc bows off the straight line from your ball to the center. The straight line is the ground path (the arc's "shadow"); the small dashed tick ties the arc's high point back to the ground so you can tell it's height, not a hook. It's illustrative — the arc always curves toward the middle of the frame, whichever side that is.
+- **On the hole map**, a pink arc bows off the straight line from your ball to the center, with the flight stats stacked right at its peak — yardage big, then plays-like/club and apex height. The straight line is the ground path (the arc's "shadow"); the small dashed tick ties the arc's high point back to the ground so you can tell it's height, not a hook. It's illustrative — the arc always curves toward the middle of the frame, whichever side that is.
 - **Side profile**: tap the big **CENTER** number to open a strip under the map showing the actual terrain cross-section between you and the green — the green's surface highlighted, elevation change labeled (`+12 ft`), and the flight arc over it. This is the picture behind the "plays like" number. Tap CENTER again to hide it; the choice sticks.
 - **In 3D**, opening the view fires an animated tracer from your ball (or the tee) to the flag, with small stats pinned at the arc's peak: the raw yardage, the plays-like number with its elevation/wind parts, your suggested club once shot tracking knows you, and apex height. Tap **TRACE** to replay it. With WIND on, a crosswind visibly bends the flight late — just like it does outside.
 
