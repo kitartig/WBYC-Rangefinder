@@ -808,7 +808,7 @@ function renderMap(h,p,tb){
     +`<linearGradient id="wgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${WCOL[0]}"/><stop offset="100%" stop-color="${WCOL[1]}"/></linearGradient>`
     +'<radialGradient id="ballgrad" cx="35%" cy="30%" r="80%"><stop offset="0%" stop-color="#ffffff"/><stop offset="65%" stop-color="#eef2ef"/><stop offset="100%" stop-color="#c7d1ca"/></radialGradient>'
     +'<radialGradient id="halograd" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fff3a6" stop-opacity="1"/><stop offset="35%" stop-color="#ffd21f" stop-opacity=".75"/><stop offset="70%" stop-color="#ffab00" stop-opacity=".3"/><stop offset="100%" stop-color="#ff9500" stop-opacity="0"/></radialGradient>'
-    +'<filter id="vib"><feColorMatrix type="saturate" values="1.6"/><feComponentTransfer><feFuncR type="linear" slope="1.07" intercept="-0.02"/><feFuncG type="linear" slope="1.07" intercept="-0.02"/><feFuncB type="linear" slope="1.07" intercept="-0.02"/></feComponentTransfer></filter>'
+    +'<filter id="vib"><feColorMatrix type="saturate" values="2.05"/><feComponentTransfer><feFuncR type="linear" slope="1.11" intercept="-0.035"/><feFuncG type="linear" slope="1.11" intercept="-0.035"/><feFuncB type="linear" slope="1.11" intercept="-0.035"/></feComponentTransfer></filter>'
     +'</defs>';
   const ctrD=[]; // contour path strings, reused for on-green reading lines
   const aer = AERIALS ? AERIALS.find(a=>a.hole===h.hole_number) : null;
