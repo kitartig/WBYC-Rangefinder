@@ -1132,6 +1132,22 @@ function build3D(h){
     for(const k in cnt) if(cnt[k]>best){ best=cnt[k]; cl=+k; }
     cls[iy*NX+ix]=cl; frs[iy*NX+ix]=Math.round(best*51); // best/5 * 255
   }
+  // inpaint elevation gaps (grid edges / lidar holes) so the mesh has no torn cells
+  const filled=new Uint8Array(NX*NY);
+  let missing=0; for(let i=0;i<zs.length;i++) if(isNaN(zs[i])) missing++;
+  let guard=0;
+  while(missing>0 && guard++<120){
+    const src=zs.slice();
+    for(let iy=0;iy<NY;iy++) for(let ix=0;ix<NX;ix++){
+      const i=iy*NX+ix; if(!isNaN(src[i])) continue;
+      let sum=0,n2=0;
+      if(ix>0&&!isNaN(src[i-1])){sum+=src[i-1];n2++;}
+      if(ix<NX-1&&!isNaN(src[i+1])){sum+=src[i+1];n2++;}
+      if(iy>0&&!isNaN(src[i-NX])){sum+=src[i-NX];n2++;}
+      if(iy<NY-1&&!isNaN(src[i+NX])){sum+=src[i+NX];n2++;}
+      if(n2){ zs[i]=sum/n2; filled[i]=1; missing--; }
+    }
+  }
   const zmid=(zlo+zhi)/2;
   const verts=[]; // world coords per grid vertex: [x, y, z] (meters, z exaggerated)
   for(let iy=0;iy<NY;iy++) for(let ix=0;ix<NX;ix++){
@@ -1153,7 +1169,7 @@ function build3D(h){
     for(let i=0;i<cls.length;i++) if(cls[i]===1){
       const d=Math.hypot(verts[i][0]-gC[0],verts[i][1]-gC[1]); if(d>gR)gR=d; } }
   return {NX,NY,verts,zs,cls,frs,zlo,zhi,cdf:cdf3,gPoly:h.green.polygon,radius:Math.hypot(W,H)/2,
-          gC,gR,hasWater:cls.includes(3),
+          gC,gR,hasWater:cls.includes(3),filled,
           // lat/lng → mesh world coords (meters, z relative to zmid) for overlays like the tracer
           toWorld:(ll,zFt)=>{ const q=rot(ll); const e=(zFt!=null)?zFt:elevFt(ll);
             return [q[0]-(minX+W/2), q[1]-(minY+H/2), ((e==null?zmid:e)-zmid)*0.3048]; },
@@ -1177,9 +1193,7 @@ function draw3D(){
   };
   const P=new Array(m.verts.length);
   for(let i=0;i<m.verts.length;i++) P[i]=proj(m.verts[i]);
-  const ramp3d = theme==='sun' ? [[248,254,214],[152,227,77]]
-              : theme==='dream' ? [[32,22,96],[28,164,192],[224,72,255]]
-              : [[55,85,31],[171,237,85]];
+  const ramp3d = RAMPS[theme] || RAMPS.dark; // same terrain palette as the hole view
   const cells=[];
   const st = D3.fast ? 2 : 1; // adaptive quality: coarser mesh while dragging
   for(let iy=0;iy<m.NY-st;iy+=st) for(let ix=0;ix<m.NX-st;ix+=st){
@@ -1206,9 +1220,10 @@ function draw3D(){
     col=rampCol(ramp3d, m.cdf ? m.cdf[Math.min(95,(tl3*96)|0)]*0.65+tl3*0.35 : tl3);
     if(cl>0){
       const f=(m.frs?m.frs[i00]:255)/255;
-      const fc = cl===1 ? (theme==='dream'?[0,230,200]:[18,204,72])
-               : cl===2 ? (theme==='dream'?[214,186,255]:[236,206,138])
-               :          (theme==='dream'?[96,116,255]:[42,124,235]);
+      // feature colors = the hole view's CSS vars (--green-fill / --sand / --water) per theme
+      const fc = cl===1 ? (theme==='dream'?[9,253,184]:theme==='sun'?[23,213,98]:[31,238,117])
+               : cl===2 ? (theme==='dream'?[236,223,248]:theme==='sun'?[232,200,120]:[240,223,184])
+               :          (theme==='dream'?[76,110,245]:theme==='sun'?[30,77,140]:[58,110,165]);
       col=[col[0]+(fc[0]-col[0])*f, col[1]+(fc[1]-col[1])*f, col[2]+(fc[2]-col[2])*f];
       if(cl===3){ // animated water shimmer, scaled by coverage
         li += (Math.sin((v0[0]+v0[1])*0.35 + D3.time*2.2)*0.07
@@ -1224,8 +1239,10 @@ function draw3D(){
     ctx.moveTo(p0[0],p0[1]); ctx.lineTo(p1[0],p1[1]); ctx.lineTo(p2[0],p2[1]); ctx.lineTo(p3[0],p3[1]);
     ctx.closePath(); ctx.fill(); ctx.stroke();
     // fine solid contour hairlines: exact 2-ft level crossings across this quad
+    // (skipped on inpainted cells — synthetic elevations would draw phantom contours)
     const zc=[m.zs[i00],m.zs[i10],m.zs[i11],m.zs[i01]];
-    if(!zc.some(isNaN)){
+    const anyFill=m.filled && (m.filled[i00]||m.filled[i10]||m.filled[i11]||m.filled[i01]);
+    if(!zc.some(isNaN) && !anyFill){
       const lo2=Math.ceil(Math.min(...zc)/2)*2, hi2=Math.floor(Math.max(...zc)/2)*2;
       if(hi2>=lo2){
         const PS=[p0,p1,p2,p3];
