@@ -75,7 +75,7 @@ The profile and 3D stats respect your ± ELEV and WIND toggles, so what they sho
 
 Tap **GRN** (on the map, next to SAT/3D) to zoom to the green complex. Up close you get fall-line arrows: small dark arrows pointing **downhill**, longer = steeper, plus the pale micro-contour lines and your ball if you're on or near the green. Tap GRN again — or change holes — to jump back to the whole hole.
 
-The arrows come from USGS 3m elevation data, so treat them as the broad break (overall tilt and big shelves), not subtle 6-inch reads. They only appear in GRN view and hide in SAT.
+The arrows come from USGS 3m elevation data, so treat them as the broad break (overall tilt and big shelves), not subtle 6-inch reads. They only appear in GRN view — including over SAT imagery, where they render smaller and pale to sit on the photo. The aerial photos themselves get a saturation boost so the course reads lush rather than flat-survey gray.
 
 ## Shot tracking
 

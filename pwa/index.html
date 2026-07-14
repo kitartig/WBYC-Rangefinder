@@ -808,6 +808,7 @@ function renderMap(h,p,tb){
     +`<linearGradient id="wgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${WCOL[0]}"/><stop offset="100%" stop-color="${WCOL[1]}"/></linearGradient>`
     +'<radialGradient id="ballgrad" cx="35%" cy="30%" r="80%"><stop offset="0%" stop-color="#ffffff"/><stop offset="65%" stop-color="#eef2ef"/><stop offset="100%" stop-color="#c7d1ca"/></radialGradient>'
     +'<radialGradient id="halograd" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fff3a6" stop-opacity="1"/><stop offset="35%" stop-color="#ffd21f" stop-opacity=".75"/><stop offset="70%" stop-color="#ffab00" stop-opacity=".3"/><stop offset="100%" stop-color="#ff9500" stop-opacity="0"/></radialGradient>'
+    +'<filter id="vib"><feColorMatrix type="saturate" values="1.6"/><feComponentTransfer><feFuncR type="linear" slope="1.07" intercept="-0.02"/><feFuncG type="linear" slope="1.07" intercept="-0.02"/><feFuncB type="linear" slope="1.07" intercept="-0.02"/></feComponentTransfer></filter>'
     +'</defs>';
   const ctrD=[]; // contour path strings, reused for on-green reading lines
   const aer = AERIALS ? AERIALS.find(a=>a.hole===h.hole_number) : null;
@@ -876,7 +877,7 @@ function renderMap(h,p,tb){
     const sx=(aer.lon1-aer.lon0)*mLonA/aer.w, tx=(aer.lon0-c.lng)*mLonA;
     const sy=-(aer.lat1-aer.lat0)*mLatA/aer.h, ty=(aer.lat1-c.lat)*mLatA;
     const A=cos*sx, B=-sin*sx, C=-sin*sy, D=-cos*sy, E=cos*tx-sin*ty, Fq=-(sin*tx+cos*ty);
-    s+=`<image href="${aer.file}" width="${aer.w}" height="${aer.h}" transform="matrix(${A.toFixed(5)} ${B.toFixed(5)} ${C.toFixed(5)} ${D.toFixed(5)} ${E.toFixed(2)} ${Fq.toFixed(2)})" preserveAspectRatio="none"/>`;
+    s+=`<image href="${aer.file}" width="${aer.w}" height="${aer.h}" transform="matrix(${A.toFixed(5)} ${B.toFixed(5)} ${C.toFixed(5)} ${D.toFixed(5)} ${E.toFixed(2)} ${Fq.toFixed(2)})" preserveAspectRatio="none" filter="url(#vib)"/>`;
   }
   // dream mode: starfield (deterministic per hole)
   if(theme==='dream' && !satOn){
@@ -937,12 +938,12 @@ function renderMap(h,p,tb){
   // green: even radial shading + micro-contour reading lines clipped to the surface
   const gPath=smoothClosed(greenPts);
   s+=`<path class="greenp" d="${gPath}" fill="${satOn?'var(--green-fill)':'url(#ggrad)'}" fill-opacity="${satOn?0.25:1}" stroke="${satOn?'#acffbc':'var(--green-stroke)'}" stroke-width="1.6"${dreamFx}/>`;
-  if(!satOn && TOPO){
+  if(TOPO){
     s+=`<clipPath id="gclip"><path d="${gPath}"/></clipPath>`;
     if(ctrD.length){
-      const gl = theme==='sun' ? '#dfffe9' : theme==='dream' ? '#aefff1' : '#cdf5d8';
+      const gl = satOn ? '#eafff0' : theme==='sun' ? '#dfffe9' : theme==='dream' ? '#aefff1' : '#cdf5d8';
       s+=`<g clip-path="url(#gclip)">`
-        + ctrD.map(d=>`<path class="ctr" d="${d}" fill="none" stroke="${gl}" stroke-width="0.6" opacity="0.55"/>`).join('')
+        + ctrD.map(d=>`<path class="ctr" d="${d}" fill="none" stroke="${gl}" stroke-width="${satOn?0.5:0.6}" opacity="${satOn?0.5:0.55}"/>`).join('')
         + '</g>';
     }
     // fall-line arrows: point downhill, longer = steeper (from the 3m green-complex patches).
@@ -964,15 +965,16 @@ function renderMap(h,p,tb){
       const mag=Math.hypot(gvX,gvY), sl=mag*100;
       if(sl<0.7) continue; // flat / noise
       const ux=-gvX/mag, uy=-gvY/mag; // downhill
-      const L=Math.min(step*0.85, 1.6+sl*0.9), hw=Math.min(1.6,L*0.3);
+      const AS=satOn?0.72:1; // smaller arrows over the photo
+      const L=Math.min(step*0.85, 1.6+sl*0.9)*AS, hw=Math.min(1.6,L*0.3);
       const tx=X+ux*L/2, ty=Y+uy*L/2, qx=X-ux*L/2, qy=Y-uy*L/2, px=-uy, py=ux;
       arr+=`<path d="M${qx.toFixed(1)} ${qy.toFixed(1)}L${tx.toFixed(1)} ${ty.toFixed(1)}`
         +`M${(tx-ux*hw+px*hw).toFixed(1)} ${(ty-uy*hw+py*hw).toFixed(1)}L${tx.toFixed(1)} ${ty.toFixed(1)}`
         +`L${(tx-ux*hw-px*hw).toFixed(1)} ${(ty-uy*hw-py*hw).toFixed(1)}"/>`;
     }
     if(arr){
-      const ac = theme==='sun' ? '#0e6b34' : theme==='dream' ? '#06424d' : '#0d5c30';
-      s+=`<g class="fall" clip-path="url(#gclip)" fill="none" stroke="${ac}" stroke-width="0.16" opacity=".75" stroke-linecap="round" stroke-linejoin="round">${arr}</g>`;
+      const ac = satOn ? '#f4fff6' : theme==='sun' ? '#0e6b34' : theme==='dream' ? '#06424d' : '#0d5c30';
+      s+=`<g class="fall" clip-path="url(#gclip)" fill="none" stroke="${ac}" stroke-width="${satOn?0.14:0.16}" opacity="${satOn?0.9:0.75}" stroke-linecap="round" stroke-linejoin="round">${arr}</g>`;
     }
     }
   }
