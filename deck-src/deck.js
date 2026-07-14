@@ -210,7 +210,7 @@ s.addText([
 ],{x:7.23,y:2.3,w:5.25,h:3.5,fontFace:BF,fontSize:14.5,margin:0});
 s.addText('Structured as a barter of services — both sides should confirm tax treatment with their accountants.',
   {x:0.57,y:6.45,w:11.5,h:0.35,fontFace:BF,fontSize:11,italic:true,color:DIM,margin:0});
-s.addNotes('If asked "why not one-time?": a one-time sale hands the club a depreciating asset; the annual trade buys a living service — seasonal re-survey, fixes, roadmap — and the ask sits below the $18K/yr member-value ceiling. Either side can walk at renewal.');
+s.addNotes('If asked "why not one-time?": a one-time sale hands the club a depreciating asset; the annual trade buys a living service — seasonal re-survey, fixes, roadmap — and the ask sits below the $18K/yr member-value ceiling. Either side can walk at renewal.\n\nIf they balk at "discounting dues in perpetuity": (1) Reframe — it is not perpetual, it is an annual subscription the club can cancel; renewal is earned each spring by visible work (the app matched the new 4/2026 scorecard the same season). (2) Mirror — the club already pays software forever: the website runs on Jonas Club Software, invoiced annually. Same line item, zero cash, member vendor. (3) Fallback ladder, concede in this order: declining schedule (full credit yrs 1-2, half after) → capped trade (credits stop at an agreed build value, ~$45-75K anchor, then paid-up license + small retainer) → buyout option (convert to perpetual license anytime, price minus dues already traded). (4) If dues are sacred, switch currency: F&B credit or guest passes pass easier than touching the dues ledger.');
 foot(s,'09');
 
 // ---------- S9 INCLUDED SERVICES ----------
@@ -329,7 +329,32 @@ s.addText('Full walkthrough: wbyc-user-guide.md ships with the app.',
   {x:0.57,y:6.72,w:11,h:0.3,fontFace:BF,fontSize:10,italic:true,color:DIM,margin:0});
 s.addText('WBYC Rangefinder · a member-built proposal · 13',{x:0.55,y:7.08,w:6,h:0.3,fontFace:BF,fontSize:9,color:DIM,margin:0});
 
-// ---------- S14 CLOSE ----------
+// ---------- S14 DEAL STRUCTURES ----------
+s = pres.addSlide();
+s.background = {color:GRNXL};
+s.addText('Appendix: four ways to structure it', {x:0.55,y:0.42,w:11.5,h:0.75,fontFace:HF,fontSize:36,bold:true,color:INK,margin:0});
+s.addText('Nothing here is "in perpetuity" — every structure has a built-in exit. The club already licenses software annually (its own website runs on Jonas Club Software); this is the same line item, paid in trade.',
+  {x:0.57,y:1.18,w:12,h:0.62,fontFace:BF,fontSize:13.5,italic:true,color:DIM,margin:0});
+const deals=[
+  ['Annual renewal  ·  as proposed','Dues credited year to year; either side can walk each spring. Renewal is earned by visible work — data refresh, fixes, new features.',INK,true],
+  ['Declining schedule','Full dues credit in years 1–2 (recovering the build), stepping to half thereafter as pure maintenance.',GRN,false],
+  ['Capped trade','Credits accumulate to an agreed build value ($45K–$75K lens); the club then holds a paid-up license with a small annual retainer.',GRN,false],
+  ['Buyout option','Convert to a perpetual license anytime for a fixed sum minus dues already traded — an exit that never gets more expensive.',GRN,false],
+];
+deals.forEach((dl,i)=>{
+  const col=i%2, row=(i-col)/2;
+  const x=0.55+col*6.35, y=2.05+row*2.2;
+  s.addShape('roundRect',{x:x,y:y,w:5.88,h:1.95,rectRadius:0.14,
+    fill:{color:dl[3]?INK:WHT}, line:{color:'D5E8DC',width:1}});
+  s.addText(dl[0],{x:x+0.3,y:y+0.2,w:5.3,h:0.4,fontFace:BF,fontSize:14.5,bold:true,color:dl[3]?'FFA5EB':GRN,margin:0});
+  s.addText(dl[1],{x:x+0.3,y:y+0.65,w:5.3,h:1.15,fontFace:BF,fontSize:11.5,color:dl[3]?PALE:'33463C',margin:0});
+});
+s.addText('If dues are the sticking point, the same value trades cleanly as F&B credit or guest passes.',
+  {x:0.57,y:6.55,w:11.5,h:0.35,fontFace:BF,fontSize:11,italic:true,color:DIM,margin:0});
+s.addNotes('Lead with the top-left card — it is the actual proposal. The other three are concessions; offer them in reading order and stop as soon as one lands.');
+s.addText('WBYC Rangefinder · a member-built proposal · 14',{x:0.55,y:7.08,w:6,h:0.3,fontFace:BF,fontSize:9,color:DIM,margin:0});
+
+// ---------- S15 CLOSE ----------
 s = pres.addSlide();
 s.background = {path: P+'hero.png'};
 s.addShape('rect',{x:0,y:0,w:13.33,h:7.5,fill:{color:'071F13',transparency:35}});
