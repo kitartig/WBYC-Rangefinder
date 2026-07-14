@@ -197,6 +197,7 @@ s.addText('THE CLUB RECEIVES',{x:0.95,y:1.8,w:5.2,h:0.4,fontFace:BF,fontSize:13,
 s.addText([
   {text:'Exclusive club license to WBYC Rangefinder for members and guests',options:{bullet:true,breakLine:true,paraSpaceAfter:10}},
   {text:'Hosting, maintenance and OS/browser updates — handled',options:{bullet:true,breakLine:true,paraSpaceAfter:10}},
+  {text:'Can be integrated into the WBYC app: works alongside the club’s existing Jonas system as a simple menu link — no vendor coordination required',options:{bullet:true,breakLine:true,paraSpaceAfter:10}},
   {text:'Reasonable revisions and update services, free (details next slide)',options:{bullet:true,breakLine:true,paraSpaceAfter:10}},
   {text:'A member-built story for the club’s 106th season — and a recruiting talking point',options:{bullet:true}},
 ],{x:0.95,y:2.3,w:5.25,h:3.5,fontFace:BF,fontSize:14.5,color:'22352B',margin:0});
