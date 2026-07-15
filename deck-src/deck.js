@@ -300,6 +300,7 @@ const inv=[
     'Auto hole detection as you walk',
     'Ball-flight tracer: map arc, side profile, 3D flyover + stats',
     'Pin sheet: tap today’s pin — every number re-keys to it',
+    'Pinch-zoom hole map, up to 8×',
     'Tournament switch: one tap to legal raw yardages']],
   ['SCORING & YOUR GAME',[
     'Running strokes / putts / fairways strip',
@@ -309,7 +310,8 @@ const inv=[
     'Club hints inside the plays-like readout',
     'Shot map: numbered dots + trail per hole',
     'One-tap GHIN posting helper',
-    'Women’s par handled automatically from the Red tees']],
+    'Your name signs the card & GHIN posts (device-only)',
+    'All five tee sets, incl. the new Greens, correct pars & handicaps']],
   ['CRAFT & PLATFORM',[
     '2-ft contours; fall-line arrows on every green',
     'Hypsometric terrain tint with hillshading',
@@ -318,13 +320,14 @@ const inv=[
     'Three themes, incl. a bright-sunlight mode',
     'Offline PWA: home-screen install, wake lock',
     'No accounts, ads, or data collection',
+    'One-tap call to the Golf House bar/dining',
     'A little hidden whimsy for those who explore']],
 ];
 inv.forEach((c2,ci)=>{
   const x=0.55+ci*4.18;
   s.addText(c2[0],{x:x,y:1.8,w:3.9,h:0.35,fontFace:BF,fontSize:12,bold:true,charSpacing:2,color:ci===2?PINK:GRN,margin:0});
-  s.addText(c2[1].map((t,i)=>({text:t,options:{bullet:{code:'2022',indent:10},breakLine:i<c2[1].length-1,paraSpaceAfter:7}})),
-    {x:x,y:2.25,w:3.95,h:4.4,fontFace:BF,fontSize:10.5,color:'33463C',margin:0,valign:'top'});
+  s.addText(c2[1].map((t,i)=>({text:t,options:{bullet:{code:'2022',indent:10},breakLine:i<c2[1].length-1,paraSpaceAfter:6}})),
+    {x:x,y:2.25,w:3.95,h:4.5,fontFace:BF,fontSize:10,color:'33463C',margin:0,valign:'top'});
 });
 s.addText('Full walkthrough: wbyc-user-guide.md ships with the app.',
   {x:0.57,y:6.72,w:11,h:0.3,fontFace:BF,fontSize:10,italic:true,color:DIM,margin:0});
