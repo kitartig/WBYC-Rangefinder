@@ -73,6 +73,9 @@
   header h1{font-family:'EB Garamond',Garamond,Baskerville,'Times New Roman',serif;
     font-size:18px;font-weight:500;letter-spacing:1.2px;text-transform:uppercase}
   header .sub{font-size:11px;color:var(--dim)}
+  /* club logo renders white in real life — collapse the beige artwork to a tintable silhouette */
+  #logo{filter:brightness(0) invert(1)}
+  body.sun #logo{filter:brightness(0)} /* white would vanish on the sunlight theme's cream */
   #tagline{display:flex;justify-content:space-between;align-items:center;margin:2px 0 8px}
   #pname{font-family:'EB Garamond',Garamond,Baskerville,'Times New Roman',serif;font-style:italic;
     font-weight:500;font-size:14px;color:var(--text);cursor:pointer;padding:4px 6px 4px 12px;
