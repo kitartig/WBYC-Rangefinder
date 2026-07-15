@@ -1156,12 +1156,14 @@ function renderMap(h,p,tb){
   if(windAdjust && wind.src && wind.spd>=1 && wind.dir!==null){
     const holeBrg=Math.atan2(vx,vy)*180/Math.PI;
     const rotA=(((wind.dir+180-holeBrg)%360)+360)%360; // blowing-to bearing, relative to hole-up
-    const asz=Math.max(10,Math.min(20,w*0.055));
+    const asz=greenView ? w*0.055 : Math.max(10,Math.min(20,w*0.055)); // no size floor up close — it dwarfed the green
+    const wsw=greenView ? (asz*0.17).toFixed(2) : '2.4';
+    const wfs=greenView ? (asz*0.62).toFixed(1) : String(Math.max(8,Math.round(asz*0.6)));
     const ax=maxX-asz*1.5, ay=minY+asz*1.6;
     s+=`<g transform="rotate(${rotA.toFixed(0)} ${ax.toFixed(1)} ${ay.toFixed(1)})" opacity=".9">`
-      +`<line x1="${ax.toFixed(1)}" y1="${(ay+asz*0.7).toFixed(1)}" x2="${ax.toFixed(1)}" y2="${(ay-asz*0.7).toFixed(1)}" stroke="var(--accent2)" stroke-width="2.4" stroke-linecap="round"/>`
-      +`<path d="M${(ax-asz*0.38).toFixed(1)} ${(ay-asz*0.15).toFixed(1)}L${ax.toFixed(1)} ${(ay-asz*0.7).toFixed(1)}L${(ax+asz*0.38).toFixed(1)} ${(ay-asz*0.15).toFixed(1)}" fill="none" stroke="var(--accent2)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g>`
-      +`<text x="${ax.toFixed(1)}" y="${(ay+asz*1.55).toFixed(1)}" text-anchor="middle" font-size="${Math.max(8,Math.round(asz*0.6))}" font-weight="700" fill="var(--accent2)">${wind.spd}</text>`;
+      +`<line x1="${ax.toFixed(1)}" y1="${(ay+asz*0.7).toFixed(1)}" x2="${ax.toFixed(1)}" y2="${(ay-asz*0.7).toFixed(1)}" stroke="var(--accent2)" stroke-width="${wsw}" stroke-linecap="round"/>`
+      +`<path d="M${(ax-asz*0.38).toFixed(1)} ${(ay-asz*0.15).toFixed(1)}L${ax.toFixed(1)} ${(ay-asz*0.7).toFixed(1)}L${(ax+asz*0.38).toFixed(1)} ${(ay-asz*0.15).toFixed(1)}" fill="none" stroke="var(--accent2)" stroke-width="${wsw}" stroke-linecap="round" stroke-linejoin="round"/></g>`
+      +`<text x="${ax.toFixed(1)}" y="${(ay+asz*1.55).toFixed(1)}" text-anchor="middle" font-size="${wfs}" font-weight="700" fill="var(--accent2)">${wind.spd}</text>`;
   }
   const svg=$('map');
   svg.style.aspectRatio = `${w.toFixed(1)} / ${ht.toFixed(1)}`; // element matches viewBox: no letterbox
