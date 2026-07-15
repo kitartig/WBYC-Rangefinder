@@ -35,6 +35,7 @@ Tap **+ your name** (top right, next to the Bar/Dining button) and enter it once
 
 ## On the course
 
+- **Pinch to zoom** anywhere on the hole map — two fingers zoom around your fingertips and drag to pan; pinch back out (or change holes) to snap back to the full hole. GRN remains the one-tap green zoom.
 - **Just stand over your ball.** The white golf ball with the glowing gold halo is you. The app averages your last 5 GPS fixes, so stand still a few seconds for best accuracy (±3–5 m typical).
 - **AUTO** (on by default) switches holes for you as you walk — it picks whichever hole's centerline you're nearest. Use **‹ ›** to browse manually (this turns AUTO off; tap AUTO to re-enable).
 - **Distances** update live: front / **CENTER** / back of green. Under CENTER, the "plays like" line stacks everything the app knows: elevation, wind, and (once shot tracking has data) your club — e.g. `plays 152 (+6 ft, wind +4) · 7i`.

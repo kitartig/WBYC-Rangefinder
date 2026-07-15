@@ -115,7 +115,7 @@
   .dist .plays{font-size:11px;font-weight:700;color:var(--accent2);min-height:14px}
 
   #mapwrap{background:var(--card);border:1px solid var(--line);border-radius:12px;
-    margin-bottom:10px;overflow:hidden;position:relative}
+    margin-bottom:10px;overflow:hidden;position:relative;touch-action:pan-y}
   #mapbtns{position:absolute;top:8px;right:8px;display:flex;gap:6px}
   #shotbar{position:absolute;bottom:22px;left:8px;display:flex;gap:6px;align-items:center}
   #shotbar select{background:rgba(10,16,12,.55);color:#fff;border:2px solid #35c8ff;border-radius:7px;
@@ -608,8 +608,9 @@ function renderStats(){
 function fmt(d){ return d==null ? '–' : String(Math.round(d)); }
 
 function render(){
-  if(render.lastH!==holeIdx){ // leaving a hole exits green view
+  if(render.lastH!==holeIdx){ // leaving a hole exits green view and any pinch zoom
     render.lastH=holeIdx;
+    mapZoom=null;
     if(greenView){ greenView=false; $('grnBtn').classList.remove('on'); }
   }
   const h = hole(), p = playerPos(), tb = teeBox(h);
@@ -743,6 +744,48 @@ function renderProfile(h,p){
 
 /* ---- SVG map ---- */
 let mapTransform=null; // for tap-to-move inverse
+let mapZoom=null, lastPinch=0; // pinch-zoom state: {k, cx, cy} in the hole's frame
+function applyMapZoom(){
+  if(!mapTransform) return;
+  const [bx,by,bw,bh]=mapTransform.base;
+  let vb=[bx,by,bw,bh];
+  if(mapZoom && mapZoom.k>1.03){
+    const zw=bw/mapZoom.k, zh=bh/mapZoom.k;
+    const zx=Math.max(bx,Math.min(bx+bw-zw, mapZoom.cx-zw/2));
+    const zy=Math.max(by,Math.min(by+bh-zh, mapZoom.cy-zh/2));
+    vb=[zx,zy,zw,zh];
+  } else mapZoom=null; // pinched back out — snap to the full hole
+  mapTransform.svg.setAttribute('viewBox', vb.map(v=>v.toFixed(1)).join(' '));
+}
+function initMapGestures(){ // two-finger pinch: zoom around the fingers, drag to pan
+  const wrap=$('mapwrap'), pts=new Map(); let g=null;
+  wrap.addEventListener('pointerdown',e=>{
+    pts.set(e.pointerId,[e.clientX,e.clientY]);
+    if(pts.size===2 && mapTransform){
+      const [a,b]=[...pts.values()], vb=mapTransform.svg.viewBox.baseVal;
+      g={d0:Math.hypot(a[0]-b[0],a[1]-b[1])||1, vb0:[vb.x,vb.y,vb.width,vb.height],
+         k0:mapTransform.base[2]/(vb.width||1)};
+    }
+  });
+  wrap.addEventListener('pointermove',e=>{
+    if(!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId,[e.clientX,e.clientY]);
+    if(pts.size===2 && g && mapTransform){
+      const [a,b]=[...pts.values()], r=mapTransform.svg.getBoundingClientRect();
+      const d=Math.hypot(a[0]-b[0],a[1]-b[1])||1, mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+      const k=Math.max(1,Math.min(8, g.k0*d/g.d0));
+      const zw=mapTransform.base[2]/k, zh=mapTransform.base[3]/k;
+      const mu=(mid[0]-r.left)/(r.width||1), mv=(mid[1]-r.top)/(r.height||1);
+      const wx=g.vb0[0]+mu*g.vb0[2], wy=g.vb0[1]+mv*g.vb0[3]; // world point under the fingers
+      mapZoom={k, cx:wx+(0.5-mu)*zw, cy:wy+(0.5-mv)*zh};
+      lastPinch=Date.now();
+      applyMapZoom();
+      e.preventDefault();
+    }
+  },{passive:false});
+  const done=e=>{ pts.delete(e.pointerId); if(pts.size<2) g=null; };
+  wrap.addEventListener('pointerup',done); wrap.addEventListener('pointercancel',done);
+}
 function renderMap(h,p,tb){
   const g=h.green, c=g.center;
   const mLat=111320, mLon=111320*Math.cos(c.lat*Math.PI/180);
@@ -1119,10 +1162,10 @@ function renderMap(h,p,tb){
       +`<text x="${ax.toFixed(1)}" y="${(ay+asz*1.55).toFixed(1)}" text-anchor="middle" font-size="${Math.max(8,Math.round(asz*0.6))}" font-weight="700" fill="var(--accent2)">${wind.spd}</text>`;
   }
   const svg=$('map');
-  svg.setAttribute('viewBox', `${minX.toFixed(1)} ${minY.toFixed(1)} ${w.toFixed(1)} ${ht.toFixed(1)}`);
   svg.style.aspectRatio = `${w.toFixed(1)} / ${ht.toFixed(1)}`; // element matches viewBox: no letterbox
   svg.innerHTML=s;
-  mapTransform={unrot, svg};
+  mapTransform={unrot, svg, base:[minX,minY,w,ht]};
+  applyMapZoom(); // sets the viewBox (pinched view if active, else the full hole)
   $('maphint').textContent = pinArm ? 'tap the green to drop today’s pin'
     : demo ? 'tap anywhere to move' : `hole ${h.hole_number} — ${tee} tee`;
 }
@@ -1516,6 +1559,7 @@ function wire3D(){
 /* tap-to-move in demo mode */
 function mapTap(ev){
   if(!mapTransform) return;
+  if(Date.now()-lastPinch<400) return; // settling fingers after a pinch aren't a tap
   const svg=mapTransform.svg, r=svg.getBoundingClientRect();
   const vb=svg.viewBox.baseVal;
   const X=vb.x + (ev.clientX-r.left)/r.width*vb.width;
@@ -1732,6 +1776,7 @@ function init(data){
   if(!TOPO) $('d3Btn').style.display='none';
   $('d3Btn').onclick=open3D;
   wire3D();
+  initMapGestures();
   render();
   startGeo();
 }
