@@ -25,9 +25,15 @@ A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, w
 - **Works offline** — installs to your home screen as an app; scorecard and shots survive restarts
 - A little hidden whimsy for those who explore
 
-## Your name
+## Your name & starting your record
 
-Tap **+ your name** (top right, next to the Bar/Dining button) and enter it once. It signs your scorecard title and your GHIN post text, and stays on the device. Tap it again anytime to change it; clear it to go anonymous.
+Three moves, and only the first is setup:
+
+1. **Tap "+ your name"** (top right, next to the Bar/Dining button) — once. It signs your scorecard and GHIN posts, and stays on the device.
+2. **Just play.** Every tap of TOTAL SCORE / PUTTS / FW and every SHOT mark saves itself instantly — there is no save button to forget.
+3. **At the last green, tap the card, then NEW.** That banks the round into your history — this is the move that builds your record: the vs-par trend, bests, averages, and club distances all grow from banked rounds. (POST first if you're sending it to GHIN.)
+
+Change your name anytime by tapping it; clear it to go anonymous. Rounds you never bank aren't lost — the card just waits for you.
 
 ## One-time setup
 

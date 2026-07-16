@@ -101,7 +101,7 @@ s.addText('No profile, no sign-up: score a hole or mark a shot and the round sav
 const home=[
   ['Replay every hole','The 3D flyover, tracer and flight stats work from the couch exactly as they did on the tee — spin the terrain, argue the club choice.'],
   ['Walk the card','Strokes, putts, fairways and GIR hole by hole; tap any row to jump back to that hole’s map and relive it.'],
-  ['Watch the season build','Vs-par trend, personal bests, last-five averages, and club distances that keep learning from every marked shot.'],
+  ['Watch the season build','One tap of NEW at the last green banks the round; the vs-par trend, personal bests, last-five averages, and learned club distances all grow from there.'],
   ['Any screen, no fuss','It’s a web app — phone on the course, iPad on the sofa, laptop in the den. Same link, no installs, no accounts.'],
 ];
 home.forEach((f,i)=>{
