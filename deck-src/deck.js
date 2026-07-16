@@ -133,7 +133,9 @@ s.addText('… for generic maps of 40,000 courses they don’t play, behind acco
 s.addShape('roundRect',{x:0.55,y:4.0,w:12.23,h:2.15,rectRadius:0.14,fill:{color:INK}});
 s.addText([{text:'WBYC Rangefinder: $0 to every member.',options:{fontSize:26,bold:true,color:WHT,breakLine:true}},
   {text:'One course, drawn from lidar and the club’s own card — sharper than any of them on the only 18 holes that matter here. ~300 golfing members × $60/yr equivalent ≈ $18,000/yr of member value.',
-   options:{fontSize:14.5,color:PALE}}],
+   options:{fontSize:14.5,color:PALE,breakLine:true}},
+  {text:'Adoption ask: 40 seconds. Open the link → allow location → Add to Home Screen. No App Store, no account, no update chores.',
+   options:{fontSize:13,italic:true,color:'FFA5EB'}}],
   {x:0.95,y:4.3,w:11.4,h:1.6,fontFace:BF,margin:0});
 s.addText('Consumer pricing: ScoringZone & Birvix app-pricing surveys, 2026. Member count is an assumption — replace with the club’s roster.',
   {x:0.55,y:6.55,w:12,h:0.3,fontFace:BF,fontSize:9,color:DIM,margin:0});

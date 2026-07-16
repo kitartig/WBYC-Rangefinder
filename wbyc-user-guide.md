@@ -37,10 +37,16 @@ Change your name anytime by tapping it; clear it to go anonymous. Rounds you nev
 
 ## One-time setup
 
-1. Deploy the `pwa/` folder to Netlify (drag-and-drop at app.netlify.com/drop works).
-2. Open the URL on your phone in Safari/Chrome → **Allow location** when prompted.
-3. **Add to Home Screen** — this installs it as an app with offline support.
-4. Sanity check from anywhere: status bar should go green with `GPS ±Xm · n/5 fixes`. If it says demo mode, GPS isn't coming through.
+**Publishing (once, on a computer):** drag the `pwa/` folder onto app.netlify.com/drop — it returns the app's URL (rename it in Site settings). Live wind starts working the moment it's served from there.
+
+**Installing on a phone (~40 seconds):**
+
+1. Open the URL in **Safari** (iPhone installs require Safari; Android: Chrome).
+2. Tap **Allow** when asked for location.
+3. Tap the **Share button** (square with the up-arrow) → **Add to Home Screen** → Add.
+4. From then on, launch it from the home-screen icon like any app — full screen, works offline, keeps the display awake during a round.
+
+Sanity check outdoors: the status line goes green with `GPS ±Xm · n/5 fixes`. If it says demo mode, location was declined — fix in Settings → Privacy → Location Services → Safari Websites. (App updates arrive on the *second* launch after we ship them — close and reopen twice.)
 
 ## On the course
 
