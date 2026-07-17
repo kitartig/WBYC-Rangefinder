@@ -879,7 +879,8 @@ function renderMap(h,p,tb){
     if(extAxis===0){ minX+=bestS; maxX+=bestS; } else { minY+=bestS; maxY+=bestS; }
   }
 
-  const GCOL={dark:['#6bff96','#1fee75'],sun:['#43f976','#17d562'],dream:['#6cffd1','#09fdb8']}[theme]||['#6bff96','#1fee75'];
+  // greens: soft light-green dome (radial light center → gently deeper rim = subtle 3D)
+  const GCOL={dark:['#e2f8e7','#9edcb4'],sun:['#ecfbee','#a3ddb2'],dream:['#e0fff5','#93e9cd']}[theme]||['#e2f8e7','#9edcb4'];
   const WCOL={dark:['#4a7fb5','#2f5781'],sun:['#3b7cc0','#1c4a80'],dream:['#6f86ff','#3d55d6']}[theme]||['#4a7fb5','#2f5781'];
   let s='<defs><filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
     +`<radialGradient id="ggrad" cx="42%" cy="38%" r="78%"><stop offset="0%" stop-color="${GCOL[0]}"/><stop offset="100%" stop-color="${GCOL[1]}"/></radialGradient>`
@@ -903,7 +904,7 @@ function renderMap(h,p,tb){
         s+=`<image href="${renderMap._turl}" x="${minX.toFixed(1)}" y="${minY.toFixed(1)}" width="${w.toFixed(1)}" height="${ht.toFixed(1)}" preserveAspectRatio="none"/>`;
       } else {
       const dprT=(typeof window!=='undefined'&&window.devicePixelRatio)||1;
-      const cw=greenView?380:Math.min(380,Math.max(200,Math.round(180*Math.min(2.1,dprT))));
+      const cw=greenView?440:Math.min(380,Math.max(200,Math.round(180*Math.min(2.1,dprT))));
       const chh=Math.max(60, Math.round(cw*ht/w));
       const cv=document.createElement('canvas'); cv.width=cw; cv.height=chh;
       const ctx=cv.getContext('2d'), img=ctx.createImageData(cw,chh);
@@ -1015,14 +1016,44 @@ function renderMap(h,p,tb){
   }
   // green: even radial shading + micro-contour reading lines clipped to the surface
   const gPath=smoothClosed(greenPts);
-  s+=`<path class="greenp" d="${gPath}" fill="${satOn?'var(--green-fill)':'url(#ggrad)'}" fill-opacity="${satOn?0.25:1}" stroke="${satOn?'#acffbc':'var(--green-stroke)'}" stroke-width="1.6"${dreamFx}/>`;
+  s+=`<path class="greenp" d="${gPath}" fill="${satOn?'var(--green-fill)':'url(#ggrad)'}" fill-opacity="${satOn?0.25:1}" stroke="${satOn?'#acffbc':'#4bb27c'}" stroke-width="1.6"${dreamFx}/>`;
   if(TOPO){
     s+=`<clipPath id="gclip"><path d="${gPath}"/></clipPath>`;
-    if(ctrD.length){
+    if(ctrD.length && (!greenView || satOn)){ // coarse 2-ft reading lines (green view gets finer ones below)
       const gl = satOn ? '#eafff0' : theme==='sun' ? '#dfffe9' : theme==='dream' ? '#aefff1' : '#cdf5d8';
       s+=`<g clip-path="url(#gclip)">`
-        + ctrD.map(d=>`<path class="ctr" d="${d}" fill="none" stroke="${gl}" stroke-width="${satOn?0.5:0.6}" opacity="${satOn?0.5:0.55}"/>`).join('')
+        + ctrD.map(d=>`<path class="ctr" d="${d}" fill="none" stroke="${satOn?'#eafff0':'#3f9868'}" stroke-width="${satOn?0.5:0.5}" opacity="${satOn?0.5:0.45}"/>`).join('')
         + '</g>';
+    }
+    if(greenView && !satOn){
+      // finer reading: 1-ft contour hairlines computed live from the 3 m lidar green patches
+      const gXs2=greenPts.map(q=>q[0]), gYs2=greenPts.map(q=>q[1]);
+      const fx0=Math.min(...gXs2)-2, fx1=Math.max(...gXs2)+2, fy0=Math.min(...gYs2)-2, fy1=Math.max(...gYs2)+2;
+      const nx=Math.min(64,Math.max(16,Math.ceil((fx1-fx0)/1.2))), ny=Math.min(64,Math.max(16,Math.ceil((fy1-fy0)/1.2)));
+      const E=new Float32Array((nx+1)*(ny+1)); let flo=Infinity, fhi=-Infinity;
+      for(let iy=0;iy<=ny;iy++) for(let ix=0;ix<=nx;ix++){
+        const e=elevFt(unrot(fx0+ix/nx*(fx1-fx0), fy0+iy/ny*(fy1-fy0)));
+        const v=(e==null)?NaN:e; E[iy*(nx+1)+ix]=v;
+        if(!isNaN(v)){ if(v<flo)flo=v; if(v>fhi)fhi=v; }
+      }
+      const FX=ix=>fx0+ix/nx*(fx1-fx0), FY=iy=>fy0+iy/ny*(fy1-fy0);
+      let fd='';
+      for(let L=Math.ceil(flo);L<=Math.floor(fhi);L++){
+        for(let iy=0;iy<ny;iy++) for(let ix=0;ix<nx;ix++){
+          const a=E[iy*(nx+1)+ix], b=E[iy*(nx+1)+ix+1], c2=E[(iy+1)*(nx+1)+ix+1], d2=E[(iy+1)*(nx+1)+ix];
+          if(isNaN(a)||isNaN(b)||isNaN(c2)||isNaN(d2)) continue;
+          const px2=[];
+          if((a<L)!==(b<L)) px2.push([FX(ix)+(L-a)/(b-a)*(FX(ix+1)-FX(ix)), FY(iy)]);
+          if((b<L)!==(c2<L)) px2.push([FX(ix+1), FY(iy)+(L-b)/(c2-b)*(FY(iy+1)-FY(iy))]);
+          if((d2<L)!==(c2<L)) px2.push([FX(ix)+(L-d2)/(c2-d2)*(FX(ix+1)-FX(ix)), FY(iy+1)]);
+          if((a<L)!==(d2<L)) px2.push([FX(ix), FY(iy)+(L-a)/(d2-a)*(FY(iy+1)-FY(iy))]);
+          if(px2.length>=2) fd+=`M${px2[0][0].toFixed(1)} ${px2[0][1].toFixed(1)}L${px2[1][0].toFixed(1)} ${px2[1][1].toFixed(1)}`;
+        }
+      }
+      if(fd){
+        const fc2 = theme==='sun' ? '#1e6f3e' : theme==='dream' ? '#0e7a5e' : '#1f7748';
+        s+=`<g class="ctrf" clip-path="url(#gclip)"><path d="${fd}" fill="none" stroke="${fc2}" stroke-width="0.28" opacity=".5" stroke-linecap="round"/></g>`;
+      }
     }
     // fall-line arrows: point downhill, longer = steeper (from the 3m green-complex patches).
     // Green view only — at whole-hole scale they're clutter.
@@ -1043,7 +1074,7 @@ function renderMap(h,p,tb){
       const mag=Math.hypot(gvX,gvY), sl=mag*100;
       if(sl<0.7) continue; // flat / noise
       const ux=-gvX/mag, uy=-gvY/mag; // downhill
-      const AS=satOn?0.72:1; // smaller arrows over the photo
+      const AS=satOn?0.5:0.68; // arrows reduced across the board (finer still over the photo)
       const L=Math.min(step*0.85, 1.6+sl*0.9)*AS, hw=Math.min(1.6,L*0.3);
       const tx=X+ux*L/2, ty=Y+uy*L/2, qx=X-ux*L/2, qy=Y-uy*L/2, px=-uy, py=ux;
       arr+=`<path d="M${qx.toFixed(1)} ${qy.toFixed(1)}L${tx.toFixed(1)} ${ty.toFixed(1)}`
@@ -1052,14 +1083,16 @@ function renderMap(h,p,tb){
     }
     if(arr){
       const ac = satOn ? '#f4fff6' : theme==='sun' ? '#0e6b34' : theme==='dream' ? '#06424d' : '#0d5c30';
-      s+=`<g class="fall" clip-path="url(#gclip)" fill="none" stroke="${ac}" stroke-width="${satOn?0.14:0.16}" opacity="${satOn?0.9:0.75}" stroke-linecap="round" stroke-linejoin="round">${arr}</g>`;
+      s+=`<g class="fall" clip-path="url(#gclip)" fill="none" stroke="${ac}" stroke-width="${satOn?0.1:0.12}" opacity="${satOn?0.9:0.8}" stroke-linecap="round" stroke-linejoin="round">${arr}</g>`;
     }
     }
   }
-  s+=`<circle cx="${fPt[0]}" cy="${fPt[1]}" r="${greenView?0.8:2.5}" fill="var(--fcb)"/><circle cx="${bPt[0]}" cy="${bPt[1]}" r="${greenView?0.8:2.5}" fill="var(--fcb)"/>`;
-  if(greenView){ // label front/back up close
-    s+=`<text x="${fPt[0].toFixed(1)}" y="${(fPt[1]+3.1).toFixed(1)}" text-anchor="middle" font-size="2.4" font-weight="700" fill="var(--fcb)" opacity=".85">F</text>`
-      +`<text x="${bPt[0].toFixed(1)}" y="${(bPt[1]-1.7).toFixed(1)}" text-anchor="middle" font-size="2.4" font-weight="700" fill="var(--fcb)" opacity=".85">B</text>`;
+  const fbStroke=greenView?' stroke="rgba(10,70,40,.5)" stroke-width="0.15"':'';
+  s+=`<circle cx="${fPt[0]}" cy="${fPt[1]}" r="${greenView?0.8:2.5}" fill="var(--fcb)"${fbStroke}/><circle cx="${bPt[0]}" cy="${bPt[1]}" r="${greenView?0.8:2.5}" fill="var(--fcb)"${fbStroke}/>`;
+  if(greenView){ // label front/back up close (dark ink on the light green)
+    const fbc=satOn?'var(--fcb)':'#175c38';
+    s+=`<text x="${fPt[0].toFixed(1)}" y="${(fPt[1]+3.1).toFixed(1)}" text-anchor="middle" font-size="2.4" font-weight="700" fill="${fbc}" opacity=".85">F</text>`
+      +`<text x="${bPt[0].toFixed(1)}" y="${(bPt[1]-1.7).toFixed(1)}" text-anchor="middle" font-size="2.4" font-weight="700" fill="${fbc}" opacity=".85">B</text>`;
   }
   // tee
   s+=`<rect x="${teePt[0]-5}" y="${teePt[1]-5}" width="10" height="10" rx="2" fill="var(--accent2)"/>`;
@@ -1351,7 +1384,7 @@ function draw3D(){
     const tl3=(z-m.zlo)/span;
     col=rampCol(ramp3d, m.cdf ? m.cdf[Math.min(95,(tl3*96)|0)]*0.65+tl3*0.35 : tl3);
     // feature colors = the hole view's CSS vars (--green-fill / --sand / --water) per theme
-    const fcOf = c2 => c2===1 ? (theme==='dream'?[9,253,184]:theme==='sun'?[23,213,98]:[31,238,117])
+    const fcOf = c2 => c2===1 ? (theme==='dream'?[150,240,209]:theme==='sun'?[168,226,182]:[162,228,183])
                : c2===2 ? (theme==='dream'?[236,223,248]:theme==='sun'?[232,200,120]:[240,223,184])
                :          (theme==='dream'?[76,110,245]:theme==='sun'?[30,77,140]:[58,110,165]);
     // edge quads get 3×3 sub-resolution — only at full quality and when big enough on screen to matter
@@ -1419,7 +1452,7 @@ function draw3D(){
   }
   // crisp draped outlines: sharp edges for greens, bunkers, water (skipped mid-drag)
   if(!D3.fast && m.outlines){
-    const oc = c2 => c2===1 ? (theme==='dream'?'rgba(108,255,209,.9)':theme==='sun'?'rgba(14,107,52,.85)':'rgba(107,255,150,.85)')
+    const oc = c2 => c2===1 ? (theme==='dream'?'rgba(24,150,112,.9)':theme==='sun'?'rgba(14,107,52,.85)':'rgba(38,140,88,.9)')
              : c2===2 ? (theme==='sun'?'rgba(122,90,40,.75)':'rgba(96,74,40,.85)')
              :          (theme==='dream'?'rgba(150,170,255,.85)':'rgba(180,215,255,.8)');
     ctx.lineJoin='round'; ctx.lineCap='round';
