@@ -16,7 +16,7 @@ A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, w
 - **Running scorecard** — strokes, putts, fairways; full 18-hole card with stats (putts, FW, GIR)
 - **GHIN post helper** — one tap copies your scores and opens ghin.com for posting
 - **Your game (STATS)** — round history, best round, averages, and a trend line across rounds
-- **Green view (GRN)** — zoom to the green complex with downhill fall-line arrows and micro-contours for reading putts
+- **Green view (GRN)** — zoom to an emerald green with white fall-line arrows and 1-ft contour lines reversed out for reading putts
 - **Ball-flight tracer** — a TV-style pink arc of your shot: on the hole map, in a tap-for-it side profile, and animated over 3D terrain with yardage stats at the apex
 - **3D terrain view** of every hole; **SAT** aerial imagery overlay
 - **Auto hole detection** as you walk the course
@@ -99,9 +99,9 @@ The profile and 3D stats respect your ± ELEV and WIND toggles, so what they sho
 
 ## Reading the green
 
-Tap **GRN** (on the map, next to SAT/3D) to zoom to the green complex. Up close you get fall-line arrows: small dark arrows pointing **downhill**, longer = steeper, plus the pale micro-contour lines and your ball if you're on or near the green. Tap GRN again — or change holes — to jump back to the whole hole.
+Tap **GRN** (on the map, next to SAT/3D) to zoom to the green complex: a deep emerald surface with everything you need **reversed out in white** — small fall-line arrows pointing downhill (longer = steeper), fine **1-foot contour lines** computed live from the high-res lidar patch under each green, the F/B markers, and your ball if you're on or near it. Tap GRN again — or change holes — to jump back to the whole hole.
 
-The arrows come from USGS 3m elevation data, so treat them as the broad break (overall tilt and big shelves), not subtle 6-inch reads. They only appear in GRN view — including over SAT imagery, where they render smaller and pale to sit on the photo. The aerial photos themselves get a saturation boost so the course reads lush rather than flat-survey gray.
+The data behind it is USGS lidar sampled on a 3 m grid, so treat the picture as the broad break (overall tilt, shelves, runoffs), not subtle 6-inch reads. Arrows appear only in GRN view — including over SAT imagery, where they render finer to sit on the photo. The aerial photos themselves get a saturation boost so the course reads lush rather than flat-survey gray.
 
 ## Shot tracking
 
@@ -118,7 +118,8 @@ The arrows come from USGS 3m elevation data, so treat them as the broad break (o
 - The strip below the map is your running card for the current hole: **TOTAL SCORE** (all strokes on the hole, putts included) and **PUTTS** +/−, and **FW** — fairway hit (tap to cycle ✓ hit → ✗ miss → blank; hidden on par 3s).
 - The right side shows your running score vs par (`+2 thru 7`) — **tap it to open the full card**: front/back/total, per-hole results, and a stats line (putts, fairways, GIR).
 - On the full card, **tap any hole row to jump the app to that hole**; NEW ROUND clears the card (with a confirm).
-- The card survives closing the app mid-round (saved on every tap). Red-tee rounds score against women's par automatically.
+- The card survives closing the app mid-round (saved on every tap). Red- and Green-tee rounds score against women's par automatically, each with its own handicap allocation.
+- The card wears the club's colors: white boxes ruled in light blue on warm card-stock, with the burgee at the top — a pocket version of the printed scorecard.
 - **POST** (on the full card) copies your hole-by-hole scores to the clipboard and opens ghin.com — log in, choose hole-by-hole posting, and paste/enter. GHIN doesn't allow direct posting from personal apps, so this is deliberately a two-tap handoff: your GHIN login never touches this app.
 - **NEW** banks the finished round into your history (it's saved, not discarded), then clears the card for the next round.
 
