@@ -965,12 +965,13 @@ function renderMap(h,p,tb){
         const len=Math.sqrt(gxs*gxs+gys*gys+1);
         return Math.max(0,(-gxs*LX-gys*LY+LZ)/len);
       };
-      const base = theme==='sun'?0.86:theme==='dream'?0.72:0.78;
-      const amp  = theme==='sun'?0.22:theme==='dream'?0.55:0.38;
+      const base = theme==='sun'?0.78:theme==='dream'?0.72:0.78;
+      const amp  = theme==='sun'?0.38:theme==='dream'?0.55:0.38;
       for(let i=0;i<es.length;i++){
         const tl=isNaN(es[i])?0:(es[i]-lo)/span;
         let t=cdf[Math.min(BINS-1,(tl*BINS)|0)]*0.65 + tl*0.35;
-        t=Math.floor(t*8)/8; // discrete USGS-like tint bands
+        const bands = theme==='sun' ? 12 : 8; // daytime gets finer gradation — fairway contours read
+        t=Math.floor(t*bands)/bands; // discrete USGS-like tint bands
         const sh=base+amp*shadeAt(i);
         const col=rampCol(stops,t);
         img.data[i*4]  =Math.min(255,Math.round(col[0]*sh));
@@ -1898,7 +1899,7 @@ let theme = (() => {
 })();
 let sunMode = theme === 'sun'; // kept in sync by applyTheme
 const RAMPS = { // bright, saturated 'lush' greens
-  sun:   [[237,255,237],[154,246,186]],
+  sun:   [[246,252,240],[170,236,190],[96,196,136]], // 3-stop: daytime relief reads (low=deep, high=pale)
   dark:  [[68,202,128],[168,255,197]],
   dream: [[10,12,42],[20,110,130],[152,52,192]]  // aurora: indigo → teal → magenta
 };
