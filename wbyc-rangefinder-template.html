@@ -166,8 +166,9 @@
   #fwBtn{width:auto !important;padding:0 8px;font-size:10px !important;letter-spacing:.5px}
   #fwBtn.hit{color:var(--accent);border-color:var(--accent)}
   #fwBtn.miss{color:var(--red);border-color:var(--red)}
-  #scTot{text-align:right;font-size:10px;color:var(--dim);cursor:pointer;line-height:1.45;flex:none}
-  #scTot b{color:var(--accent2);font-size:15px}
+  #scTot{text-align:right;font-size:13px;font-weight:800;color:var(--accent2);cursor:pointer;line-height:1.4;flex:none;letter-spacing:.5px}
+  #scTot b{color:var(--accent2);font-size:16px}
+  #scTot #scThru{font-weight:600;color:var(--dim)}
   #scorecard{position:fixed;inset:0;background:#f2e9d6;z-index:60;display:none;flex-direction:column;padding:12px}
   #scorecard.open{display:flex}
   #scbar{display:flex;justify-content:space-between;align-items:center;padding:2px 2px 10px}
@@ -251,7 +252,7 @@
     <span class="grp" title="All strokes on this hole, putts included">TOTAL SCORE <button id="scSm">−</button><b id="scS">·</b><button id="scSp">+</button></span>
     <span class="grp">PUTTS <button id="scPm">−</button><b id="scP">·</b><button id="scPp">+</button></span>
     <button id="fwBtn" title="Fairway hit — tap to cycle ✓ hit / ✗ miss / blank (hidden on par 3s)">FW ·</button>
-    <span id="scTot">card ▸<br><b id="scTotV">—</b> <span id="scThru"></span></span>
+    <span id="scTot">CARD ▸<br><b id="scTotV">—</b> <span id="scThru"></span></span>
   </div>
 
   <div class="panel">
