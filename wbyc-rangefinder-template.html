@@ -370,6 +370,18 @@ let elevAdjust = localStorage.getItem('wbyc_elev')!=='off';
 let windAdjust = localStorage.getItem('wbyc_wind')!=='off';
 /* ---- pin sheet: today's tapped pin positions, per hole (pins move daily — date-scoped) ---- */
 let pname = localStorage.getItem('wbyc_name') || '';
+/* SAT needs its photo files beside the app — probe once, and disable SAT cleanly if they're missing
+   (a lone HTML file copied to a phone has no aerials/ folder; without this, SAT renders gold lines on bare tint) */
+let aerialsOK = true;
+function probeAerials(){
+  if(typeof Image==='undefined' || !AERIALS || !AERIALS.length) return;
+  const t=new Image();
+  t.onerror=()=>{ aerialsOK=false; satMode=false;
+    const b=$('satBtn'); b.classList.remove('on'); b.style.opacity='.35';
+    b.title='Aerial photos not found beside this file — use the deployed app (or keep the aerials/ folder next to the HTML)';
+    render(); };
+  t.src=(AERIALS[0]&&AERIALS[0].file)||'aerials/hole01.jpg';
+}
 let pins = {d:'', p:{}}, pinArm = false;
 try{ const s2=JSON.parse(localStorage.getItem('wbyc_pins')||'null'); if(s2 && s2.p) pins=s2; }catch(e){}
 function freshPins(){ if(pins.d !== today()) pins = {d: today(), p: {}}; } // pins expire at midnight
@@ -908,7 +920,7 @@ function renderMap(h,p,tb){
     +'</defs>';
   const ctrD=[]; // contour path strings, reused for on-green reading lines
   const aer = AERIALS ? AERIALS.find(a=>a.hole===h.hole_number) : null;
-  const satOn = satMode && !!aer;
+  const satOn = satMode && !!aer && aerialsOK;
   // frame background matches the tint base so the shading reads edge-to-edge
   const bgStops=RAMPS[theme]||RAMPS.dark;
   $('mapwrap').style.background = `rgb(${bgStops[0][0]},${bgStops[0][1]},${bgStops[0][2]})`;
@@ -1888,6 +1900,7 @@ function init(data){
   $('d3Btn').onclick=open3D;
   wire3D();
   initMapGestures();
+  probeAerials();
   render();
   startGeo();
 }

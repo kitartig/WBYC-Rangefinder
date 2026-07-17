@@ -30,3 +30,4 @@ globalThis.requestAnimationFrame=()=>0;
 globalThis.getComputedStyle=()=>({getPropertyValue:()=>'#000'});
 globalThis.confirm=()=>true; globalThis.prompt=()=>null; globalThis.open=()=>{};
 globalThis.devicePixelRatio=1;
+globalThis.Image=class{set src(v){}};
