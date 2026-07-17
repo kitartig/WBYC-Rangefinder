@@ -69,7 +69,8 @@ Sanity check outdoors: the status line goes green with `GPS ±Xm · n/5 fixes`. 
 | 3D | 3D terrain view with animated shot tracer (drag to rotate, pinch to zoom, TRACE to replay) |
 | CENTER box | Tap the big CENTER number to toggle the side-profile flight view |
 | ☀ / ✦ / ☾ | Cycle theme: dark → sun → dream |
-| SHOT | Mark a shot from where you stand (club picker beside it; long-press = undo) |
+| 7i (club picker) | The two-character button by SHOT is your selected club — 7i = seven iron, 3w = three wood. Tap to change; it drives the carry rings and shot marks |
+| SHOT | Mark a shot from where you stand with the selected club (long-press = undo) |
 | ± ELEV | Elevation-adjusted "plays like" distances (~1 yd per 3 ft) |
 | WIND | Wind-adjusted "plays like" — tap to toggle, long-press to set wind manually |
 | DEMO MODE | Tap-the-map positioning when GPS is off/unavailable |
@@ -103,9 +104,11 @@ Tap **GRN** (on the map, next to SAT/3D) to zoom to the green complex: a deep em
 
 The data behind it is USGS lidar sampled on a 3 m grid, so treat the picture as the broad break (overall tilt, shelves, runoffs), not subtle 6-inch reads. Arrows appear only in GRN view — including over SAT imagery, where they render finer to sit on the photo. The aerial photos themselves get a saturation boost so the course reads lush rather than flat-survey gray.
 
-## Shot tracking
+## Shot tracking (the two little buttons on the map)
 
-- Standing at your ball, pick the club (bottom-left of the map) and tap **SHOT** just before you hit. That's the whole flow — one tap per shot.
+That pair at the bottom edge of the map — one reading something like **7i**, the other **SHOT** — is the club picker and the shot marker, and together they're the feature that gets smarter every time you play. **7i means seven iron** (D = driver, 3w = three wood, PW = pitching wedge, and so on); tap it to choose what's in your hands. SHOT drops a mark where you're standing. Nothing about your swing is measured — just where you stood — and from those marks the app learns *your* true distance with every club.
+
+- Standing at your ball, make sure the picker shows the club you're hitting, then tap **SHOT** just before you swing. That's the whole flow — one tap per shot.
 - Each mark's distance is measured to your next mark on the hole (the last one measures to green center), so the app learns your **real** club distances. Mismarked? **Long-press SHOT to undo.**
 - Today's shots draw on the map as numbered dots with a dotted trail from the tee.
 - **Carry arcs**: dashed rings from your position show what the selected club reaches (bold arc), with one longer and one shorter club as fainter neighbors. Change the club in the picker to move them. They start from stock distances and switch to *your* numbers once a club has 2+ tracked shots. Arcs show raw carry — the plays-like number handles wind/elevation. Hole view only.
