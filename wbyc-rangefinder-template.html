@@ -1015,11 +1015,12 @@ function renderMap(h,p,tb){
       if(seg.length<2) continue;
       const rp=seg.map(q=>rot({lat:q[0],lng:q[1]}));
       const idx=ln.lvl%TOPO.indexEvery===0;
+      if(satOn && !idx) continue; // photography leads in SAT — only the 10-ft index lines, whisper-quiet
       const cMin = satOn ? 'rgba(255,255,255,.9)' : 'var(--topo)';
-      const cIdx = satOn ? 'rgba(255,255,255,.95)' : 'var(--topo-index)'; // no gold/brown lines on the photo
+      const cIdx = satOn ? 'rgba(255,255,255,.9)' : 'var(--topo-index)'; // white, never gold/brown, on the photo
       const dstr = smoothOpen(rp);
       ctrD.push(dstr);
-      s+=`<path class="ctr${idx?' idx':''}" d="${dstr}" fill="none" stroke="${idx?cIdx:cMin}" stroke-width="${idx?1.1:0.55}" opacity="${idx?(satOn?0.8:0.55):(satOn?0.45:0.4)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      s+=`<path class="ctr${idx?' idx':''}" d="${dstr}" fill="none" stroke="${idx?cIdx:cMin}" stroke-width="${idx?(satOn?0.8:1.1):0.55}" opacity="${idx?(satOn?0.45:0.55):0.4}" stroke-linecap="round" stroke-linejoin="round"/>`;
     }
   }
   // centerline
