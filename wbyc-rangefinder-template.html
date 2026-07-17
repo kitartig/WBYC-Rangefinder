@@ -893,14 +893,15 @@ function renderMap(h,p,tb){
   }
 
   // greens: bright pastel dome (light crown → pastel rim) bordered by a slightly darker shade
-  const GCOL={dark:['#d0f6d9','#84dfa6','#37a263'],sun:['#d4f6dc','#8adba4','#3e9d63'],dream:['#c4f5e2','#78e0bb','#2fa87e']}[theme]||['#d0f6d9','#84dfa6','#37a263'];
+  // greens lean warm apple-green — hue separation from the cool emerald terrain, readable at any zoom
+  const GCOL={dark:['#eef9d2','#c4ea90','#8dbe57'],sun:['#f0f9d6','#c8e896','#92bb5e'],dream:['#e6fad4','#b6ec90','#7fc85c']}[theme]||['#eef9d2','#c4ea90','#8dbe57'];
   const WCOL={dark:['#4a7fb5','#2f5781'],sun:['#3b7cc0','#1c4a80'],dream:['#6f86ff','#3d55d6']}[theme]||['#4a7fb5','#2f5781'];
   let s='<defs><filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
     +`<radialGradient id="ggrad" cx="42%" cy="38%" r="78%"><stop offset="0%" stop-color="${GCOL[0]}"/><stop offset="100%" stop-color="${GCOL[1]}"/></radialGradient>`
     +`<linearGradient id="wgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${WCOL[0]}"/><stop offset="100%" stop-color="${WCOL[1]}"/></linearGradient>`
     +'<radialGradient id="ballgrad" cx="35%" cy="30%" r="80%"><stop offset="0%" stop-color="#ffffff"/><stop offset="65%" stop-color="#eef2ef"/><stop offset="100%" stop-color="#c7d1ca"/></radialGradient>'
     +'<radialGradient id="halograd" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fff3a6" stop-opacity="1"/><stop offset="35%" stop-color="#ffd21f" stop-opacity=".75"/><stop offset="70%" stop-color="#ffab00" stop-opacity=".3"/><stop offset="100%" stop-color="#ff9500" stop-opacity="0"/></radialGradient>'
-    +'<filter id="gshadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="0.9" stdDeviation="1.7" flood-color="#06301a" flood-opacity="0.55"/></filter>'
+    +`<filter id="gshadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="${(w*0.006).toFixed(1)}" stdDeviation="${(w*0.011).toFixed(1)}" flood-color="#06301a" flood-opacity="0.5"/></filter>`
     +'<filter id="vib"><feColorMatrix type="saturate" values="2.05"/><feComponentTransfer><feFuncR type="linear" slope="1.11" intercept="-0.035"/><feFuncG type="linear" slope="1.11" intercept="-0.035"/><feFuncB type="linear" slope="1.11" intercept="-0.035"/></feComponentTransfer></filter>'
     +'</defs>';
   const ctrD=[]; // contour path strings, reused for on-green reading lines
@@ -1400,7 +1401,7 @@ function draw3D(){
     const tl3=(z-m.zlo)/span;
     col=rampCol(ramp3d, m.cdf ? m.cdf[Math.min(95,(tl3*96)|0)]*0.65+tl3*0.35 : tl3);
     // feature colors = the hole view's CSS vars (--green-fill / --sand / --water) per theme
-    const fcOf = c2 => c2===1 ? (theme==='dream'?[126,222,190]:theme==='sun'?[146,217,166]:[138,219,164])
+    const fcOf = c2 => c2===1 ? (theme==='dream'?[182,236,144]:theme==='sun'?[200,232,150]:[196,234,144])
                : c2===2 ? (theme==='dream'?[236,223,248]:theme==='sun'?[232,200,120]:[240,223,184])
                :          (theme==='dream'?[76,110,245]:theme==='sun'?[30,77,140]:[58,110,165]);
     // edge quads get 3×3 sub-resolution — only at full quality and when big enough on screen to matter
@@ -1468,7 +1469,7 @@ function draw3D(){
   }
   // crisp draped outlines: sharp edges for greens, bunkers, water (skipped mid-drag)
   if(!D3.fast && m.outlines){
-    const oc = c2 => c2===1 ? (theme==='dream'?'rgba(24,150,112,.9)':theme==='sun'?'rgba(14,107,52,.85)':'rgba(38,140,88,.9)')
+    const oc = c2 => c2===1 ? (theme==='dream'?'rgba(100,160,60,.9)':theme==='sun'?'rgba(90,140,45,.85)':'rgba(105,155,58,.9)')
              : c2===2 ? (theme==='sun'?'rgba(122,90,40,.75)':'rgba(96,74,40,.85)')
              :          (theme==='dream'?'rgba(150,170,255,.85)':'rgba(180,215,255,.8)');
     ctx.lineJoin='round'; ctx.lineCap='round';
