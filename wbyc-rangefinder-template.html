@@ -123,7 +123,7 @@
   #mapbtns{position:absolute;top:8px;right:8px;display:flex;gap:6px}
   #shotbar{position:absolute;bottom:22px;left:8px;display:flex;gap:6px;align-items:center}
   #shotbar select{background:rgba(10,16,12,.62);color:#fff;border:2px solid #35c8ff;border-radius:7px;
-    padding:6px 7px;font-size:13px;font-weight:900;backdrop-filter:blur(2px)}
+    padding:6px 7px;font-size:13px;font-weight:900;letter-spacing:1.2px;backdrop-filter:blur(2px)}
   #shotbar button{background:rgba(10,16,12,.62);color:#fff;border:2px solid var(--accent2);border-radius:7px;
     padding:6px 12px;font-size:13px;font-weight:900;letter-spacing:.6px;cursor:pointer;backdrop-filter:blur(2px)}
   body.sun #shotbar select, body.sun #shotbar button{background:rgba(255,255,255,.75);color:#111}
@@ -916,7 +916,7 @@ function renderMap(h,p,tb){
   if(TOPO){
     try{
       // sharper tint: DPR-scaled raster (extra resolution in green view), cached per frame
-      const tintKey=[h.hole_number,theme,greenView?1:0,minX.toFixed(1),minY.toFixed(1),w.toFixed(1),ht.toFixed(1)].join('|');
+      const tintKey=[h.hole_number,theme,greenView?1:0,satOn?1:0,minX.toFixed(1),minY.toFixed(1),w.toFixed(1),ht.toFixed(1)].join('|');
       if(renderMap._tk===tintKey && renderMap._turl){
         s+=`<image href="${renderMap._turl}" x="${minX.toFixed(1)}" y="${minY.toFixed(1)}" width="${w.toFixed(1)}" height="${ht.toFixed(1)}" preserveAspectRatio="none"/>`;
       } else {
@@ -949,7 +949,8 @@ function renderMap(h,p,tb){
         }
       }
       const span=Math.max(hi-lo,1);
-      const stops = RAMPS[theme] || RAMPS.dark;
+      const stops = (theme==='sun' && satOn) ? [[237,255,237],[154,246,186]] // SAT keeps the gentle pre-exaggeration ramp
+                  : (RAMPS[theme] || RAMPS.dark);
       // histogram-equalize the ramp (65/35 blend with linear) so skewed holes still sweep full color
       const BINS=96, cdf=new Float32Array(BINS);
       { const hist=new Float32Array(BINS); let n=0;
@@ -965,12 +966,12 @@ function renderMap(h,p,tb){
         const len=Math.sqrt(gxs*gxs+gys*gys+1);
         return Math.max(0,(-gxs*LX-gys*LY+LZ)/len);
       };
-      const base = theme==='sun'?0.78:theme==='dream'?0.72:0.78;
-      const amp  = theme==='sun'?0.38:theme==='dream'?0.55:0.38;
+      const base = theme==='sun'?(satOn?0.86:0.78):theme==='dream'?0.72:0.78;
+      const amp  = theme==='sun'?(satOn?0.22:0.38):theme==='dream'?0.55:0.38;
       for(let i=0;i<es.length;i++){
         const tl=isNaN(es[i])?0:(es[i]-lo)/span;
         let t=cdf[Math.min(BINS-1,(tl*BINS)|0)]*0.65 + tl*0.35;
-        const bands = theme==='sun' ? 12 : 8; // daytime gets finer gradation — fairway contours read
+        const bands = (theme==='sun' && !satOn) ? 12 : 8; // daytime map gets finer gradation — SAT stays as it was
         t=Math.floor(t*bands)/bands; // discrete USGS-like tint bands
         const sh=base+amp*shadeAt(i);
         const col=rampCol(stops,t);
@@ -1015,7 +1016,7 @@ function renderMap(h,p,tb){
       const rp=seg.map(q=>rot({lat:q[0],lng:q[1]}));
       const idx=ln.lvl%TOPO.indexEvery===0;
       const cMin = satOn ? 'rgba(255,255,255,.9)' : 'var(--topo)';
-      const cIdx = satOn ? '#ffdf9e' : 'var(--topo-index)';
+      const cIdx = satOn ? 'rgba(255,255,255,.95)' : 'var(--topo-index)'; // no gold/brown lines on the photo
       const dstr = smoothOpen(rp);
       ctrD.push(dstr);
       s+=`<path class="ctr${idx?' idx':''}" d="${dstr}" fill="none" stroke="${idx?cIdx:cMin}" stroke-width="${idx?1.1:0.55}" opacity="${idx?(satOn?0.8:0.55):(satOn?0.45:0.4)}" stroke-linecap="round" stroke-linejoin="round"/>`;
