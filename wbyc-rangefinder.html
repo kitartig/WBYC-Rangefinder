@@ -174,14 +174,22 @@
   #scbar span{font-size:13px;font-weight:700;letter-spacing:.5px}
   #scbar button{background:var(--card);border:1px solid var(--line);color:var(--text);border-radius:8px;
     padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;margin-left:6px}
+  #scLogoWrap{text-align:center;padding:0 0 10px}
+  #scLogo{height:46px;width:auto}
+  /* the card itself: white boxes ruled in light blue, like the club's printed scorecard */
   #sctab{flex:1;overflow-y:auto}
-  #sctab table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
-  #sctab th,#sctab td{padding:5px 2px;text-align:center;border-bottom:1px solid var(--line)}
-  #sctab th{color:var(--dim);font-weight:600;font-size:10px;letter-spacing:.5px}
-  #sctab td:first-child,#sctab th:first-child{text-align:left;padding-left:6px}
-  #sctab td small{color:var(--dim);font-size:10px}
-  #sctab tr.cur td{color:var(--accent);font-weight:700}
-  #sctab tr.tot td{font-weight:700;border-top:2px solid var(--line)}
+  #sctab table{width:100%;border-collapse:separate;border-spacing:0;font-size:17px;
+    font-variant-numeric:tabular-nums;background:#ffffff;color:#1b3a66;
+    border:1.5px solid #9fc2ea;border-radius:14px;overflow:hidden}
+  #sctab th,#sctab td{padding:8px 3px;text-align:center;background:#ffffff;
+    border-bottom:1px solid #bcd6f2;border-right:1px solid #e2eefb}
+  #sctab th:last-child,#sctab td:last-child{border-right:none}
+  #sctab tr:last-child td{border-bottom:none}
+  #sctab th{color:#4a6ea8;font-weight:700;font-size:12px;letter-spacing:.6px}
+  #sctab td:first-child,#sctab th:first-child{text-align:left;padding-left:10px}
+  #sctab td small{color:#7b93b8;font-size:11px}
+  #sctab tr.cur td{color:#1f5fd0;font-weight:700}
+  #sctab tr.tot td{font-weight:700;border-top:2px solid #9fc2ea}
   #sctab tr[data-h]{cursor:pointer}
   #scstats{padding:10px 4px;font-size:11px;color:var(--dim);text-align:center}
 
@@ -263,6 +271,7 @@
 <div id="scorecard">
   <div id="scbar"><span id="scTitle">SCORECARD</span>
     <span><button id="scStats">STATS</button><button id="scClubs">CLUBS</button><button id="scPost" title="Copy hole-by-hole scores and open GHIN">POST</button><button id="scNew" title="Bank this round to your history and start fresh">NEW</button><button id="scClose">✕</button></span></div>
+  <div id="scLogoWrap"><img id="scLogo" alt=""></div>
   <div id="sctab"></div>
   <div id="scstats"></div>
 </div>
@@ -880,7 +889,7 @@ function renderMap(h,p,tb){
   }
 
   // greens: bright pastel dome (light crown → pastel rim) bordered by a slightly darker shade
-  const GCOL={dark:['#dcfbe2','#a7f0bd','#7fd39c'],sun:['#e6fdea','#aae4ba','#7cc898'],dream:['#d9fff1','#98ecd0','#6fd6b2']}[theme]||['#dcfbe2','#a7f0bd','#7fd39c'];
+  const GCOL={dark:['#c2f2cd','#7edb9f','#55bf7e'],sun:['#c9f3d2','#84d7a0','#5cbb7f'],dream:['#b8f2dd','#71dcb6','#4cc396']}[theme]||['#c2f2cd','#7edb9f','#55bf7e'];
   const WCOL={dark:['#4a7fb5','#2f5781'],sun:['#3b7cc0','#1c4a80'],dream:['#6f86ff','#3d55d6']}[theme]||['#4a7fb5','#2f5781'];
   let s='<defs><filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
     +`<radialGradient id="ggrad" cx="42%" cy="38%" r="78%"><stop offset="0%" stop-color="${GCOL[0]}"/><stop offset="100%" stop-color="${GCOL[1]}"/></radialGradient>`
@@ -1384,7 +1393,7 @@ function draw3D(){
     const tl3=(z-m.zlo)/span;
     col=rampCol(ramp3d, m.cdf ? m.cdf[Math.min(95,(tl3*96)|0)]*0.65+tl3*0.35 : tl3);
     // feature colors = the hole view's CSS vars (--green-fill / --sand / --water) per theme
-    const fcOf = c2 => c2===1 ? (theme==='dream'?[150,240,209]:theme==='sun'?[168,226,182]:[162,228,183])
+    const fcOf = c2 => c2===1 ? (theme==='dream'?[126,222,190]:theme==='sun'?[146,217,166]:[138,219,164])
                : c2===2 ? (theme==='dream'?[236,223,248]:theme==='sun'?[232,200,120]:[240,223,184])
                :          (theme==='dream'?[76,110,245]:theme==='sun'?[30,77,140]:[58,110,165]);
     // edge quads get 3×3 sub-resolution — only at full quality and when big enough on screen to matter
@@ -1689,6 +1698,7 @@ function init(data){
   $('autoBtn').onclick=()=>{autoHole=!autoHole;$('autoBtn').classList.toggle('on',autoHole);if(autoHole){detectHole();render();}};
   $('autoBtn').classList.toggle('on',autoHole);
   $('demoBtn').onclick=()=>setDemo(!demo);
+  $('scLogo').src=$('logo').src; // burgee tops the scorecard, reusing the embedded artwork
   // player name: tap the header chip to set; signs the scorecard title + GHIN post text
   {
     const pnEl=$('pname');
