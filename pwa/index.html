@@ -169,14 +169,14 @@
   #scTot{text-align:right;font-size:13px;font-weight:800;color:var(--accent2);cursor:pointer;line-height:1.4;flex:none;letter-spacing:.5px}
   #scTot b{color:var(--accent2);font-size:16px}
   #scTot #scThru{font-weight:600;color:var(--dim)}
-  #scorecard{position:fixed;inset:0;background:#f2e9d6;z-index:60;display:none;flex-direction:column;padding:12px}
+  #scorecard{position:fixed;inset:0;background:#f2e9d6;z-index:60;display:none;flex-direction:column;padding:4px 12px 10px}
   #scorecard.open{display:flex}
-  #scbar{display:flex;justify-content:space-between;align-items:center;padding:2px 2px 10px}
+  #scbar{display:flex;justify-content:space-between;align-items:center;padding:0 2px 4px}
   #scbar span{font-size:13px;font-weight:700;letter-spacing:.5px;color:#1b3a66}
   #scbar button{background:#ffffff;border:1px solid #cfc3a2;color:#1b3a66;border-radius:8px;
     padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;margin-left:6px}
-  #scLogoWrap{text-align:center;padding:0 0 6px}
-  #scLogo{width:min(340px,82%);height:auto;margin:-28px 0 -34px} /* the artwork has generous transparent margins — pull them in */
+  #scLogoWrap{text-align:center;padding:0}
+  #scLogo{width:min(340px,82%);height:auto;margin:-36px 0 -42px} /* the artwork has generous transparent margins — pull them in */
   /* the card itself: white boxes ruled in light blue, like the club's printed scorecard */
   #sctab{flex:1;overflow-y:auto;padding:0 14px}
   #sctab table{width:100%;border-collapse:separate;border-spacing:0;font-size:17px;
@@ -893,13 +893,14 @@ function renderMap(h,p,tb){
   }
 
   // greens: bright pastel dome (light crown → pastel rim) bordered by a slightly darker shade
-  const GCOL={dark:['#c2f2cd','#7edb9f','#55bf7e'],sun:['#c9f3d2','#84d7a0','#5cbb7f'],dream:['#b8f2dd','#71dcb6','#4cc396']}[theme]||['#c2f2cd','#7edb9f','#55bf7e'];
+  const GCOL={dark:['#d0f6d9','#84dfa6','#37a263'],sun:['#d4f6dc','#8adba4','#3e9d63'],dream:['#c4f5e2','#78e0bb','#2fa87e']}[theme]||['#d0f6d9','#84dfa6','#37a263'];
   const WCOL={dark:['#4a7fb5','#2f5781'],sun:['#3b7cc0','#1c4a80'],dream:['#6f86ff','#3d55d6']}[theme]||['#4a7fb5','#2f5781'];
   let s='<defs><filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
     +`<radialGradient id="ggrad" cx="42%" cy="38%" r="78%"><stop offset="0%" stop-color="${GCOL[0]}"/><stop offset="100%" stop-color="${GCOL[1]}"/></radialGradient>`
     +`<linearGradient id="wgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${WCOL[0]}"/><stop offset="100%" stop-color="${WCOL[1]}"/></linearGradient>`
     +'<radialGradient id="ballgrad" cx="35%" cy="30%" r="80%"><stop offset="0%" stop-color="#ffffff"/><stop offset="65%" stop-color="#eef2ef"/><stop offset="100%" stop-color="#c7d1ca"/></radialGradient>'
     +'<radialGradient id="halograd" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fff3a6" stop-opacity="1"/><stop offset="35%" stop-color="#ffd21f" stop-opacity=".75"/><stop offset="70%" stop-color="#ffab00" stop-opacity=".3"/><stop offset="100%" stop-color="#ff9500" stop-opacity="0"/></radialGradient>'
+    +'<filter id="gshadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="0.9" stdDeviation="1.7" flood-color="#06301a" flood-opacity="0.55"/></filter>'
     +'<filter id="vib"><feColorMatrix type="saturate" values="2.05"/><feComponentTransfer><feFuncR type="linear" slope="1.11" intercept="-0.035"/><feFuncG type="linear" slope="1.11" intercept="-0.035"/><feFuncB type="linear" slope="1.11" intercept="-0.035"/></feComponentTransfer></filter>'
     +'</defs>';
   const ctrD=[]; // contour path strings, reused for on-green reading lines
@@ -1003,6 +1004,8 @@ function renderMap(h,p,tb){
   s+=`<path d="M${clPts.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join('L')}" fill="none" stroke="var(--cl)" stroke-width="2" stroke-dasharray="6 6"/>`;
   // hazards
   const dreamFx = theme==='dream' && !satOn ? ' filter="url(#glow)"' : '';
+  // greens float over the terrain: soft drop shadow (the tint behind is green too — value separation, not chroma)
+  const gfx = (satOn || theme==='dream') ? '' : ' filter="url(#gshadow)"';
   const inset=(pts,f)=>{ let cx=0,cy=0; pts.forEach(q=>{cx+=q[0];cy+=q[1];}); cx/=pts.length; cy/=pts.length;
     return pts.map(q=>[cx+(q[0]-cx)*f, cy+(q[1]-cy)*f]); };
   const ripCol = theme==='sun' ? 'rgba(255,255,255,.55)' : 'rgba(255,255,255,.33)';
@@ -1015,7 +1018,7 @@ function renderMap(h,p,tb){
     for(const oh of course.holes){
       if(oh===h) continue;
       if(inView(oh.green.polygon))
-        s+=`<path d="${smoothClosed(oh.green.polygon.map(q=>rot(q)))}" fill="${satOn?'var(--green-fill)':'url(#ggrad)'}" fill-opacity="${satOn?0.25:0.9}" stroke="${satOn?'var(--green-stroke)':GCOL[2]}" stroke-width="0.8"/>`;
+        s+=`<path d="${smoothClosed(oh.green.polygon.map(q=>rot(q)))}" fill="${satOn?'var(--green-fill)':'url(#ggrad)'}" fill-opacity="${satOn?0.25:0.9}" stroke="${satOn?'var(--green-stroke)':GCOL[2]}" stroke-width="0.8"${gfx}/>`;
       for(const hz of oh.hazards) if(inView(hz.points)) hzShapes.push({t:hz.type, pts:hz.points.map(q=>rot(q))});
     }
   }
@@ -1029,7 +1032,7 @@ function renderMap(h,p,tb){
   }
   // green: even radial shading + micro-contour reading lines clipped to the surface
   const gPath=smoothClosed(greenPts);
-  s+=`<path class="greenp" d="${gPath}" fill="${satOn?'var(--green-fill)':'url(#ggrad)'}" fill-opacity="${satOn?0.25:1}" stroke="${satOn?'#acffbc':GCOL[2]}" stroke-width="${greenView?0.45:0.9}"${dreamFx}/>`;
+  s+=`<path class="greenp" d="${gPath}" fill="${satOn?'var(--green-fill)':'url(#ggrad)'}" fill-opacity="${satOn?0.25:1}" stroke="${satOn?'#acffbc':GCOL[2]}" stroke-width="${greenView?0.55:1.1}"${dreamFx||gfx}/>`;
   if(TOPO){
     s+=`<clipPath id="gclip"><path d="${gPath}"/></clipPath>`;
     if(ctrD.length && (!greenView || satOn)){ // coarse 2-ft reading lines (green view gets finer ones below)
