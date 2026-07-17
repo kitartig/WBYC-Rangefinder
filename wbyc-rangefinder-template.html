@@ -879,8 +879,8 @@ function renderMap(h,p,tb){
     if(extAxis===0){ minX+=bestS; maxX+=bestS; } else { minY+=bestS; maxY+=bestS; }
   }
 
-  // greens: soft light-green dome (radial light center → gently deeper rim = subtle 3D)
-  const GCOL={dark:['#e2f8e7','#9edcb4'],sun:['#ecfbee','#a3ddb2'],dream:['#e0fff5','#93e9cd']}[theme]||['#e2f8e7','#9edcb4'];
+  // greens: bright pastel dome (light crown → pastel rim) bordered by a slightly darker shade
+  const GCOL={dark:['#dcfbe2','#a7f0bd','#7fd39c'],sun:['#e6fdea','#aae4ba','#7cc898'],dream:['#d9fff1','#98ecd0','#6fd6b2']}[theme]||['#dcfbe2','#a7f0bd','#7fd39c'];
   const WCOL={dark:['#4a7fb5','#2f5781'],sun:['#3b7cc0','#1c4a80'],dream:['#6f86ff','#3d55d6']}[theme]||['#4a7fb5','#2f5781'];
   let s='<defs><filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
     +`<radialGradient id="ggrad" cx="42%" cy="38%" r="78%"><stop offset="0%" stop-color="${GCOL[0]}"/><stop offset="100%" stop-color="${GCOL[1]}"/></radialGradient>`
@@ -1002,7 +1002,7 @@ function renderMap(h,p,tb){
     for(const oh of course.holes){
       if(oh===h) continue;
       if(inView(oh.green.polygon))
-        s+=`<path d="${smoothClosed(oh.green.polygon.map(q=>rot(q)))}" fill="${satOn?'var(--green-fill)':'url(#ggrad)'}" fill-opacity="${satOn?0.25:0.9}" stroke="var(--green-stroke)" stroke-width="1"/>`;
+        s+=`<path d="${smoothClosed(oh.green.polygon.map(q=>rot(q)))}" fill="${satOn?'var(--green-fill)':'url(#ggrad)'}" fill-opacity="${satOn?0.25:0.9}" stroke="${satOn?'var(--green-stroke)':GCOL[2]}" stroke-width="0.8"/>`;
       for(const hz of oh.hazards) if(inView(hz.points)) hzShapes.push({t:hz.type, pts:hz.points.map(q=>rot(q))});
     }
   }
@@ -1016,7 +1016,7 @@ function renderMap(h,p,tb){
   }
   // green: even radial shading + micro-contour reading lines clipped to the surface
   const gPath=smoothClosed(greenPts);
-  s+=`<path class="greenp" d="${gPath}" fill="${satOn?'var(--green-fill)':'url(#ggrad)'}" fill-opacity="${satOn?0.25:1}" stroke="${satOn?'#acffbc':'#4bb27c'}" stroke-width="1.6"${dreamFx}/>`;
+  s+=`<path class="greenp" d="${gPath}" fill="${satOn?'var(--green-fill)':'url(#ggrad)'}" fill-opacity="${satOn?0.25:1}" stroke="${satOn?'#acffbc':GCOL[2]}" stroke-width="${greenView?0.45:0.9}"${dreamFx}/>`;
   if(TOPO){
     s+=`<clipPath id="gclip"><path d="${gPath}"/></clipPath>`;
     if(ctrD.length && (!greenView || satOn)){ // coarse 2-ft reading lines (green view gets finer ones below)
