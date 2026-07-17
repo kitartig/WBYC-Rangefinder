@@ -1,5 +1,7 @@
 # WBYC Rangefinder — Quick User Guide
 
+*Guide edition: app v105 · July 17, 2026*
+
 A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, working offline in your pocket.
 
 ## Features at a glance
