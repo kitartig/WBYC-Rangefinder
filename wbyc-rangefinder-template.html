@@ -1201,7 +1201,7 @@ function renderMap(h,p,tb){
       +`<circle cx="${pp[0].toFixed(1)}" cy="${pp[1].toFixed(1)}" r="${greenView?0.5:1.3}" fill="#fff"/></g>`;
   }
   // player + line to the target (today's pin when set, else green center)
-  if(pPt){
+  if(pPt && pNear){
     const cc=rot(target(h));
     if(theme==='dream') trail.slice(0,-1).forEach((tp,i)=>{
       const q=rot(tp);
@@ -1259,11 +1259,13 @@ function renderMap(h,p,tb){
     s+=`<circle cx="${pPt[0]}" cy="${pPt[1]}" r="${(6.5*mk).toFixed(1)}" fill="url(#ballgrad)" stroke="#f5b512" stroke-width="${(1.8*mw).toFixed(1)}"${theme==='dream'?' filter="url(#glow)"':''}/>`;
     s+=`<g fill="#aab8ae" opacity=".8"><circle cx="${(pPt[0]-1.9*mk).toFixed(1)}" cy="${(pPt[1]-1.6*mk).toFixed(1)}" r="${(.65*mk).toFixed(2)}"/><circle cx="${(pPt[0]+1.4*mk).toFixed(1)}" cy="${(pPt[1]-0.5*mk).toFixed(1)}" r="${(.65*mk).toFixed(2)}"/><circle cx="${(pPt[0]-0.3*mk).toFixed(1)}" cy="${(pPt[1]+1.8*mk).toFixed(1)}" r="${(.65*mk).toFixed(2)}"/></g>`;
   } else if(!demo){
-    // GPS ON but no fix yet — a pink "searching" ball at the centre of the current view (always on-screen); becomes the gold you-ball on lock
-    const wcx=(minX+w/2).toFixed(1), wcy=(minY+ht/2).toFixed(1), wr=Math.max(6,w*0.03).toFixed(1);
-    s+=`<circle class="you-search" cx="${wcx}" cy="${wcy}" r="${wr}" fill="none" stroke="#ff2fd6" stroke-width="${(w*0.008).toFixed(1)}" opacity=".9"/>`
-      +`<circle cx="${wcx}" cy="${wcy}" r="${(wr*0.5).toFixed(1)}" fill="#ff2fd6"/>`
-      +`<text x="${wcx}" y="${(minY+ht/2+w*0.08).toFixed(1)}" text-anchor="middle" font-size="${(w*0.035).toFixed(1)}" font-weight="700" fill="#ff2fd6" opacity=".8">finding you…</text>`;
+    // GPS ON but not usefully placed on THIS hole — pink marker at view centre (always on-screen). becomes the gold you-ball once you're near.
+    // two cases: no fix yet ("finding you…"), or a fix that's off this hole ("not on this hole — you're elsewhere on the course / away").
+    const wcx=(minX+w/2), wcy=(minY+ht/2), wr=Math.max(6,w*0.03);
+    const label = pos ? 'not on this hole' : 'finding you…';
+    s+=`<circle class="you-search" cx="${wcx.toFixed(1)}" cy="${wcy.toFixed(1)}" r="${wr.toFixed(1)}" fill="none" stroke="#ff2fd6" stroke-width="${(w*0.008).toFixed(1)}" opacity=".9"/>`
+      +`<circle cx="${wcx.toFixed(1)}" cy="${wcy.toFixed(1)}" r="${(wr*0.5).toFixed(1)}" fill="#ff2fd6"/>`
+      +`<text x="${wcx.toFixed(1)}" y="${(wcy+w*0.08).toFixed(1)}" text-anchor="middle" font-size="${(w*0.035).toFixed(1)}" font-weight="700" fill="#ff2fd6" paint-order="stroke" stroke="${sunMode?'rgba(255,255,255,.8)':'rgba(8,14,10,.7)'}" stroke-width="${(w*0.008).toFixed(1)}">${label}</text>`;
   }
   // wind arrow (top-right): points where the wind blows, in this hole's rotated frame
   if(windAdjust && wind.src && wind.spd>=1 && wind.dir!==null){
