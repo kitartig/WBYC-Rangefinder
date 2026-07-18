@@ -134,7 +134,7 @@ That pair at the bottom edge of the map — one reading something like **7i**, t
 ## Scorecard
 
 - The strip below the map is your running card for the current hole: **TOTAL SCORE** (all strokes on the hole, putts included) and **PUTTS** +/−, and **FW** — fairway hit (tap to cycle ✓ hit → ✗ miss → blank; hidden on par 3s).
-- The right side shows your running score vs par (`+2 thru 7`) — **tap it to open the full card**: front/back/total, per-hole results, and a stats line (putts, fairways, GIR).
+- The right side (**CARD ▸**) shows your running total strokes and holes played (`48 · thru 9`) — **tap it to open the full card**: front/back/total, per-hole results, and a stats line (putts, fairways, GIR). No over-par running tally — just your strokes.
 - On the full card, **tap any hole row to jump the app to that hole**; NEW ROUND clears the card (with a confirm).
 - The card survives closing the app mid-round (saved on every tap). Red- and Green-tee rounds score against women's par automatically, each with its own handicap allocation.
 - The card wears the club's colors: white boxes ruled in light blue on warm card-stock, with the burgee at the top — a pocket version of the printed scorecard.
