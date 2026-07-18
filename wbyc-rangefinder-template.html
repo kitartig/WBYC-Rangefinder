@@ -492,7 +492,7 @@ function setDemo(on, why){
   if(on){
     const tb=teeBox(hole());
     demoPos = demoPos || {lat:tb.lat, lng:tb.lng};
-    gpsStatus('demo', 'demo — tap map to move' + (why?` (${why})`:''));
+    gpsStatus('demo', 'GPS off — tap map to move' + (why?` (${why})`:''));
   } else {
     gpsStatus(pos?'ok':'bad', pos?'GPS live':'waiting for GPS…');
   }
@@ -1259,9 +1259,11 @@ function renderMap(h,p,tb){
     s+=`<circle cx="${pPt[0]}" cy="${pPt[1]}" r="${(6.5*mk).toFixed(1)}" fill="url(#ballgrad)" stroke="#f5b512" stroke-width="${(1.8*mw).toFixed(1)}"${theme==='dream'?' filter="url(#glow)"':''}/>`;
     s+=`<g fill="#aab8ae" opacity=".8"><circle cx="${(pPt[0]-1.9*mk).toFixed(1)}" cy="${(pPt[1]-1.6*mk).toFixed(1)}" r="${(.65*mk).toFixed(2)}"/><circle cx="${(pPt[0]+1.4*mk).toFixed(1)}" cy="${(pPt[1]-0.5*mk).toFixed(1)}" r="${(.65*mk).toFixed(2)}"/><circle cx="${(pPt[0]-0.3*mk).toFixed(1)}" cy="${(pPt[1]+1.8*mk).toFixed(1)}" r="${(.65*mk).toFixed(2)}"/></g>`;
   } else if(!demo){
-    // GPS ON but no fix yet — a pink "searching" ball at the tee so the map isn't empty; it becomes the gold you-ball on lock
-    s+=`<circle class="you-search" cx="${teePt[0]}" cy="${teePt[1]}" r="9" fill="none" stroke="#ff2fd6" stroke-width="2.4" opacity=".9"/>`
-      +`<circle cx="${teePt[0]}" cy="${teePt[1]}" r="4.5" fill="#ff2fd6"/>`;
+    // GPS ON but no fix yet — a pink "searching" ball at the centre of the current view (always on-screen); becomes the gold you-ball on lock
+    const wcx=(minX+w/2).toFixed(1), wcy=(minY+ht/2).toFixed(1), wr=Math.max(6,w*0.03).toFixed(1);
+    s+=`<circle class="you-search" cx="${wcx}" cy="${wcy}" r="${wr}" fill="none" stroke="#ff2fd6" stroke-width="${(w*0.008).toFixed(1)}" opacity=".9"/>`
+      +`<circle cx="${wcx}" cy="${wcy}" r="${(wr*0.5).toFixed(1)}" fill="#ff2fd6"/>`
+      +`<text x="${wcx}" y="${(minY+ht/2+w*0.08).toFixed(1)}" text-anchor="middle" font-size="${(w*0.035).toFixed(1)}" font-weight="700" fill="#ff2fd6" opacity=".8">finding you…</text>`;
   }
   // wind arrow (top-right): points where the wind blows, in this hole's rotated frame
   if(windAdjust && wind.src && wind.spd>=1 && wind.dir!==null){
@@ -1282,7 +1284,7 @@ function renderMap(h,p,tb){
   mapTransform={unrot, svg, base:[minX,minY,w,ht]};
   applyMapZoom(); // sets the viewBox (pinched view if active, else the full hole)
   $('maphint').textContent = pinArm ? 'tap the green to drop today’s pin'
-    : demo ? 'tap anywhere to move' : `hole ${h.hole_number} — ${tee} tee`;
+    : demo ? 'GPS off — tap anywhere to move' : `hole ${h.hole_number} — ${tee} tee`;
 }
 
 /* ============ 3D HOLE VIEW: canvas heightfield, no dependencies ============ */
