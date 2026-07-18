@@ -214,7 +214,8 @@
   #gps.live{font-weight:700}
   #demoBtn,#elevBtn,#windBtn{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:7px;
     padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer}
-  #demoBtn.on{color:var(--accent2);border-color:var(--accent2)}
+  #demoBtn{color:#1f9d54;border-color:#1f9d54}         /* GPS ON — green */
+  #demoBtn.on{color:#b07d1a;border-color:var(--accent2);background:rgba(224,196,104,.14)} /* GPS OFF — amber */
   #elevBtn.on{color:var(--accent);border-color:var(--accent)}
   #windBtn.on{color:var(--accent2);border-color:var(--accent2)}
 
@@ -272,7 +273,7 @@
     <span style="display:flex;gap:6px">
       <button id="windBtn" title="Wind-adjusted distances. Tap to toggle; long-press to set wind manually. Turn OFF for tournament play.">WIND</button>
       <button id="elevBtn" title="Elevation-adjusted distances. Turn OFF for tournament play (USGA/R&A Rule 4.3a).">± ELEV</button>
-      <button id="demoBtn" title="Position yourself by tapping the map when GPS is off, or to study a hole from home">MANUAL</button>
+      <button id="demoBtn" title="GPS ON = the ball tracks you live. Tap to switch GPS OFF and place yourself by tapping the map (for studying a hole from home).">GPS ON</button>
     </span>
   </div>
 
@@ -485,7 +486,9 @@ function startGeo(){
 function gpsStatus(cls,msg){ $('gpsDot').className='dot '+cls; $('gpsText').textContent=msg; $('gps').classList.toggle('live', cls==='ok'); }
 function setDemo(on, why){
   demo = on;
-  $('demoBtn').classList.toggle('on', on);
+  const db=$('demoBtn');
+  db.classList.toggle('on', on);          // 'on' = demo/manual active (amber)
+  db.textContent = on ? 'GPS OFF' : 'GPS ON';
   if(on){
     const tb=teeBox(hole());
     demoPos = demoPos || {lat:tb.lat, lng:tb.lng};

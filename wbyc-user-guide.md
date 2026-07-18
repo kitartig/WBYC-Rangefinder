@@ -88,7 +88,7 @@ If the bottom still says **"demo mode"** or **"GPS needs the installed app,"** t
 | SHOT | Mark a shot from where you stand with the selected club (long-press = undo) |
 | ± ELEV | Elevation-adjusted "plays like" distances (~1 yd per 3 ft) |
 | WIND | Wind-adjusted "plays like" — tap to toggle, long-press to set wind manually |
-| DEMO MODE | Tap-the-map positioning when GPS is off/unavailable |
+| GPS ON / GPS OFF | Toggle. Green **GPS ON** = the ball tracks you live. Tap to **GPS OFF** (amber) to place yourself by tapping the map — for studying a hole from home |
 
 ## Wind
 
@@ -153,7 +153,7 @@ Turn **± ELEV and WIND off** — adjusted distances aren't allowed under USGA/R
 
 ## Demo mode
 
-Kicks in automatically if GPS is denied or unavailable (or tap DEMO MODE). Tap anywhere on the map to move yourself. **When GPS is live, tapping the map does nothing** — your ball stays locked on you, so stray taps can't knock you out of tracking. To position by hand, tap DEMO MODE first; tap it again to return to GPS.
+Kicks in automatically if GPS is denied or unavailable (or tap the toggle to **GPS OFF**). Tap anywhere on the map to move yourself. **When GPS is ON, tapping the map does nothing** — your ball stays locked on you, so stray taps can't knock you out of tracking. To position by hand, switch to **GPS OFF** first; tap it back to **GPS ON** to resume tracking.
 
 ## Fun
 
