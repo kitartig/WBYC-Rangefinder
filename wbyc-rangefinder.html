@@ -161,10 +161,10 @@
   /* ---- running scorecard ---- */
   #scstrip{display:flex;justify-content:space-between;align-items:center;gap:4px;flex-wrap:wrap;background:var(--card);
     border:1px solid var(--line);border-radius:12px;padding:8px 8px;margin-bottom:10px}
-  #scstrip .grp{display:flex;align-items:center;gap:2px;font-size:9.5px;font-weight:800;color:var(--text);letter-spacing:.4px}
-  #scstrip .grp b{font-size:17px;color:var(--text);min-width:19px;text-align:center;font-variant-numeric:tabular-nums}
-  #scstrip button{width:28px;height:30px;border-radius:8px;border:1px solid var(--line);background:none;
-    color:var(--text);font-size:15px;font-weight:700;cursor:pointer;flex:none}
+  #scstrip .grp{display:flex;align-items:center;gap:3px;font-size:10px;font-weight:800;color:var(--text);letter-spacing:.4px}
+  #scstrip .grp b{font-size:22px;color:var(--text);min-width:22px;text-align:center;font-variant-numeric:tabular-nums}
+  #scstrip button{width:30px;height:38px;border-radius:8px;border:1px solid var(--line);background:none;
+    color:var(--text);font-size:18px;font-weight:700;cursor:pointer;flex:none}
   #fwBtn{width:auto !important;padding:0 6px;font-size:10px !important;letter-spacing:.4px}
   #fwBtn.hit{color:var(--accent);border-color:var(--accent)}
   #fwBtn.miss{color:var(--red);border-color:var(--red)}
@@ -206,13 +206,14 @@
   #scBackup button{background:none;border:none;color:#7b93b8;font-size:11px;font-weight:600;cursor:pointer;padding:6px 10px;text-decoration:underline;text-underline-offset:2px}
   #scBackup button:active{color:#1f5fd0}
 
-  #gps{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--dim);padding:0 4px}
-  #gps .dot{width:8px;height:8px;border-radius:50%;background:#666;display:inline-block;margin-right:6px}
+  #gps{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;color:var(--text);
+    background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 12px;margin-bottom:10px;gap:8px}
+  #gps .dot{width:11px;height:11px;border-radius:50%;background:#666;display:inline-block;margin-right:7px;flex:none}
   #gps .dot.ok{background:#22c55e;box-shadow:0 0 5px #22c55e} #gps .dot.bad{background:var(--red)} #gps .dot.demo{background:var(--accent2)}
   #gps .dot.ok, #gps.live #gpsText{color:#1f9d54}
   #gps.live{font-weight:700}
-  #demoBtn,#elevBtn,#windBtn{background:none;border:1px solid var(--line);color:var(--dim);border-radius:6px;
-    padding:3px 8px;font-size:10px;cursor:pointer}
+  #demoBtn,#elevBtn,#windBtn{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:7px;
+    padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer}
   #demoBtn.on{color:var(--accent2);border-color:var(--accent2)}
   #elevBtn.on{color:var(--accent);border-color:var(--accent)}
   #windBtn.on{color:var(--accent2);border-color:var(--accent2)}
@@ -263,12 +264,7 @@
     <span class="grp" title="All strokes on this hole, putts included">TOTAL SCORE <button id="scSm">−</button><b id="scS">·</b><button id="scSp">+</button></span>
     <span class="grp">PUTTS <button id="scPm">−</button><b id="scP">·</b><button id="scPp">+</button></span>
     <button id="fwBtn" title="Fairway hit — tap to cycle ✓ hit / ✗ miss / blank (hidden on par 3s)">FW ·</button>
-    <span id="scTot">CARD ▸<br><b id="scTotV">—</b> <span id="scThru"></span></span>
-  </div>
-
-  <div class="panel">
-    <h2>HAZARDS &amp; TARGETS <span style="float:right;font-weight:400">reach / carry (yds)</span></h2>
-    <div id="hazList"></div>
+    <span id="scTot">CARD ▸ <b id="scTotV"></b> <span id="scThru"></span></span>
   </div>
 
   <div id="gps">
@@ -276,8 +272,13 @@
     <span style="display:flex;gap:6px">
       <button id="windBtn" title="Wind-adjusted distances. Tap to toggle; long-press to set wind manually. Turn OFF for tournament play.">WIND</button>
       <button id="elevBtn" title="Elevation-adjusted distances. Turn OFF for tournament play (USGA/R&A Rule 4.3a).">± ELEV</button>
-      <button id="demoBtn">DEMO MODE</button>
+      <button id="demoBtn" title="Position yourself by tapping the map when GPS is off, or to study a hole from home">MANUAL</button>
     </span>
+  </div>
+
+  <div class="panel">
+    <h2>HAZARDS &amp; TARGETS <span style="float:right;font-weight:400">reach / carry (yds)</span></h2>
+    <div id="hazList"></div>
   </div>
 
   <footer id="attribution"></footer>
