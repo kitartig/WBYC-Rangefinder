@@ -208,7 +208,9 @@
 
   #gps{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--dim);padding:0 4px}
   #gps .dot{width:8px;height:8px;border-radius:50%;background:#666;display:inline-block;margin-right:6px}
-  #gps .dot.ok{background:var(--accent)} #gps .dot.bad{background:var(--red)} #gps .dot.demo{background:var(--accent2)}
+  #gps .dot.ok{background:#22c55e;box-shadow:0 0 5px #22c55e} #gps .dot.bad{background:var(--red)} #gps .dot.demo{background:var(--accent2)}
+  #gps .dot.ok, #gps.live #gpsText{color:#1f9d54}
+  #gps.live{font-weight:700}
   #demoBtn,#elevBtn,#windBtn{background:none;border:1px solid var(--line);color:var(--dim);border-radius:6px;
     padding:3px 8px;font-size:10px;cursor:pointer}
   #demoBtn.on{color:var(--accent2);border-color:var(--accent2)}
@@ -479,7 +481,7 @@ function startGeo(){
            if(!pos && !demo) setDemo(true,'auto (no GPS)'); },
     { enableHighAccuracy:true, maximumAge:2000, timeout:15000 });
 }
-function gpsStatus(cls,msg){ $('gpsDot').className='dot '+cls; $('gpsText').textContent=msg; }
+function gpsStatus(cls,msg){ $('gpsDot').className='dot '+cls; $('gpsText').textContent=msg; $('gps').classList.toggle('live', cls==='ok'); }
 function setDemo(on, why){
   demo = on;
   $('demoBtn').classList.toggle('on', on);
@@ -595,7 +597,7 @@ function renderScore(){
   fb.textContent='FW '+(e.f===true?'✓':e.f===false?'✗':'·');
   fb.className=e.f===true?'hit':e.f===false?'miss':'';
   const t=cardTotals();
-  $('scTotV').textContent = t.n ? t.s : '—';        // gross strokes — no depressing over-par running tally
+  $('scTotV').textContent = t.n ? t.s : '';          // gross strokes; blank (no lonely dash) before any score
   $('scThru').textContent = t.n ? `thru ${t.n}` : '';
 }
 function renderCard(){
