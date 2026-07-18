@@ -56,6 +56,8 @@
   @keyframes youpulse{0%{transform:scale(.6);opacity:.9}70%{transform:scale(2.2);opacity:0}100%{transform:scale(2.2);opacity:0}}
   #map .you-glow{transform-box:fill-box;transform-origin:center;animation:youglow 1.4s ease-in-out infinite alternate}
   @keyframes youglow{from{transform:scale(.85);opacity:.75}to{transform:scale(1.15);opacity:1}}
+  #map .you-search{transform-box:fill-box;transform-origin:center;animation:yousearch 1.1s ease-in-out infinite alternate}
+  @keyframes yousearch{from{transform:scale(.8);opacity:.55}to{transform:scale(1.25);opacity:1}}
   body.dream .dist .val{color:var(--accent);text-shadow:0 0 14px rgba(110,231,255,.75)}
   body.dream .dist .box.center .val{text-shadow:0 0 18px rgba(110,231,255,.9)}
   #d3ex{width:110px;accent-color:var(--accent)}
@@ -159,16 +161,13 @@
   .hazrow .nums b{color:var(--text);font-size:15px;font-weight:700}
 
   /* ---- running scorecard ---- */
-  #scstrip{display:flex;justify-content:space-between;align-items:center;gap:4px;flex-wrap:wrap;background:var(--card);
-    border:1px solid var(--line);border-radius:12px;padding:8px 8px;margin-bottom:10px}
+  #scstrip{display:flex;justify-content:space-around;align-items:center;gap:4px;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;padding:5px 10px;margin-bottom:10px}
   #scstrip .grp{display:flex;align-items:center;gap:3px;font-size:10px;font-weight:800;color:var(--text);letter-spacing:.4px}
   #scstrip .grp b{font-size:22px;color:var(--text);min-width:22px;text-align:center;font-variant-numeric:tabular-nums}
   #scstrip button{width:30px;height:38px;border-radius:8px;border:1px solid var(--line);background:none;
     color:var(--text);font-size:18px;font-weight:700;cursor:pointer;flex:none}
-  #fwBtn{width:auto !important;padding:0 6px;font-size:10px !important;letter-spacing:.4px}
-  #fwBtn.hit{color:var(--accent);border-color:var(--accent)}
-  #fwBtn.miss{color:var(--red);border-color:var(--red)}
-  #scTot{text-align:right;font-size:14px;font-weight:800;color:var(--accent2);cursor:pointer;line-height:1.35;flex:none;letter-spacing:.5px}
+  #scTot{text-align:center;font-size:14px;font-weight:800;color:var(--accent2);cursor:pointer;line-height:1.35;flex:none;letter-spacing:.5px}
   #scTot b{color:var(--accent2);font-size:19px}
   #scTot #scThru{font-weight:600;color:var(--dim)}
   #scorecard{position:fixed;inset:0;background:#f2e9d6;z-index:60;display:none;flex-direction:column;padding:4px 12px 10px}
@@ -264,7 +263,6 @@
   <div id="scstrip">
     <span class="grp" title="All strokes on this hole, putts included">TOTAL SCORE <button id="scSm">−</button><b id="scS">·</b><button id="scSp">+</button></span>
     <span class="grp">PUTTS <button id="scPm">−</button><b id="scP">·</b><button id="scPp">+</button></span>
-    <button id="fwBtn" title="Fairway hit — tap to cycle ✓ hit / ✗ miss / blank (hidden on par 3s)">FW ·</button>
     <span id="scTot">CARD ▸ <b id="scTotV"></b> <span id="scThru"></span></span>
   </div>
 
@@ -596,10 +594,6 @@ function renderScore(){
   const e=card.holes[holeIdx];
   $('scS').textContent=e.s||'·';
   $('scP').textContent=e.p||'·';
-  const fb=$('fwBtn');
-  fb.style.visibility = holePar(hole())===3 ? 'hidden' : 'visible';
-  fb.textContent='FW '+(e.f===true?'✓':e.f===false?'✗':'·');
-  fb.className=e.f===true?'hit':e.f===false?'miss':'';
   const t=cardTotals();
   $('scTotV').textContent = t.n ? t.s : '';          // gross strokes; blank (no lonely dash) before any score
   $('scThru').textContent = t.n ? `thru ${t.n}` : '';
@@ -1262,6 +1256,10 @@ function renderMap(h,p,tb){
     s+=`<circle class="you-pulse" cx="${pPt[0]}" cy="${pPt[1]}" r="${(10*mk).toFixed(1)}" fill="none" stroke="#ffd21f" stroke-width="${(2.2*mw).toFixed(1)}"/>`;
     s+=`<circle cx="${pPt[0]}" cy="${pPt[1]}" r="${(6.5*mk).toFixed(1)}" fill="url(#ballgrad)" stroke="#f5b512" stroke-width="${(1.8*mw).toFixed(1)}"${theme==='dream'?' filter="url(#glow)"':''}/>`;
     s+=`<g fill="#aab8ae" opacity=".8"><circle cx="${(pPt[0]-1.9*mk).toFixed(1)}" cy="${(pPt[1]-1.6*mk).toFixed(1)}" r="${(.65*mk).toFixed(2)}"/><circle cx="${(pPt[0]+1.4*mk).toFixed(1)}" cy="${(pPt[1]-0.5*mk).toFixed(1)}" r="${(.65*mk).toFixed(2)}"/><circle cx="${(pPt[0]-0.3*mk).toFixed(1)}" cy="${(pPt[1]+1.8*mk).toFixed(1)}" r="${(.65*mk).toFixed(2)}"/></g>`;
+  } else if(!demo){
+    // GPS ON but no fix yet — a pink "searching" ball at the tee so the map isn't empty; it becomes the gold you-ball on lock
+    s+=`<circle class="you-search" cx="${teePt[0]}" cy="${teePt[1]}" r="9" fill="none" stroke="#ff2fd6" stroke-width="2.4" opacity=".9"/>`
+      +`<circle cx="${teePt[0]}" cy="${teePt[1]}" r="4.5" fill="#ff2fd6"/>`;
   }
   // wind arrow (top-right): points where the wind blows, in this hole's rotated frame
   if(windAdjust && wind.src && wind.spd>=1 && wind.dir!==null){
@@ -1866,7 +1864,6 @@ function init(data){
   const bump=(k,d)=>{ const e=card.holes[holeIdx]; e[k]=Math.max(0,Math.min(15,(e[k]||0)+d)); saveCard(); renderScore(); };
   $('scSp').onclick=()=>bump('s',1);  $('scSm').onclick=()=>bump('s',-1);
   $('scPp').onclick=()=>bump('p',1);  $('scPm').onclick=()=>bump('p',-1);
-  $('fwBtn').onclick=()=>{ const e=card.holes[holeIdx]; e.f = e.f===null ? true : e.f===true ? false : null; saveCard(); renderScore(); };
   let scMode='card';
   const scShow=()=>{
     ({card:renderCard, clubs:renderClubs, stats:renderStats})[scMode]();

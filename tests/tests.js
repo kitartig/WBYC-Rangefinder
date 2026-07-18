@@ -64,6 +64,10 @@ setTimeout(()=>{
       mapTap({clientX:150,clientY:200});
       A('live GPS tap does not enter demo', demo===false);
       pos=null; })();
+    // waiting ball when GPS on, no fix
+    (()=>{ demo=false; pos=null; render();
+      A('waiting ball shown (GPS on, no fix)', elems['map'].innerHTML.includes('you-search'));
+      A('no FW button in strip', !elems['map'] || document.getElementById('fwBtn').innerHTML===''); })();
     // GPS toggle label
     setDemo(false); A('GPS toggle reads ON when live', elems['demoBtn'].textContent==='GPS ON');
     setDemo(true); A('GPS toggle reads OFF in manual', elems['demoBtn'].textContent==='GPS OFF');
