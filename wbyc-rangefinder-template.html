@@ -125,7 +125,9 @@
   #shotbar select{background:rgba(10,16,12,.62);color:#fff;border:2px solid #35c8ff;border-radius:7px;
     padding:6px 7px;font-size:13px;font-weight:900;letter-spacing:1.2px;backdrop-filter:blur(2px)}
   #shotbar button{background:rgba(10,16,12,.62);color:#fff;border:2px solid var(--accent2);border-radius:7px;
-    padding:6px 12px;font-size:13px;font-weight:900;letter-spacing:.6px;cursor:pointer;backdrop-filter:blur(2px)}
+    padding:6px 12px;font-size:13px;font-weight:900;letter-spacing:.6px;cursor:pointer;backdrop-filter:blur(2px);transition:background .12s,border-color .12s,color .12s}
+  #shotbar button.marking{background:#12d17a;border-color:#0aa860;color:#04150c;animation:shotflash .5s ease-out}
+  @keyframes shotflash{0%{transform:scale(1)}35%{transform:scale(1.14)}100%{transform:scale(1)}}
   body.sun #shotbar select, body.sun #shotbar button{background:rgba(255,255,255,.75);color:#111}
   #mapbtns button{background:rgba(10,16,12,.55);color:#fff;border:2px solid #35c8ff;border-radius:7px;
     padding:5px 9px;font-size:10px;font-weight:700;letter-spacing:.5px;cursor:pointer;backdrop-filter:blur(2px)}
@@ -166,8 +168,8 @@
   #fwBtn{width:auto !important;padding:0 6px;font-size:10px !important;letter-spacing:.4px}
   #fwBtn.hit{color:var(--accent);border-color:var(--accent)}
   #fwBtn.miss{color:var(--red);border-color:var(--red)}
-  #scTot{text-align:right;font-size:12px;font-weight:800;color:var(--accent2);cursor:pointer;line-height:1.4;flex:none;letter-spacing:.4px}
-  #scTot b{color:var(--accent2);font-size:16px}
+  #scTot{text-align:right;font-size:14px;font-weight:800;color:var(--accent2);cursor:pointer;line-height:1.35;flex:none;letter-spacing:.5px}
+  #scTot b{color:var(--accent2);font-size:19px}
   #scTot #scThru{font-weight:600;color:var(--dim)}
   #scorecard{position:fixed;inset:0;background:#f2e9d6;z-index:60;display:none;flex-direction:column;padding:4px 12px 10px}
   #scorecard.open{display:flex}
@@ -200,6 +202,9 @@
   #sctab tr.tot td{font-weight:700;border-top:2px solid #9fc2ea}
   #sctab tr[data-h]{cursor:pointer}
   #scstats{padding:10px 4px;font-size:11px;color:#867d64;text-align:center}
+  #scBackup{text-align:center;padding:2px 0 6px}
+  #scBackup button{background:none;border:none;color:#7b93b8;font-size:11px;font-weight:600;cursor:pointer;padding:6px 10px;text-decoration:underline;text-underline-offset:2px}
+  #scBackup button:active{color:#1f5fd0}
 
   #gps{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--dim);padding:0 4px}
   #gps .dot{width:8px;height:8px;border-radius:50%;background:#666;display:inline-block;margin-right:6px}
@@ -210,7 +215,7 @@
   #elevBtn.on{color:var(--accent);border-color:var(--accent)}
   #windBtn.on{color:var(--accent2);border-color:var(--accent2)}
 
-  footer{font-size:9px;color:var(--dim);text-align:center;margin-top:14px;line-height:1.5;opacity:.8}
+  footer{font-size:7px;color:var(--dim);text-align:center;margin-top:16px;line-height:1.4;opacity:.35}
   footer a{color:var(--dim)}
 </style>
 </head>
@@ -282,6 +287,11 @@
   <div id="scLogoWrap"><img id="scLogo" alt=""></div>
   <div id="sctab"></div>
   <div id="scstats"></div>
+  <div id="scBackup">
+    <button id="scExport" title="Save all your rounds, shots and club data to a file">⤓ Export my data</button>
+    <button id="scImport" title="Restore rounds, shots and clubs from an exported file">⤒ Import</button>
+    <input id="scImportFile" type="file" accept="application/json,.json" style="display:none">
+  </div>
 </div>
 
 <div id="threeD">
@@ -505,6 +515,7 @@ function markShot(){
   const p=playerPos(); if(!p) return;
   shots.push({d:today(), h:hole().hole_number, lat:p.lat, lng:p.lng, t:Date.now(), club:curClub});
   saveShots();
+  const sb=$('shotBtn'); if(sb){ sb.classList.add('marking'); setTimeout(()=>sb.classList.remove('marking'),480); } // flash confirmation
   $('maphint').textContent=`shot ${shots.filter(s=>s.d===today()&&s.h===hole().hole_number).length} marked (${curClub})`;
   render();
 }
@@ -584,14 +595,14 @@ function renderScore(){
   fb.textContent='FW '+(e.f===true?'✓':e.f===false?'✗':'·');
   fb.className=e.f===true?'hit':e.f===false?'miss':'';
   const t=cardTotals();
-  $('scTotV').textContent = t.n ? fmtDiff(t.s-t.par) : '—';
+  $('scTotV').textContent = t.n ? t.s : '—';        // gross strokes — no depressing over-par running tally
   $('scThru').textContent = t.n ? `thru ${t.n}` : '';
 }
 function renderCard(){
   const row=i=>{
-    const h=course.holes[i], e=card.holes[i], hp=holePar(h), d=e.s?e.s-hp:0;
+    const h=course.holes[i], e=card.holes[i], hp=holePar(h);
     return `<tr class="${i===holeIdx?'cur':''}" data-h="${i}"><td>${h.hole_number}</td><td>${hp}</td>`
-      +`<td>${e.s?e.s+(d?` <small>${d>0?'+':''}${d}</small>`:''):''}</td><td>${e.p||''}</td>`
+      +`<td>${e.s||''}</td><td>${e.p||''}</td>`   // raw score only — no per-hole +/- delta
       +`<td>${hp===3?'—':e.f===true?'✓':e.f===false?'✗':''}</td></tr>`;
   };
   const half=(a,b,label)=>{
@@ -605,7 +616,7 @@ function renderCard(){
   $('sctab').innerHTML=html+'</table>';
   const t=cardTotals();
   $('scstats').textContent = t.n
-    ? `${t.n} holes · ${fmtDiff(t.s-t.par)} · ${t.p} putts · FW ${t.fwH}/${t.fwT} · GIR ${t.gir}`
+    ? `${t.n} holes · ${t.s} strokes · ${t.p} putts · FW ${t.fwH}/${t.fwT} · GIR ${t.gir}`
     : 'no scores yet — use the +/− strip on any hole · tap a row to jump there';
 }
 function renderClubs(){
@@ -1882,6 +1893,32 @@ function init(data){
   sb.addEventListener('pointerdown',()=>{ slpTimer=setTimeout(()=>{ slpFired=true; undoShot(); },550); });
   ['pointerup','pointerleave','pointercancel'].forEach(ev=>sb.addEventListener(ev,()=>clearTimeout(slpTimer)));
   $('scClose').onclick=()=>$('scorecard').classList.remove('open');
+  // Export / Import — back up or move your whole record between devices (rounds live per-device by design)
+  const BKEYS=['wbyc_card','wbyc_rounds','wbyc_shots','wbyc_club','wbyc_name','wbyc_tee'];
+  $('scExport').onclick=()=>{
+    const data={app:'wbyc-rangefinder', v:1, exported:new Date().toISOString(), store:{}};
+    for(const k of BKEYS){ const v=localStorage.getItem(k); if(v!==null) data.store[k]=v; }
+    const blob=new Blob([JSON.stringify(data,null,1)],{type:'application/json'});
+    const url=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=url; a.download=`wbyc-rangefinder-${pname?pname.replace(/[^a-z0-9]+/gi,'-').toLowerCase()+'-':''}${today()}.json`;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+    $('scstats').textContent='exported — save that file somewhere safe (or AirDrop it to another device)';
+  };
+  $('scImport').onclick=()=>$('scImportFile').click();
+  $('scImportFile').onchange=e=>{
+    const f=e.target.files&&e.target.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=()=>{
+      try{
+        const data=JSON.parse(r.result);
+        if(!data||data.app!=='wbyc-rangefinder'||!data.store) throw 0;
+        if(!confirm('Import will REPLACE the rounds, shots and settings on this device with the file’s. Continue?')) return;
+        for(const k of BKEYS){ if(k in data.store) localStorage.setItem(k, data.store[k]); }
+        location.reload();
+      }catch(_){ $('scstats').textContent='that file isn’t a WBYC Rangefinder export — nothing changed'; }
+    };
+    r.readAsText(f); e.target.value='';
+  };
   $('scNew').onclick=()=>{ if(confirm('Start a new round? This card will be saved to your history.')){ archiveRound(); card=blankCard(); saveCard(); scShow(); renderScore(); } };
   $('sctab').onclick=ev=>{ // tap a hole row to jump there
     const tr=ev.target && ev.target.closest ? ev.target.closest('tr[data-h]') : null;

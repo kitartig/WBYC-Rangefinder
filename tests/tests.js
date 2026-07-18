@@ -49,6 +49,15 @@ setTimeout(()=>{
     A('name saves trimmed', pname==='Kit');
     A('scorecard signed', elems['scTitle'].textContent==='KIT — SCORECARD');
     globalThis.prompt=()=>null;
+    // export/import + no-plus-strokes
+    A('CARD shows gross not vs-par', (()=>{ const h=hole(); card.holes[holeIdx]={s:6,p:2,f:true}; renderScore(); return elems['scTotV'].textContent===6 || elems['scTotV'].textContent==='6'; })());
+    A('export wired', typeof elems['scExport'].onclick==='function');
+    A('import wired', typeof elems['scImport'].onclick==='function');
+    (()=>{ let dl=''; const oCreate=document.createElement;
+      document.createElement=t2=>{ const el=oCreate(t2); if(t2==='a'){ el.click=()=>{dl='clicked';}; } return el; };
+      globalThis.Blob=class{constructor(a){this.a=a;}}; globalThis.URL={createObjectURL:()=>'blob:x',revokeObjectURL(){}};
+      elems['scExport'].onclick(); document.createElement=oCreate;
+      A('export produces a download', dl==='clicked'); })();
     // pin sheet
     (()=>{ const h=hole(), gf=h.green.front;
       freshPins(); pins.p[h.hole_number]={lat:gf.lat,lng:gf.lng}; savePins(); render();
