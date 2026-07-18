@@ -153,7 +153,7 @@ Turn **± ELEV and WIND off** — adjusted distances aren't allowed under USGA/R
 
 ## Demo mode
 
-Kicks in automatically if GPS is denied or unavailable (or tap DEMO MODE). Tap anywhere on the map to move yourself. Tapping the map while GPS is live also switches you into demo — tap DEMO MODE again to return to GPS.
+Kicks in automatically if GPS is denied or unavailable (or tap DEMO MODE). Tap anywhere on the map to move yourself. **When GPS is live, tapping the map does nothing** — your ball stays locked on you, so stray taps can't knock you out of tracking. To position by hand, tap DEMO MODE first; tap it again to return to GPS.
 
 ## Fun
 

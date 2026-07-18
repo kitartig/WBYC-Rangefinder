@@ -58,6 +58,12 @@ setTimeout(()=>{
       globalThis.Blob=class{constructor(a){this.a=a;}}; globalThis.URL={createObjectURL:()=>'blob:x',revokeObjectURL(){}};
       elems['scExport'].onclick(); document.createElement=oCreate;
       A('export produces a download', dl==='clicked'); })();
+    // live-GPS tap immunity
+    (()=>{ demo=false; pos={lat:course.holes[0].green.center.lat+0.001,lng:course.holes[0].green.center.lng}; render();
+      const svg=mapTransform.svg; svg.getBoundingClientRect=()=>({left:0,top:0,width:300,height:400});
+      mapTap({clientX:150,clientY:200});
+      A('live GPS tap does not enter demo', demo===false);
+      pos=null; })();
     // pin sheet
     (()=>{ const h=hole(), gf=h.green.front;
       freshPins(); pins.p[h.hole_number]={lat:gf.lat,lng:gf.lng}; savePins(); render();

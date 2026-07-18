@@ -1719,7 +1719,10 @@ function mapTap(ev){
     } else $('maphint').textContent='closer to the green, please';
     return;
   }
-  if(!demo) setDemo(true,'tap');            // first tap on the map enters demo mode
+  if(!demo){
+    if(pos) return;              // GPS is live — ignore stray taps so the ball stays locked on you
+    setDemo(true,'tap');         // no GPS fix yet — a tap enters demo so you can position by hand
+  }
   demoPos=ll;
   // easter egg: land the tap on the pin (≤3 yds) on all 18 holes
   if(yds(demoPos, hole().green.center) <= 3){
