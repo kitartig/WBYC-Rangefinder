@@ -454,6 +454,13 @@ function pushFix(lat,lng,accuracy){
 }
 function startGeo(){
   if(!navigator.geolocation){ setDemo(true,'no geolocation support'); return; }
+  // GPS requires a secure context — a lone file:// or plain-http copy can't get location, only the deployed https app can
+  const secureGeo = location.protocol==='https:' || ['localhost','127.0.0.1'].includes(location.hostname);
+  if(!secureGeo){
+    setDemo(true,'needs the online app');
+    gpsStatus('bad','GPS needs the installed app — demo mode for now');
+    return;
+  }
   watchId = navigator.geolocation.watchPosition(
     p => { if(demo) return;
       pushFix(p.coords.latitude, p.coords.longitude, p.coords.accuracy);
