@@ -1,6 +1,6 @@
 # WBYC Rangefinder — Quick User Guide
 
-*Guide edition: app v105 · July 17, 2026*
+*Guide edition: app v109 · July 17, 2026 · live at wbyc-rangefinder.netlify.app*
 
 A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, working offline in your pocket.
 
@@ -49,6 +49,19 @@ Change your name anytime by tapping it; clear it to go anonymous. Rounds you nev
 4. From then on, launch it from the home-screen icon like any app — full screen, works offline, keeps the display awake during a round.
 
 Sanity check outdoors: the status line goes green with `GPS ±Xm · n/5 fixes`. If it says demo mode, location was declined — fix in Settings → Privacy → Location Services → Safari Websites. (App updates arrive on the *second* launch after we ship them — close and reopen twice.)
+
+## Is the GPS working? (read this first)
+
+**You'll know it's working when:** the little dot at the bottom of the screen turns **green** and says something like **`GPS ±5m`**, and the glowing ball on the map sits right where you're standing. Walk a few steps — the ball walks with you. That's it. The phone is now your golf ball.
+
+**If the ball is frozen and won't move with you, do this:**
+
+1. Make sure you opened the app from the **web link** (wbyc-rangefinder.netlify.app), not an old copy. GPS only works from the real link — a saved file can't use it.
+2. When the phone asks **"Allow location?"**, tap **Allow**. (If you tapped "Don't Allow" by mistake: go to Settings → Privacy → Location Services → Safari, and set it to **While Using**.)
+3. Be **outside**, under open sky. GPS is weak indoors and near tall trees.
+4. Give it a few seconds after you open it — the dot goes yellow, then green.
+
+If the bottom still says **"demo mode"** or **"GPS needs the installed app,"** the phone isn't sharing your location yet — it's almost always step 1 or step 2 above.
 
 ## On the course
 
