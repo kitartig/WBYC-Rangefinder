@@ -224,17 +224,17 @@
   #gps .dot.ok{background:#22c55e;box-shadow:0 0 5px #22c55e} #gps .dot.bad{background:var(--red)} #gps .dot.demo{background:var(--accent2)}
   #gps .dot.ok, #gps.live #gpsText{color:#1f9d54}
   #gps.live{font-weight:700}
-  /* status-card pills — soft, rounded, and they glow in their own colour when active */
-  #demoBtn,#elevBtn,#windBtn{background:var(--card2);border:1.5px solid var(--line);color:var(--dim);
-    border-radius:999px;padding:7px 15px;font-size:11px;font-weight:800;letter-spacing:.6px;cursor:pointer;
-    box-shadow:0 1px 2px rgba(0,0,0,.14);transition:background .16s,box-shadow .16s,color .16s,border-color .16s,transform .1s}
+  /* status-card pills — solid colour chips, white type; muted when off, saturated + glow when active */
+  #demoBtn,#elevBtn,#windBtn{border:none;color:#fff;border-radius:999px;padding:8px 16px;
+    font-size:11px;font-weight:800;letter-spacing:.6px;cursor:pointer;
+    box-shadow:0 1px 3px rgba(0,0,0,.22);transition:background .16s,box-shadow .16s,transform .1s;text-shadow:0 1px 1px rgba(0,0,0,.18)}
   #demoBtn:active,#elevBtn:active,#windBtn:active{transform:translateY(1px)}
-  #windBtn{color:var(--blue);border-color:var(--blue)}                                   /* WIND — sky blue */
-  #windBtn.on{background:rgba(133,185,234,.18);box-shadow:0 0 9px rgba(133,185,234,.4),0 1px 2px rgba(0,0,0,.14)}
-  #elevBtn{color:var(--accent);border-color:var(--accent)}                               /* ± ELEV — periwinkle */
-  #elevBtn.on{background:rgba(157,180,240,.2);box-shadow:0 0 9px rgba(157,180,240,.4),0 1px 2px rgba(0,0,0,.14)}
-  #demoBtn{color:#1f9d54;border-color:#1f9d54}                                           /* GPS ON — green */
-  #demoBtn.on{color:#b07d1a;border-color:var(--accent2);background:rgba(224,196,104,.2);box-shadow:0 0 9px rgba(224,196,104,.4),0 1px 2px rgba(0,0,0,.14)} /* GPS OFF — amber */
+  #windBtn{background:#8fb2dc}                                                            /* WIND — sky blue */
+  #windBtn.on{background:#2f7fce;box-shadow:0 0 10px rgba(47,127,206,.5),0 1px 3px rgba(0,0,0,.22)}
+  #elevBtn{background:#a6a6df}                                                            /* ± ELEV — periwinkle */
+  #elevBtn.on{background:#6d6fd6;box-shadow:0 0 10px rgba(109,111,214,.5),0 1px 3px rgba(0,0,0,.22)}
+  #demoBtn{background:#21a35a}                                                            /* GPS ON — green */
+  #demoBtn.on{background:#d79626;box-shadow:0 0 10px rgba(215,150,38,.5),0 1px 3px rgba(0,0,0,.22)} /* GPS OFF — amber */
 
   footer{font-size:7px;color:var(--dim);text-align:center;margin-top:16px;line-height:1.4;opacity:.35}
   footer a{color:var(--dim)}
