@@ -66,11 +66,11 @@ setTimeout(()=>{
       pos=null; })();
     // waiting ball when GPS on, no fix
     (()=>{ demo=false; pos=null; render();
-      A('waiting ball shown (GPS on, no fix)', elems['map'].innerHTML.includes('burgee-load'));
+      A('waiting ball shown (GPS on, no fix)', elems['map'].innerHTML.includes('you-search'));
       A('no FW button in strip', !elems['map'] || document.getElementById('fwBtn').innerHTML===''); })();
     // far-fix shows centered marker not off-screen ball
     (()=>{ demo=false; pos={lat:0,lng:0}; render(); // 0,0 is nowhere near WBYC
-      A('far GPS shows searching marker', elems['map'].innerHTML.includes('patiently waiting for you') && elems['map'].innerHTML.includes('burgee-wave'));
+      A('far GPS shows searching marker', elems['map'].innerHTML.includes('patiently waiting for you') && elems['map'].innerHTML.includes('you-search'));
       A('no off-screen gold ball when far', !elems['map'].innerHTML.includes('you-glow'));
       pos=null; })();
     // weather flourish
