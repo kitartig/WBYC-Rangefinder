@@ -473,6 +473,9 @@ let fixes=[], pos=null, acc=null, watchId=null;
 const $ = id => document.getElementById(id);
 const hole = () => course.holes[holeIdx];
 const teeBox = h => h.tee_boxes.find(t=>t.name===tee) || h.tee_boxes[0];
+// In GPS-off mode the ball stands in for you; snap it to the selected tee so the
+// distance matches the tee you picked (live GPS ignores this — the ball is really you).
+function snapDemo(){ if(demo){ const tb=teeBox(hole()); demoPos={lat:tb.lat,lng:tb.lng}; } }
 
 /* ============ POSITION ============ */
 function playerPos(){
@@ -1801,7 +1804,7 @@ function buildTees(){
   $('teeRow').innerHTML = course.tees.map(t=>
     `<button data-tee="${t.name}">${t.name.toUpperCase()}<br><span style="font-size:10px;font-weight:400">${t.total_yardage}</span></button>`).join('');
   document.querySelectorAll('.tees button').forEach(b=>b.onclick=()=>{
-    tee=b.dataset.tee; localStorage.setItem('wbyc_tee',tee); render();
+    tee=b.dataset.tee; localStorage.setItem('wbyc_tee',tee); snapDemo(); render();
   });
 }
 function init(data){

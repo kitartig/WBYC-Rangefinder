@@ -84,6 +84,12 @@ setTimeout(()=>{
     (()=>{ demo=false; pos={lat:0,lng:0}; render();
       A('far fix blanks CENTER distance', elems['dCenter'].textContent==='–');
       pos=null; })();
+    // demo ball snaps to the selected tee (so Red reads the Red yardage)
+    (()=>{ setDemo(true); holeIdx=4; const t0=tee;
+      tee='Blue'; snapDemo(); render(); const blue=+elems['dCenter'].textContent;
+      tee='Red'; snapDemo(); render(); const red=+elems['dCenter'].textContent;
+      A('demo: Red tee reads ~290 (card), not Blue distance', Math.abs(red-290)<6 && blue>red+80);
+      tee=t0; holeIdx=0; render(); })();
     // GPS toggle label
     setDemo(false); A('GPS toggle reads ON when live', elems['demoBtn'].textContent==='GPS ON');
     setDemo(true); A('GPS toggle reads OFF in manual', elems['demoBtn'].textContent==='GPS OFF');
