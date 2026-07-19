@@ -1,4 +1,7 @@
 [build]
   # The deployable site lives in pwa/ (index.html + sw.js + icons).
-  # No build step — it's a static PWA — so Netlify just publishes this folder.
+  # It's a static PWA — nothing to compile — so the "build" is a no-op.
+  # This empty command overrides any leftover build command in the Netlify UI,
+  # which was causing "Build script returned non-zero exit code: 2".
+  command = "echo 'static PWA — no build step'"
   publish = "pwa"
