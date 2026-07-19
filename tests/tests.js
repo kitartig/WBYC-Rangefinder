@@ -66,13 +66,19 @@ setTimeout(()=>{
       pos=null; })();
     // waiting ball when GPS on, no fix
     (()=>{ demo=false; pos=null; render();
-      A('waiting ball shown (GPS on, no fix)', elems['map'].innerHTML.includes('you-search'));
+      A('waiting ball shown (GPS on, no fix)', elems['map'].innerHTML.includes('burgee-load'));
       A('no FW button in strip', !elems['map'] || document.getElementById('fwBtn').innerHTML===''); })();
     // far-fix shows centered marker not off-screen ball
     (()=>{ demo=false; pos={lat:0,lng:0}; render(); // 0,0 is nowhere near WBYC
-      A('far GPS shows searching marker', elems['map'].innerHTML.includes('you-search') && elems['map'].innerHTML.includes('patiently waiting for you'));
+      A('far GPS shows searching marker', elems['map'].innerHTML.includes('patiently waiting for you') && elems['map'].innerHTML.includes('burgee-wave'));
       A('no off-screen gold ball when far', !elems['map'].innerHTML.includes('you-glow'));
       pos=null; })();
+    // weather flourish
+    (()=>{ weather={code:61,day:true}; demo=true; render();
+      A('weather flourish (rain) renders', elems['map'].innerHTML.includes('wx-rain'));
+      weather={code:0,day:true}; render();
+      A('weather flourish (sun) renders', elems['map'].innerHTML.includes('sunglint'));
+      weather={code:null,day:true}; render(); })();
     // GPS toggle label
     setDemo(false); A('GPS toggle reads ON when live', elems['demoBtn'].textContent==='GPS ON');
     setDemo(true); A('GPS toggle reads OFF in manual', elems['demoBtn'].textContent==='GPS OFF');
