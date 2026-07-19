@@ -1,0 +1,4 @@
+[build]
+  # The deployable site lives in pwa/ (index.html + sw.js + icons).
+  # No build step — it's a static PWA — so Netlify just publishes this folder.
+  publish = "pwa"
