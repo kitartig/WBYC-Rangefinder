@@ -56,13 +56,13 @@ Sanity check outdoors: the status card goes green with `GPS ±Xm · n/5 fixes` (
 
 **You'll know it's working when:** the **status card** (just above HAZARDS & TARGETS — scroll down a little) shows a **green** dot and **`GPS ±5m`**, the **GPS ON** button is green, and the glowing gold ball sits right where you're standing. Walk a few steps — the ball walks with you. The phone is now your golf ball.
 
-**Before it locks on, you'll see a pink marker** in the middle of the map that says **"finding you…"** (no fix yet) or **"not on this hole"** (it has a fix, but you're not standing on the hole that's showing — e.g. you're indoors at home, or on a different hole). That's normal — it becomes the gold ball the moment you're near the right hole outside.
+**Before it locks on, you'll see a pink marker** in the middle of the map that says **"finding you…"** (no fix yet) or **"patiently waiting for you"** (it has a fix, but you're not standing on the hole that's showing — e.g. you're indoors at home, or on a different hole). That's normal — it becomes the gold ball the moment you're near the right hole outside.
 
 **If the ball won't track you, do this:**
 
 1. Open the app from the **web link** (wbyc-rangefinder.netlify.app), not an old saved copy — GPS only works from the real link.
 2. Tap **Allow** when it asks for location. (Declined by mistake? Settings → Privacy → Location Services → Safari → **While Using**.)
-3. Be **outside**, under open sky. GPS is weak indoors and near tall trees — indoors you'll usually get "not on this hole" because the phone places you at home.
+3. Be **outside**, under open sky. GPS is weak indoors and near tall trees — indoors you'll usually get "patiently waiting for you" because the phone places you at home.
 4. Give it a few seconds — the dot goes from grey to green.
 
 If the status card says **"GPS off"**, tap the **GPS OFF** button (amber) once to switch it back to **GPS ON** (green). If it says **"GPS needs the installed app,"** you opened an old file copy — use the web link.

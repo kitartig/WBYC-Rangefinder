@@ -70,7 +70,7 @@ setTimeout(()=>{
       A('no FW button in strip', !elems['map'] || document.getElementById('fwBtn').innerHTML===''); })();
     // far-fix shows centered marker not off-screen ball
     (()=>{ demo=false; pos={lat:0,lng:0}; render(); // 0,0 is nowhere near WBYC
-      A('far GPS shows searching marker', elems['map'].innerHTML.includes('you-search') && elems['map'].innerHTML.includes('not on this hole'));
+      A('far GPS shows searching marker', elems['map'].innerHTML.includes('you-search') && elems['map'].innerHTML.includes('patiently waiting for you'));
       A('no off-screen gold ball when far', !elems['map'].innerHTML.includes('you-glow'));
       pos=null; })();
     // GPS toggle label
