@@ -37,6 +37,7 @@ setTimeout(()=>{
     A('5 tee sets loaded', course.tees.length===5 && course.tees[4].name==='Green' && course.tees[4].total_yardage===4779);
     A('every hole has a Green box', course.holes.every(h2=>h2.tee_boxes.some(tb2=>tb2.name==='Green')));
     A('estimates flagged', course.holes.filter(h2=>h2.tee_boxes.find(tb2=>tb2.name==='Green').estimated).length===15);
+    A('h5 red re-pinned to card 290', (()=>{const h5=course.holes[4],rd=h5.tee_boxes.find(t=>t.name==='Red');return rd.estimated===true && Math.abs(yds({lat:rd.lat,lng:rd.lng},h5.green.center)-290)<3;})());
     A('red h10 updated', course.holes[9].tee_boxes.find(tb2=>tb2.name==='Red').yardage===260);
     (()=>{ const t0=tee; tee='Green'; holeIdx=0; render();
       A('green tee: womens par', elems['holeMeta'].innerHTML.includes('Par 5'));
