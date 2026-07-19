@@ -1,6 +1,6 @@
 # WBYC Rangefinder — Quick User Guide
 
-*Guide edition: app v109 · July 17, 2026 · live at wbyc-rangefinder.netlify.app*
+*Guide edition: app v122 · July 18, 2026 · live at wbyc-rangefinder.netlify.app*
 
 A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, working offline in your pocket.
 
@@ -25,6 +25,8 @@ A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, w
 - **Hazards & targets panel** — reach / carry distances to every bunker, water hazard, and dogleg
 - **Three themes** (dark / sun / dream) with a high-contrast sun mode for bright days
 - **Works offline** — installs to your home screen as an app; scorecard and shots survive restarts
+- **Export / Import** — back up your whole record to a file, or move it to another device
+- **GPS ON/OFF toggle** with a clear status card, and a "finding you…" marker while it locks on
 - A little hidden whimsy for those who explore
 
 ## Your name & starting your record
@@ -48,20 +50,22 @@ Change your name anytime by tapping it; clear it to go anonymous. Rounds you nev
 3. Tap the **Share button** (square with the up-arrow) → **Add to Home Screen** → Add.
 4. From then on, launch it from the home-screen icon like any app — full screen, works offline, keeps the display awake during a round.
 
-Sanity check outdoors: the status line goes green with `GPS ±Xm · n/5 fixes`. If it says demo mode, location was declined — fix in Settings → Privacy → Location Services → Safari Websites. (App updates arrive on the *second* launch after we ship them — close and reopen twice.)
+Sanity check outdoors: the status card goes green with `GPS ±Xm · n/5 fixes` (the "n/5 fixes" just means it's averaging your last 5 readings for accuracy — 5/5 is fully settled). If it says "GPS off," tap the toggle back to GPS ON; if location was declined, fix it in Settings → Privacy → Location Services → Safari. (App updates arrive on the *second* launch after we ship them — close and reopen twice, or remove the icon and re-add from Safari for a guaranteed refresh.)
 
 ## Is the GPS working? (read this first)
 
-**You'll know it's working when:** the little dot at the bottom of the screen turns **green** and says something like **`GPS ±5m`**, and the glowing ball on the map sits right where you're standing. Walk a few steps — the ball walks with you. That's it. The phone is now your golf ball.
+**You'll know it's working when:** the **status card** (just above HAZARDS & TARGETS — scroll down a little) shows a **green** dot and **`GPS ±5m`**, the **GPS ON** button is green, and the glowing gold ball sits right where you're standing. Walk a few steps — the ball walks with you. The phone is now your golf ball.
 
-**If the ball is frozen and won't move with you, do this:**
+**Before it locks on, you'll see a pink marker** in the middle of the map that says **"finding you…"** (no fix yet) or **"not on this hole"** (it has a fix, but you're not standing on the hole that's showing — e.g. you're indoors at home, or on a different hole). That's normal — it becomes the gold ball the moment you're near the right hole outside.
 
-1. Make sure you opened the app from the **web link** (wbyc-rangefinder.netlify.app), not an old copy. GPS only works from the real link — a saved file can't use it.
-2. When the phone asks **"Allow location?"**, tap **Allow**. (If you tapped "Don't Allow" by mistake: go to Settings → Privacy → Location Services → Safari, and set it to **While Using**.)
-3. Be **outside**, under open sky. GPS is weak indoors and near tall trees.
-4. Give it a few seconds after you open it — the dot goes yellow, then green.
+**If the ball won't track you, do this:**
 
-If the bottom still says **"demo mode"** or **"GPS needs the installed app,"** the phone isn't sharing your location yet — it's almost always step 1 or step 2 above.
+1. Open the app from the **web link** (wbyc-rangefinder.netlify.app), not an old saved copy — GPS only works from the real link.
+2. Tap **Allow** when it asks for location. (Declined by mistake? Settings → Privacy → Location Services → Safari → **While Using**.)
+3. Be **outside**, under open sky. GPS is weak indoors and near tall trees — indoors you'll usually get "not on this hole" because the phone places you at home.
+4. Give it a few seconds — the dot goes from grey to green.
+
+If the status card says **"GPS off"**, tap the **GPS OFF** button (amber) once to switch it back to **GPS ON** (green). If it says **"GPS needs the installed app,"** you opened an old file copy — use the web link.
 
 ## On the course
 
@@ -69,7 +73,8 @@ If the bottom still says **"demo mode"** or **"GPS needs the installed app,"** t
 - **Just stand over your ball.** The white golf ball with the glowing gold halo is you. The app averages your last 5 GPS fixes, so stand still a few seconds for best accuracy (±3–5 m typical).
 - **AUTO** (on by default) switches holes for you as you walk — it picks whichever hole's centerline you're nearest. Use **‹ ›** to browse manually (this turns AUTO off; tap AUTO to re-enable).
 - **Distances** update live: front / **CENTER** / back of green. Under CENTER, the "plays like" line stacks everything the app knows: elevation, wind, and (once shot tracking has data) your club — e.g. `plays 152 (+6 ft, wind +4) · 7i`.
-- **Tee buttons** (Blue/White/Gold/Red/Green) set the scorecard yardage shown and demo-mode start point. Red and Green score against women's par and use their own handicap allocations from the 4/2026 card. Heads-up: most Green tee positions are estimated on the line of play until they're GPS-captured — yardages match the card, but the dot on the map may sit a pace or two off the actual pad.
+- **Tee buttons** (Blue/White/Gold/Red/Green) set the scorecard yardage shown and the GPS-OFF start point. Red and Green score against women's par and use their own handicap allocations from the 4/2026 card. Heads-up: most Green tee positions are estimated on the line of play until they're GPS-captured — yardages match the card, but the dot on the map may sit a pace or two off the actual pad.
+- The **status card** (GPS · WIND · ± ELEV · GPS ON/OFF) sits just above HAZARDS & TARGETS. Green **GPS ON** = tracking you; tap to **GPS OFF** (amber) to place yourself by tapping the map — handy for studying a hole from home.
 - The screen stays awake during a round (wake lock) — expect battery drain; start charged.
 
 ## Buttons
@@ -133,13 +138,14 @@ That pair at the bottom edge of the map — one reading something like **7i**, t
 
 ## Scorecard
 
-- The strip below the map is your running card for the current hole: **TOTAL SCORE** (all strokes on the hole, putts included) and **PUTTS** +/−, and **FW** — fairway hit (tap to cycle ✓ hit → ✗ miss → blank; hidden on par 3s).
-- The right side (**CARD ▸**) shows your running total strokes and holes played (`48 · thru 9`) — **tap it to open the full card**: front/back/total, per-hole results, and a stats line (putts, fairways, GIR). No over-par running tally — just your strokes.
+- The strip below the map is your running card for the current hole: **TOTAL SCORE** (all strokes on the hole, putts included) and **PUTTS**, each with big +/− buttons.
+- **CARD ▸** (right side) shows your running total strokes and holes played (`48 · thru 9`) — **tap it to open the full card**: front/back/total, per-hole results, and a stats line (putts, fairways, GIR). No over-par running tally — just your strokes.
 - On the full card, **tap any hole row to jump the app to that hole**; NEW ROUND clears the card (with a confirm).
 - The card survives closing the app mid-round (saved on every tap). Red- and Green-tee rounds score against women's par automatically, each with its own handicap allocation.
 - The card wears the club's colors: white boxes ruled in light blue on warm card-stock, with the burgee at the top — a pocket version of the printed scorecard.
 - **POST** (on the full card) copies your hole-by-hole scores to the clipboard and opens ghin.com — log in, choose hole-by-hole posting, and paste/enter. GHIN doesn't allow direct posting from personal apps, so this is deliberately a two-tap handoff: your GHIN login never touches this app.
 - **NEW** banks the finished round into your history (it's saved, not discarded), then clears the card for the next round.
+- **Export my data / Import** (small links at the bottom of the scorecard) save your whole record — rounds, shots, clubs, name — to a file, or restore it. Export to back up before switching phones; Import on the new phone brings it all across. Rounds otherwise live only on the phone that recorded them (no accounts, by design).
 
 ## Your game (STATS)
 
