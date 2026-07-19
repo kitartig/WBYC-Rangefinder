@@ -169,7 +169,7 @@
     border-bottom:1px solid var(--line);font-size:14px}
   .hazrow:last-child{border-bottom:none}
   .hazrow .ic{width:14px;height:14px;border-radius:4px;display:inline-block;margin-right:8px;vertical-align:-2px}
-  .ic.bunker{background:var(--sand)} .ic.water{background:var(--water)} .ic.dogleg{background:var(--accent2);border-radius:50%}
+  .ic.bunker{background:var(--sand)} .ic.water{background:var(--water)} .ic.dogleg{background:#f000c2;border-radius:50%}
   .hazrow .nums{font-variant-numeric:tabular-nums;color:var(--dim);font-size:13px}
   .hazrow .nums b{color:var(--text);font-size:15px;font-weight:700}
 
@@ -1315,7 +1315,7 @@ function renderMap(h,p,tb){
     const asz=greenView ? w*0.055 : Math.max(10,Math.min(20,w*0.055)); // no size floor up close — it dwarfed the green
     const wsw=greenView ? (asz*0.17).toFixed(2) : '2.4';
     const wfs=greenView ? (asz*0.62).toFixed(1) : String(Math.max(8,Math.round(asz*0.6)));
-    const ax=maxX-asz*1.5, ay=minY+asz*1.6;
+    const ax=maxX-asz*1.5, ay=minY+asz*(greenView?1.6:3.6);  // clear the SAT/GRN/PIN/3D buttons in hole view
     s+=`<g transform="rotate(${rotA.toFixed(0)} ${ax.toFixed(1)} ${ay.toFixed(1)})" opacity=".9">`
       +`<line x1="${ax.toFixed(1)}" y1="${(ay+asz*0.7).toFixed(1)}" x2="${ax.toFixed(1)}" y2="${(ay-asz*0.7).toFixed(1)}" stroke="var(--accent2)" stroke-width="${wsw}" stroke-linecap="round"/>`
       +`<path d="M${(ax-asz*0.38).toFixed(1)} ${(ay-asz*0.15).toFixed(1)}L${ax.toFixed(1)} ${(ay-asz*0.7).toFixed(1)}L${(ax+asz*0.38).toFixed(1)} ${(ay-asz*0.15).toFixed(1)}" fill="none" stroke="var(--accent2)" stroke-width="${wsw}" stroke-linecap="round" stroke-linejoin="round"/></g>`

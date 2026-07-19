@@ -153,9 +153,14 @@ Tap **STATS** on the scorecard for your profile page: every banked round (date, 
 
 **Reviewing at home:** the same link works on an iPad or laptop — replay any hole's 3D flyover, walk the card, and browse your stats from the couch. One catch: rounds live on the device that recorded them (there are no accounts, by design), so review your round on the phone that scored it, or use the big screen for course study and replays.
 
-## Tournament play
+## Tournament play — why WIND and ± ELEV have off switches
 
-Turn **± ELEV and WIND off** — adjusted distances aren't allowed under USGA/R&A Rule 4.3a. Plain GPS distances are fine.
+Those two chips toggle for a reason: **the Rules of Golf.** A rangefinder may give you plain straight-line distance, but under **USGA/R&A Rule 4.3a** it may **not** give you distance adjusted for slope or wind — that crosses into "advice" a device can't provide. So:
+
+- **On** (casual play): the CENTER number reads "plays like," folding in elevation and wind — smarter club choices.
+- **Off** (tournaments, or any round posted under strict rules): tap both chips off and you get the raw, legal GPS yardage.
+
+Leave both on for everyday golf; flip both off before competition. (Handy anytime, too — one tap shows the pure number, e.g. to check against a sprinkler head.)
 
 ## GPS OFF (manual positioning)
 
