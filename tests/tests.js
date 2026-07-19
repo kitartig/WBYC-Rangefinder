@@ -79,6 +79,10 @@ setTimeout(()=>{
       weather={code:0,day:true}; render();
       A('weather flourish (sun) renders', elems['map'].innerHTML.includes('sunglint'));
       weather={code:null,day:true}; render(); })();
+    // far fix blanks distances (no 4-digit couch readout)
+    (()=>{ demo=false; pos={lat:0,lng:0}; render();
+      A('far fix blanks CENTER distance', elems['dCenter'].textContent==='–');
+      pos=null; })();
     // GPS toggle label
     setDemo(false); A('GPS toggle reads ON when live', elems['demoBtn'].textContent==='GPS ON');
     setDemo(true); A('GPS toggle reads OFF in manual', elems['demoBtn'].textContent==='GPS OFF');

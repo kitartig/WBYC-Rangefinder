@@ -699,7 +699,11 @@ function render(){
   const g = h.green;
   $('dCLbl').textContent = pinFor(h) ? 'PIN' : 'CENTER';
   $('pinBtn').classList.toggle('on', !!pinFor(h));
-  if(p){
+  // only show live distances when you're actually near this hole — otherwise a far/home GPS fix
+  // would read the true (huge) distance to the green. Matches the "patiently waiting" map marker.
+  const holeLen0 = yds({lat:tb.lat,lng:tb.lng}, g.center);
+  const near = p && yds(p, g.center) < holeLen0*1.6 + 120;
+  if(p && near){
     const tgt = target(h);
     const dc = yds(p,tgt);
     $('dFront').textContent  = fmt(yds(p,g.front));
