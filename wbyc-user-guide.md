@@ -34,7 +34,7 @@ A GPS rangefinder built for one course: every hole, hazard, and green at WBYC, w
 Three moves, and only the first is setup:
 
 1. **Tap "+ your name"** (top right, next to the Bar/Dining button) — once. It signs your scorecard and GHIN posts, and stays on the device.
-2. **Just play.** Every tap of TOTAL SCORE / PUTTS / FW and every SHOT mark saves itself instantly — there is no save button to forget.
+2. **Just play.** Every tap of TOTAL SCORE / PUTTS and every SHOT mark saves itself instantly — there is no save button to forget.
 3. **At the last green, tap the card, then NEW.** That banks the round into your history — this is the move that builds your record: the vs-par trend, bests, averages, and club distances all grow from banked rounds. (POST first if you're sending it to GHIN.)
 
 Change your name anytime by tapping it; clear it to go anonymous. Rounds you never bank aren't lost — the card just waits for you.
@@ -157,14 +157,14 @@ Tap **STATS** on the scorecard for your profile page: every banked round (date, 
 
 Turn **± ELEV and WIND off** — adjusted distances aren't allowed under USGA/R&A Rule 4.3a. Plain GPS distances are fine.
 
-## Demo mode
+## GPS OFF (manual positioning)
 
 Kicks in automatically if GPS is denied or unavailable (or tap the toggle to **GPS OFF**). Tap anywhere on the map to move yourself. **When GPS is ON, tapping the map does nothing** — your ball stays locked on you, so stray taps can't knock you out of tracking. To position by hand, switch to **GPS OFF** first; tap it back to **GPS ON** to resume tracking.
 
 ## Fun
 
 - Long-press **± ELEV** to cycle gravity: Earth → Moon → Mars distances. Resets on reload.
-- In demo mode, landing a tap within 3 yards of the pin on all 18 holes does… something. 
+- With **GPS OFF**, landing a tap within 3 yards of the pin on all 18 holes does… something. 
 
 ## Known quirks
 
