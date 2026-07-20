@@ -1,5 +1,5 @@
 /* WBYC Rangefinder service worker — offline-first app shell */
-const VERSION = 'wbyc-v138';
+const VERSION = 'wbyc-v139';
 const SHELL = ['./', './index.html', './manifest.webmanifest',
                './icon-192.png', './icon-512.png', './course_data_v2.json'];
 
@@ -26,6 +26,13 @@ self.addEventListener('fetch', e => {
                                   .catch(() => cached);
       return cached || net;
     }));
+    return;
+  }
+  // guide: network-first so edits appear without an app version bump; cache is the offline fallback
+  if (url.pathname.startsWith('/guide')) {
+    e.respondWith(caches.open(VERSION).then(c =>
+      fetch(e.request).then(r => { if (r.ok) c.put(e.request, r.clone()); return r; })
+                      .catch(() => c.match(e.request).then(hit => hit || c.match('./guide/')))));
     return;
   }
   // everything else: cache-first, network fallback; navigations fall back to shell
