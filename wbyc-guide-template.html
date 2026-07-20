@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WBYC Rangefinder — User Guide</title>
+<style>
+/*__FONTS__*/
+:root{
+  --bg:#f5edda; --card:#ffffff; --card2:#eff5ea; --line:#d8cfba; --line2:#c9c2b2;
+  --text:#1a1712; --dim:#5b5647; --accent:#4a5fae; --accent2:#b45309;
+  --blue:#4d84c4; --gold:#ffc72c; --red:#fb637e; --sand:#e8c878; --water:#1e4d8c;
+  --green:#249a55; --green-lt:#4cc97f; --green-dk:#0e6b3a; --pink:#f000c2;
+  --serif:'EB Garamond',Garamond,Baskerville,'Times New Roman',serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);
+  line-height:1.55;-webkit-font-smoothing:antialiased;
+  padding:0 18px calc(48px + env(safe-area-inset-bottom));}
+.wrap{max-width:820px;margin:0 auto}
+
+/* ---- hero ---- */
+.hero{display:flex;align-items:center;gap:16px;padding:30px 4px 18px;border-bottom:1px solid var(--line)}
+.hero img{width:74px;height:auto;flex:none}
+.hero h1{font-family:var(--serif);margin:0;font-weight:500;letter-spacing:.5px;line-height:.98}
+.hero .wbyc{font-size:38px}
+.hero .rf{font-size:19px;letter-spacing:2.5px;color:var(--dim)}
+.hero .tag{font-family:var(--serif);font-style:italic;color:var(--accent);font-size:16px;margin-top:4px}
+.edition{color:var(--dim);font-size:12.5px;margin:14px 4px 0}
+
+h2{font-family:var(--serif);font-weight:600;font-size:26px;margin:38px 0 4px;letter-spacing:.3px}
+h2 .num{display:inline-block;color:var(--pink)}
+h3{font-family:var(--serif);font-weight:600;font-size:19px;margin:22px 0 2px}
+p{margin:8px 0}
+a{color:var(--accent);text-decoration-color:rgba(74,95,174,.4)}
+.lead{font-size:16.5px;color:var(--dim);max-width:60ch}
+.rule{height:1px;background:var(--line);border:0;margin:30px 0}
+
+/* ---- schematic block ---- */
+.sch{display:flex;gap:26px;align-items:flex-start;margin:14px 0 4px;flex-wrap:wrap}
+.sch .art{flex:0 0 320px;max-width:100%;margin:0 auto}
+.sch svg{width:100%;height:auto;display:block;
+  filter:drop-shadow(0 8px 22px rgba(60,45,20,.16))}
+.sch .legend{flex:1 1 320px;min-width:280px}
+ol.cal{list-style:none;margin:6px 0 0;padding:0;counter-reset:c}
+ol.cal li{position:relative;padding:7px 0 7px 40px;border-bottom:1px solid var(--line);
+  font-size:14.5px}
+ol.cal li:before{counter-increment:c;content:counter(c);
+  position:absolute;left:0;top:7px;width:26px;height:26px;border-radius:50%;
+  background:var(--pink);color:#fff;font-weight:800;font-size:13px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 5px rgba(240,0,194,.35)}
+ol.cal b{color:var(--text)}
+ol.cal li span{color:var(--dim)}
+
+/* ---- generic feature cards ---- */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+@media(max-width:620px){.grid{grid-template-columns:1fr}}
+.fc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;
+  box-shadow:0 2px 8px rgba(60,45,20,.05)}
+.fc h4{margin:0 0 3px;font-size:15px}
+.fc p{margin:0;font-size:13.5px;color:var(--dim)}
+.pill{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.4px;
+  border-radius:999px;padding:2px 10px;color:#fff;vertical-align:middle}
+.callbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.callbar .pill{font-size:12.5px}
+
+table.btns{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+table.btns td{border-bottom:1px solid var(--line);padding:8px 6px;vertical-align:top}
+table.btns td:first-child{white-space:nowrap;font-weight:800;color:var(--accent);width:120px}
+
+.note{background:var(--card2);border-left:3px solid var(--green);border-radius:0 10px 10px 0;
+  padding:10px 14px;margin:14px 0;font-size:14px}
+.note b{color:var(--green-dk)}
+
+footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);
+  color:var(--dim);font-size:12.5px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:10px 0}
+.steps li{position:relative;padding:6px 0 6px 34px;font-size:14.5px}
+.steps li:before{counter-increment:s;content:counter(s);position:absolute;left:0;top:5px;
+  width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;
+  font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <img src="__BURGEE__" alt="WBYC burgee">
+    <div>
+      <h1><span class="wbyc">WBYC</span><br><span class="rf">RANGEFINDER</span></h1>
+      <div class="tag">Striving to be the best part of your day.</div>
+    </div>
+  </div>
+  <p class="edition">User guide · app v137 · July 2026 · live at <a href="https://wbyc-rangefinder.netlify.app">wbyc-rangefinder.netlify.app</a></p>
+  <p class="lead">A GPS rangefinder built for one course — every hole, hazard, and green at White Bear Yacht Club, in your pocket and working offline. Here's the whole app in two screens.</p>
+
+  <!-- ============ MAIN SCREEN ============ -->
+  <h2><span class="num">1 ·</span> The main screen</h2>
+  <p class="lead">Stand over your ball; the phone becomes the ball. Everything you need for the shot lives here.</p>
+
+  <div class="sch">
+    <div class="art">
+      <svg viewBox="0 0 340 726" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Annotated main screen schematic">
+        <defs>
+          <linearGradient id="turf" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#3aa564"/><stop offset="1" stop-color="#1c7a45"/>
+          </linearGradient>
+          <radialGradient id="grn" cx="50%" cy="40%" r="60%">
+            <stop offset="0" stop-color="#7fe3a6"/><stop offset="1" stop-color="#2a9c5c"/>
+          </radialGradient>
+          <radialGradient id="ball" cx="38%" cy="34%" r="70%">
+            <stop offset="0" stop-color="#fffef2"/><stop offset="1" stop-color="#f4d24a"/>
+          </radialGradient>
+          <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+            <stop offset="0" stop-color="#fff3a6" stop-opacity=".9"/><stop offset="1" stop-color="#ffab00" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="dine" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#fbe9b8"/><stop offset="1" stop-color="#eeb86a"/>
+          </linearGradient>
+          <style>
+            .lbl{font-family:-apple-system,sans-serif}
+            .b{font-weight:800}
+            .badge{fill:#f000c2}
+            .bt{fill:#fff;font-weight:800;font-size:13px;font-family:sans-serif;text-anchor:middle}
+          </style>
+        </defs>
+
+        <!-- phone frame -->
+        <rect x="6" y="6" width="328" height="714" rx="26" fill="#f5edda" stroke="#c9c2b2" stroke-width="1.5"/>
+
+        <!-- header -->
+        <image href="__BURGEE__" x="20" y="24" width="46" height="31"/>
+        <text x="74" y="42" class="lbl" style="font-family:'EB Garamond',serif;font-size:20px" fill="#1a1712">WBYC</text>
+        <text x="74" y="55" class="lbl" style="font-family:'EB Garamond',serif;font-size:9px;letter-spacing:1.5px" fill="#5b5647">RANGEFINDER</text>
+        <rect x="196" y="27" width="86" height="21" rx="10.5" fill="url(#dine)" stroke="#e5c48a"/>
+        <text x="239" y="41" class="lbl" style="font-size:8.5px;font-style:italic;font-family:'EB Garamond',serif" fill="#5a3d12" text-anchor="middle">☎ Bar/Dining</text>
+        <text x="285" y="41" class="lbl" style="font-size:8.5px;font-style:italic;font-family:'EB Garamond',serif" fill="#8a8270" text-anchor="middle">+ name</text>
+        <circle cx="309" cy="39" r="11" fill="#fff" stroke="#c9c2b2"/><text x="309" y="43" class="bt" fill="#4a5fae" style="font-size:13px">?</text>
+
+        <!-- holebar -->
+        <rect x="20" y="70" width="28" height="30" rx="8" fill="#fff" stroke="#c9c2b2"/><text x="34" y="90" text-anchor="middle" fill="#1a1712" style="font-size:15px">‹</text>
+        <rect x="54" y="70" width="170" height="30" rx="8" fill="#fff" stroke="#c9c2b2"/>
+        <text x="64" y="85" class="lbl b" fill="#1a1712" style="font-size:14px">Hole 5</text>
+        <text x="118" y="83" class="lbl" fill="#5b5647" style="font-size:8.5px">Par 4 · 290 yds</text>
+        <text x="118" y="93" class="lbl" fill="#5b5647" style="font-size:8.5px">Hcp 13</text>
+        <rect x="228" y="70" width="28" height="30" rx="8" fill="#fff" stroke="#c9c2b2"/><text x="242" y="90" text-anchor="middle" fill="#1a1712" style="font-size:15px">›</text>
+        <rect x="262" y="70" width="58" height="30" rx="8" fill="#fff" stroke="#c9c2b2"/><text x="291" y="89" text-anchor="middle" class="lbl b" fill="#1a1712" style="font-size:11px">AUTO</text>
+
+        <!-- tee row -->
+        <g class="lbl" style="font-size:11px">
+          <rect x="20" y="110" width="56" height="34" rx="8" fill="#fff" stroke="#c9c2b2"/><text x="48" y="126" text-anchor="middle" class="b" fill="#1a1712">BLUE</text><text x="48" y="138" text-anchor="middle" fill="#5b5647" style="font-size:9px">6471</text>
+          <rect x="80" y="110" width="56" height="34" rx="8" fill="#fff" stroke="#c9c2b2"/><text x="108" y="126" text-anchor="middle" class="b" fill="#1a1712">WHITE</text><text x="108" y="138" text-anchor="middle" fill="#5b5647" style="font-size:9px">6266</text>
+          <rect x="140" y="110" width="56" height="34" rx="8" fill="#fff" stroke="#c9c2b2"/><text x="168" y="126" text-anchor="middle" class="b" fill="#1a1712">GOLD</text><text x="168" y="138" text-anchor="middle" fill="#5b5647" style="font-size:9px">5823</text>
+          <rect x="200" y="110" width="56" height="34" rx="8" fill="#fb637e" stroke="#e0455f"/><text x="228" y="126" text-anchor="middle" class="b" fill="#fff">RED</text><text x="228" y="138" text-anchor="middle" fill="#fff" style="font-size:9px">5636</text>
+          <rect x="260" y="110" width="56" height="34" rx="8" fill="#fff" stroke="#c9c2b2"/><text x="288" y="126" text-anchor="middle" class="b" fill="#1a1712">GREEN</text><text x="288" y="138" text-anchor="middle" fill="#5b5647" style="font-size:9px">4779</text>
+        </g>
+
+        <!-- distances -->
+        <rect x="20" y="156" width="88" height="66" rx="12" fill="#fff" stroke="#c9c2b2"/>
+        <text x="64" y="172" text-anchor="middle" class="lbl" fill="#5b5647" style="font-size:9px;letter-spacing:1px">FRONT</text>
+        <text x="64" y="203" text-anchor="middle" class="lbl b" fill="#1a1712" style="font-size:30px">374</text>
+        <rect x="114" y="156" width="94" height="66" rx="12" fill="#eff5ea" stroke="#4a5fae" stroke-width="1.5"/>
+        <text x="161" y="172" text-anchor="middle" class="lbl" fill="#4a5fae" style="font-size:9px;letter-spacing:1px">CENTER</text>
+        <text x="161" y="202" text-anchor="middle" class="lbl b" fill="#4a5fae" style="font-size:32px">385</text>
+        <text x="161" y="216" text-anchor="middle" class="lbl b" fill="#b45309" style="font-size:8.5px">plays 382 (wind −2)</text>
+        <rect x="214" y="156" width="88" height="66" rx="12" fill="#fff" stroke="#c9c2b2"/>
+        <text x="258" y="172" text-anchor="middle" class="lbl" fill="#5b5647" style="font-size:9px;letter-spacing:1px">BACK</text>
+        <text x="258" y="203" text-anchor="middle" class="lbl b" fill="#1a1712" style="font-size:30px">397</text>
+
+        <!-- map -->
+        <clipPath id="mapclip"><rect x="20" y="234" width="300" height="238" rx="12"/></clipPath>
+        <g clip-path="url(#mapclip)">
+          <rect x="20" y="234" width="300" height="238" fill="url(#turf)"/>
+          <path d="M120 472 C110 400 150 340 168 300 C186 262 176 250 172 234 L210 234 C214 260 210 300 206 340 C200 400 220 440 214 472 Z" fill="#5cc07f" opacity=".55"/>
+          <ellipse cx="188" cy="262" rx="34" ry="26" fill="url(#grn)" stroke="#eafff0" stroke-width="1.4"/>
+          <circle cx="150" cy="330" r="12" fill="#e8c878" opacity=".9"/>
+          <ellipse cx="238" cy="410" rx="18" ry="11" fill="#1e4d8c" opacity=".85"/>
+          <!-- pink flight arc -->
+          <path d="M186 430 Q150 330 188 264" fill="none" stroke="#f000c2" stroke-width="2.4" opacity=".85"/>
+          <!-- ball -->
+          <circle cx="186" cy="432" r="16" fill="url(#halo)"/>
+          <circle cx="186" cy="432" r="6.5" fill="url(#ball)" stroke="#f5b512" stroke-width="1.6"/>
+          <!-- wind arrow -->
+          <g transform="translate(298,258)"><path d="M0 8 L6 -6 L0 -2 L-6 -6 Z" fill="#b45309"/><text x="0" y="20" text-anchor="middle" class="lbl b" fill="#b45309" style="font-size:9px">2</text></g>
+        </g>
+        <!-- map buttons -->
+        <g class="lbl b" style="font-size:9px" text-anchor="middle">
+          <rect x="176" y="240" width="30" height="17" rx="8.5" fill="#fff" stroke="#4a5fae"/><text x="191" y="252" fill="#1a1712">SAT</text>
+          <rect x="210" y="240" width="30" height="17" rx="8.5" fill="#fff" stroke="#c9c2b2"/><text x="225" y="252" fill="#1a1712">GRN</text>
+          <rect x="244" y="240" width="30" height="17" rx="8.5" fill="#fff" stroke="#c9c2b2"/><text x="259" y="252" fill="#1a1712">PIN</text>
+          <rect x="278" y="240" width="30" height="17" rx="8.5" fill="#fff" stroke="#c9c2b2"/><text x="293" y="252" fill="#1a1712">3D</text>
+        </g>
+        <!-- shotbar -->
+        <g class="lbl b" style="font-size:10px" text-anchor="middle">
+          <rect x="28" y="446" width="34" height="20" rx="6" fill="rgba(10,16,12,.62)" stroke="#b45309" stroke-width="1.5"/><text x="45" y="460" fill="#fff">7i</text>
+          <rect x="66" y="446" width="48" height="20" rx="6" fill="rgba(10,16,12,.62)" stroke="#b45309" stroke-width="1.5"/><text x="90" y="460" fill="#fff">SHOT</text>
+        </g>
+
+        <!-- scstrip -->
+        <rect x="20" y="482" width="300" height="34" rx="10" fill="#fff" stroke="#c9c2b2"/>
+        <text x="30" y="497" class="lbl b" fill="#1a1712" style="font-size:8px">TOTAL SCORE</text>
+        <text x="30" y="510" class="lbl" fill="#5b5647" style="font-size:8px">PUTTS</text>
+        <g class="lbl b" fill="#1a1712" style="font-size:12px" text-anchor="middle"><text x="110" y="504">− 5 +</text><text x="180" y="504">− 2 +</text></g>
+        <text x="300" y="502" class="lbl b" fill="#b45309" style="font-size:11px" text-anchor="end">CARD ▸</text>
+
+        <!-- status card -->
+        <rect x="20" y="524" width="300" height="38" rx="10" fill="#fff" stroke="#c9c2b2"/>
+        <circle cx="35" cy="543" r="6" fill="#45dca0"/><circle cx="35" cy="543" r="8" fill="none" stroke="#45dca0" stroke-opacity=".5"/>
+        <text x="48" y="547" class="lbl b" fill="#17a06a" style="font-size:11px">GPS ±5m</text>
+        <g class="lbl b" style="font-size:9.5px" text-anchor="middle" fill="#fff">
+          <rect x="150" y="533" width="42" height="18" rx="9" fill="#00a9e0"/><text x="171" y="545">WIND</text>
+          <rect x="196" y="533" width="52" height="18" rx="9" fill="#de5fb0"/><text x="222" y="545">± ELEV</text>
+          <rect x="252" y="533" width="60" height="18" rx="9" fill="#45dca0"/><text x="282" y="545" fill="#0b3b29">GPS ON</text>
+        </g>
+
+        <!-- hazards -->
+        <rect x="20" y="570" width="300" height="128" rx="12" fill="#fff" stroke="#c9c2b2"/>
+        <text x="32" y="588" class="lbl b" fill="#1a1712" style="font-size:11px;letter-spacing:.5px">HAZARDS &amp; TARGETS</text>
+        <g class="lbl" style="font-size:11px" fill="#1a1712">
+          <circle cx="36" cy="606" r="5" fill="#e8c878"/><text x="48" y="610">Fairway bunker — carry 232 · reach 251</text>
+          <circle cx="36" cy="628" r="5" fill="#1e4d8c"/><text x="48" y="632">Pond (right) — carry 268</text>
+          <circle cx="36" cy="650" r="5" fill="#f000c2"/><text x="48" y="654">Dogleg corner — 208 to turn</text>
+          <circle cx="36" cy="672" r="5" fill="#e8c878"/><text x="48" y="676">Greenside bunker — 6 to carry</text>
+        </g>
+
+        <!-- CALLOUT BADGES -->
+        <g class="bt">
+          <circle cx="206" cy="110" r="11" class="badge"/><text x="206" y="114">1</text>
+          <circle cx="118" cy="156" r="11" class="badge"/><text x="118" y="160">2</text>
+          <circle cx="176" cy="240" r="11" class="badge"/><text x="176" y="244">3</text>
+          <circle cx="316" cy="256" r="11" class="badge"/><text x="316" y="260">4</text>
+          <circle cx="186" cy="432" r="11" class="badge" stroke="#fff" stroke-width="1.5"/><text x="186" y="436">5</text>
+          <circle cx="28" cy="446" r="11" class="badge"/><text x="28" y="450">6</text>
+          <circle cx="30" cy="482" r="11" class="badge"/><text x="30" y="486">7</text>
+          <circle cx="316" cy="493" r="11" class="badge"/><text x="316" y="497">8</text>
+          <circle cx="30" cy="524" r="11" class="badge"/><text x="30" y="528">9</text>
+          <circle cx="30" cy="570" r="11" class="badge"/><text x="30" y="574">10</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="legend">
+      <ol class="cal">
+        <li><b>Tee selector.</b> <span>Tap your tee — the yardage line and the GPS‑OFF start point follow. Red &amp; Green score against women's par.</span></li>
+        <li><b>CENTER distance.</b> <span>The big number is yards to the middle of the green. Under it, "plays like" folds in elevation, wind, and your club (e.g. <i>plays 152 · 7i</i>). Tap the box for a side‑profile of the shot.</span></li>
+        <li><b>Map views.</b> <span>SAT aerial · GRN green zoom · PIN drop today's pin · 3D flyover with an animated tracer.</span></li>
+        <li><b>Wind arrow.</b> <span>Points where the wind blows relative to the hole; the number is mph. Up = tailwind to the green.</span></li>
+        <li><b>You.</b> <span>The glowing gold ball is your GPS position — walk and it walks with you. A pink "finding you…" marker shows until it locks on.</span></li>
+        <li><b>Shot tracking.</b> <span>Set the club (7i = 7‑iron), tap SHOT at your ball. The app learns your real distances; long‑press to undo.</span></li>
+        <li><b>Score strip.</b> <span>TOTAL SCORE and PUTTS for this hole, big +/− buttons. Every tap saves itself.</span></li>
+        <li><b>CARD ▸.</b> <span>Your running total and holes played — tap to open the full scorecard (screen 2).</span></li>
+        <li><b>Status card.</b> <span>Green dot + "GPS ±5m" = tracking you. WIND / ± ELEV toggle the "plays like" math; GPS ON/OFF switches live tracking vs. tap‑to‑place.</span></li>
+        <li><b>Hazards &amp; targets.</b> <span>Carry and reach distances to every bunker, water hazard, and dogleg on the hole.</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============ SCORECARD SCREEN ============ -->
+  <h2><span class="num">2 ·</span> The scorecard</h2>
+  <p class="lead">Tap <b>CARD ▸</b> to open your round — styled like the printed club card, with three views along the top.</p>
+
+  <div class="sch">
+    <div class="art">
+      <svg viewBox="0 0 340 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Annotated scorecard schematic">
+        <defs>
+          <style>
+            .cl{font-family:-apple-system,sans-serif}
+            .cb{font-weight:800}
+          </style>
+        </defs>
+        <!-- card stock -->
+        <rect x="6" y="6" width="328" height="458" rx="20" fill="#f2e9d6" stroke="#cfc3a2" stroke-width="1.5"/>
+        <!-- crest + title -->
+        <image href="__BURGEE__" x="150" y="18" width="40" height="27"/>
+        <text x="170" y="60" text-anchor="middle" class="cl cb" fill="#1b3a66" style="font-size:9px;letter-spacing:1.4px">WBYC</text>
+        <text x="170" y="74" text-anchor="middle" class="cl" style="font-family:'EB Garamond',serif;font-size:15px;letter-spacing:1px" fill="#1b3a66">KIT — SCORECARD</text>
+
+        <!-- tabs -->
+        <g class="cl cb" style="font-size:11px" text-anchor="middle">
+          <rect x="66" y="84" width="66" height="24" rx="7" fill="#1f5fd0"/><text x="99" y="100" fill="#fff">CARD</text>
+          <rect x="138" y="84" width="66" height="24" rx="7" fill="#fff" stroke="#cfc3a2"/><text x="171" y="100" fill="#1b3a66">CLUBS</text>
+          <rect x="210" y="84" width="66" height="24" rx="7" fill="#fff" stroke="#cfc3a2"/><text x="243" y="100" fill="#1b3a66">STATS</text>
+        </g>
+
+        <!-- table -->
+        <g class="cl" style="font-size:10px">
+          <rect x="24" y="120" width="292" height="150" rx="12" fill="#fff" stroke="#9fc2ea" stroke-width="1.4"/>
+          <!-- header row -->
+          <line x1="24" y1="146" x2="316" y2="146" stroke="#bcd6f2"/>
+          <text x="44" y="138" text-anchor="middle" class="cb" fill="#1b3a66">HOLE</text>
+          <g fill="#1b3a66" text-anchor="middle">
+            <text x="86" y="138">1</text><text x="112" y="138">2</text><text x="138" y="138">3</text><text x="164" y="138">4</text><text x="190" y="138">5</text><text x="216" y="138">6</text><text x="242" y="138">7</text><text x="268" y="138">8</text><text x="294" y="138" class="cb">OUT</text>
+          </g>
+          <!-- PAR row -->
+          <line x1="24" y1="172" x2="316" y2="172" stroke="#e2eefb"/>
+          <text x="44" y="164" text-anchor="middle" class="cb" fill="#4a5647">PAR</text>
+          <g fill="#5b5647" text-anchor="middle"><text x="86" y="164">4</text><text x="112" y="164">4</text><text x="138" y="164">5</text><text x="164" y="164">3</text><text x="190" y="164">4</text><text x="216" y="164">4</text><text x="242" y="164">3</text><text x="268" y="164">5</text><text x="294" y="164" class="cb">36</text></g>
+          <!-- YOU row (current hole highlighted) -->
+          <rect x="177" y="176" width="26" height="22" fill="#eaf1fd"/>
+          <text x="44" y="190" text-anchor="middle" class="cb" fill="#1f5fd0">YOU</text>
+          <g fill="#1b3a66" text-anchor="middle"><text x="86" y="190">5</text><text x="112" y="190">4</text><text x="138" y="190">6</text><text x="164" y="190">3</text><text x="190" y="190" class="cb" fill="#1f5fd0">5</text><text x="216" y="190">—</text><text x="242" y="190">—</text><text x="268" y="190">—</text><text x="294" y="190" class="cb">23</text></g>
+          <!-- stats line -->
+          <line x1="24" y1="212" x2="316" y2="212" stroke="#e2eefb"/>
+          <text x="34" y="234" fill="#5b5647" style="font-size:10.5px">Putts 9 · FW 3/4 · GIR 2</text>
+          <text x="306" y="234" text-anchor="end" class="cb" fill="#1b3a66" style="font-size:12px">TOTAL 23 · thru 5</text>
+          <text x="34" y="256" fill="#867d64" style="font-size:9px">Red tees · women's par</text>
+        </g>
+
+        <!-- action buttons -->
+        <g class="cl cb" style="font-size:11px" text-anchor="middle">
+          <rect x="24" y="284" width="88" height="28" rx="8" fill="#fff" stroke="#cfc3a2"/><text x="68" y="302" fill="#1b3a66">POST</text>
+          <rect x="126" y="284" width="88" height="28" rx="8" fill="#fff" stroke="#cfc3a2"/><text x="170" y="302" fill="#1b3a66">NEW</text>
+          <rect x="228" y="284" width="88" height="28" rx="8" fill="#fff" stroke="#cfc3a2"/><text x="272" y="302" fill="#1b3a66">✕ CLOSE</text>
+        </g>
+        <text x="170" y="336" text-anchor="middle" class="cl" fill="#5b5647" style="font-size:11px;text-decoration:underline">Export my data · Import</text>
+
+        <!-- helper caption -->
+        <text x="170" y="372" text-anchor="middle" class="cl" fill="#867d64" style="font-size:10px;font-style:italic;font-family:'EB Garamond',serif">Tap any hole to jump there · NEW banks the round</text>
+
+        <!-- CALLOUTS -->
+        <g style="font-family:sans-serif" fill="#fff" font-weight="800" font-size="13" text-anchor="middle">
+          <circle cx="66" cy="84" r="11" fill="#f000c2"/><text x="66" y="88">1</text>
+          <circle cx="177" cy="176" r="11" fill="#f000c2"/><text x="177" y="180">2</text>
+          <circle cx="306" cy="176" r="11" fill="#f000c2"/><text x="306" y="180">3</text>
+          <circle cx="68" cy="284" r="11" fill="#f000c2"/><text x="68" y="288">4</text>
+          <circle cx="170" cy="284" r="11" fill="#f000c2"/><text x="170" y="288">5</text>
+          <circle cx="248" cy="336" r="11" fill="#f000c2"/><text x="248" y="340">6</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="legend">
+      <ol class="cal">
+        <li><b>Three views.</b> <span>CARD is your hole‑by‑hole round; CLUBS shows your learned distance per club; STATS is your round history, trend line, and bests.</span></li>
+        <li><b>Tap a hole to jump.</b> <span>Any hole row takes the app straight to that hole. Your current hole is highlighted.</span></li>
+        <li><b>OUT / IN / TOTAL.</b> <span>Front nine, back nine, and total — strokes only, no depressing over‑par tally. Red/Green rounds score women's par automatically.</span></li>
+        <li><b>POST.</b> <span>Copies your hole‑by‑hole scores and opens ghin.com to paste — a deliberate two‑tap handoff, so your GHIN login never touches the app.</span></li>
+        <li><b>NEW.</b> <span>Banks the finished round into your history (bests, averages, club distances all grow from this), then clears the card.</span></li>
+        <li><b>Export / Import.</b> <span>Back up your whole record to a file, or move it to a new phone. Rounds otherwise live only on the device that recorded them — no accounts, by design.</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============ GETTING STARTED ============ -->
+  <h2><span class="num">3 ·</span> Getting started</h2>
+
+  <h3>Install it on your phone (~40 seconds)</h3>
+  <ol class="steps">
+    <li>Open <a href="https://wbyc-rangefinder.netlify.app">wbyc-rangefinder.netlify.app</a> in <b>Safari</b> (iPhone) or <b>Chrome</b> (Android).</li>
+    <li>Tap <b>Allow</b> when it asks for your location.</li>
+    <li>Tap the <b>Share</b> button → <b>Add to Home Screen</b> → Add.</li>
+    <li>Launch it from the home‑screen icon after that — full screen, offline, screen stays awake during a round.</li>
+  </ol>
+
+  <h3>Your name &amp; your record</h3>
+  <p>Tap <b>+ your name</b> once (top right) — it signs your card and stays on the device. Then just play: every score and shot saves itself. At the last green, open the card and tap <b>NEW</b> to bank the round — that's the move that builds your trend, bests, and club distances.</p>
+
+  <div class="note"><b>Is the GPS working?</b> Outdoors, the status card goes green and reads <b>GPS ±5m</b>, and the gold ball sits where you stand. Before it locks on you'll see a pink <i>finding you…</i> marker — normal. Always open the app from the web link (not an old saved copy), tap Allow for location, and be under open sky.</div>
+
+  <!-- ============ EVERY BUTTON ============ -->
+  <h2><span class="num">4 ·</span> Every button</h2>
+  <table class="btns">
+    <tr><td>‹ ›</td><td>Previous / next hole (turns AUTO off).</td></tr>
+    <tr><td>AUTO</td><td>Detects your hole from GPS as you walk.</td></tr>
+    <tr><td>SAT</td><td>Aerial photography under the map.</td></tr>
+    <tr><td>GRN</td><td>Zoom to the green — white fall‑line arrows and 1‑ft contours for reading putts.</td></tr>
+    <tr><td>PIN</td><td>Tap PIN, then tap the pin's real spot — every number re‑keys to it. Long‑press to clear; pins reset at midnight.</td></tr>
+    <tr><td>3D</td><td>3D terrain flyover with an animated shot tracer (drag to rotate, pinch to zoom, TRACE to replay).</td></tr>
+    <tr><td>CENTER box</td><td>Tap the big number to open the side‑profile flight view.</td></tr>
+    <tr><td>7i</td><td>Club picker by SHOT (7i = 7‑iron). Drives the carry rings and shot marks.</td></tr>
+    <tr><td>SHOT</td><td>Mark a shot from where you stand (long‑press = undo).</td></tr>
+    <tr><td>WIND</td><td>Wind‑adjusted "plays like" — tap to toggle, long‑press to set wind by hand.</td></tr>
+    <tr><td>± ELEV</td><td>Elevation‑adjusted "plays like" (~1 yd per 3 ft).</td></tr>
+    <tr><td>GPS ON / OFF</td><td>Green = the ball tracks you live. Tap to OFF to place yourself by tapping the map.</td></tr>
+    <tr><td>☀ / ✦ / ☾</td><td>Cycle theme: dark → sun → dream.</td></tr>
+    <tr><td>?</td><td>Opens this guide.</td></tr>
+  </table>
+
+  <!-- ============ GOOD TO KNOW ============ -->
+  <h2><span class="num">5 ·</span> Good to know</h2>
+  <div class="grid">
+    <div class="fc"><h4>Pinch to zoom</h4><p>Two fingers zoom the hole map up to 8× and pan; pinch back out or change holes to snap back.</p></div>
+    <div class="fc"><h4>Ball flight, three ways</h4><p>The pink tracer shows on the hole map, in the tap‑for‑it side profile, and animated over 3D terrain — with yardage stats at the apex.</p></div>
+    <div class="fc"><h4>Carry arcs</h4><p>Dashed rings show your selected club's reach (and its neighbors) from where you stand. They switch to your learned numbers after a few tracked shots.</p></div>
+    <div class="fc"><h4>Reading the green</h4><p>GRN shows a deep‑emerald green with white downhill arrows and 1‑ft contours — read the broad break, not 6‑inch putts.</p></div>
+    <div class="fc"><h4>Tournament‑legal</h4><p>Flip WIND and ± ELEV <b>off</b> for the raw, rules‑legal yardage (USGA Rule 4.3a). Leave both on for everyday golf.</p></div>
+    <div class="fc"><h4>Works offline</h4><p>Installed to your home screen, the app and your record survive with no signal. Live wind needs a connection.</p></div>
+  </div>
+
+  <div class="note">A little whimsy hides in here for those who explore — long‑press <b>± ELEV</b> to golf on the Moon, for one.</div>
+
+  <footer>
+    Data: scorecard from the club; course geometry © OpenStreetMap contributors (ODbL); elevation &amp; aerials from USGS 3DEP / NAIP (public domain).<br>
+    WBYC Rangefinder · a gift to White Bear Yacht Club.
+  </footer>
+
+</div>
+</body>
+</html>

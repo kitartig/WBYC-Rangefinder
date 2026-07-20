@@ -1,10 +1,12 @@
 /* WBYC Rangefinder service worker — offline-first app shell */
-const VERSION = 'wbyc-v137';
+const VERSION = 'wbyc-v138';
 const SHELL = ['./', './index.html', './manifest.webmanifest',
                './icon-192.png', './icon-512.png', './course_data_v2.json'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VERSION)
+    .then(c => c.addAll(SHELL).then(() => c.add('./guide/').catch(() => {})))  // guide is best-effort — never fail install
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
