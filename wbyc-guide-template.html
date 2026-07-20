@@ -7,7 +7,7 @@
 <style>
 /*__FONTS__*/
 :root{
-  --bg:#f5edda; --card:#ffffff; --card2:#eff5ea; --line:#d8cfba; --line2:#c9c2b2;
+  --bg:#faf5ea; --card:#ffffff; --card2:#f2f7ee; --line:#e2dac8; --line2:#d3cbb8;
   --text:#1a1712; --dim:#5b5647; --accent:#4a5fae; --accent2:#b45309;
   --blue:#4d84c4; --gold:#ffc72c; --red:#fb637e; --sand:#e8c878; --water:#1e4d8c;
   --green:#249a55; --green-lt:#4cc97f; --green-dk:#0e6b3a; --pink:#f000c2;
@@ -22,8 +22,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);
 .wrap{max-width:820px;margin:0 auto}
 
 /* ---- hero ---- */
-.hero{display:flex;align-items:center;gap:16px;padding:30px 4px 18px;border-bottom:1px solid var(--line)}
-.hero img{width:74px;height:auto;flex:none}
+.hero{display:flex;align-items:center;gap:22px;padding:30px 4px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.hero img{width:clamp(140px,32vw,180px);height:auto;flex:none}
 .hero h1{font-family:var(--serif);margin:0;font-weight:500;letter-spacing:.5px;line-height:.98}
 .hero .wbyc{font-size:38px}
 .hero .rf{font-size:19px;letter-spacing:2.5px;color:var(--dim)}
