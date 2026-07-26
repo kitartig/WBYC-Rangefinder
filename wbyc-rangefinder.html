@@ -209,6 +209,8 @@
   #bearlog .bl-eyebrow{font-family:-apple-system,sans-serif;font-size:11px;letter-spacing:2.6px;text-transform:uppercase;color:#0e6b3a;font-weight:700;white-space:nowrap}
   #bearlog .bl-date{font-family:'EB Garamond',serif;font-weight:600;font-size:32px;margin:10px 0 0;line-height:1.05;color:#1a1712;white-space:nowrap}
   #bearlog .bl-who{font-family:'EB Garamond',serif;font-style:italic;font-size:16px;color:#6b6350;margin-top:12px}
+  #bearlog .bl-cond{text-align:right;font-size:12.5px;color:#6b6350;line-height:1.55;white-space:nowrap;font-family:-apple-system,sans-serif;flex:none}
+  #bearlog .bl-cond b{color:#1a1712;font-weight:700}
   #bearlog .bl-sec{font-family:'EB Garamond',serif;font-weight:600;font-size:18px;color:#0e6b3a;margin:22px 0 9px}
   #bearlog .bl-band{display:flex;align-items:baseline;gap:16px;margin:2px 0 4px}
   #bearlog .bl-score{font-family:'EB Garamond',serif;font-weight:600;font-size:64px;line-height:.9;color:#1a1712}
@@ -710,8 +712,10 @@ function blBuild(){
     <div class="bl-sec" style="text-align:center">No round yet</div>
     <p style="font-family:'EB Garamond',serif;font-style:italic;color:#6b6350">Score a hole and your Bear's Log will start writing itself.</p></div>`};
   const played=H.map((h,i)=>({h,i,e:card.holes[i],hp:holePar(h),d:card.holes[i].s?card.holes[i].s-holePar(h):0})).filter(x=>x.e.s>0);
-  const cp=[]; const wx=blWx(); if(wx) cp.push('<b>'+wx+'</b>'); if(weather.temp!=null) cp.push(weather.temp+'°F');
-  if(wind.src&&wind.spd>0&&wind.dir!=null) cp.push(dirName(wind.dir)+' wind '+wind.spd+' mph');
+  const wx=blWx();
+  const l1=[]; if(wx) l1.push('<b>'+wx+'</b>'); if(weather.temp!=null) l1.push(weather.temp+'°F');
+  const wline=(wind.src&&wind.spd>0&&wind.dir!=null)?`${dirName(wind.dir)} wind ${wind.spd} mph`:'';
+  const condHtml=(l1.length||wline)?`<div class="bl-cond">${l1.join(' · ')}${(l1.length&&wline)?'<br>':''}${wline}</div>`:'';
   const mk=(e,hp)=>{ if(!e.s) return '<span class="bl-mk"></span>'; const d=e.s-hp; let c=''; if(d<=-2)c='bl-eagle';else if(d===-1)c='bl-bird';else if(d===1)c='bl-bog';else if(d>=2)c='bl-dbl'; return `<span class="bl-mk ${c}">${e.s}</span>`; };
   const nine=(a,b,lbl)=>{ let hh='',pp='',yy='',sp=0,sy=0,any=false;
     for(let i=a;i<b;i++){ const h=H[i],e=card.holes[i],hp=holePar(h); hh+=`<td>${h.hole_number}</td>`; pp+=`<td class="bl-par">${hp}</td>`; yy+=`<td>${mk(e,hp)}</td>`; sp+=hp; if(e.s){sy+=e.s;any=true;} }
@@ -759,7 +763,7 @@ function blBuild(){
   const who=`${pname?pname+' · ':''}${tee} tees`;
   const page=`<div class="bl-page">`
     +`<div class="bl-mast"><img class="bl-burgee" alt=""><div class="bl-t">`
-    +`<div class="bl-eyebrow">The Bear's Log · WBYC</div><div class="bl-date">${dateStr}</div><div class="bl-who">${who}</div></div></div>`
+    +`<div class="bl-eyebrow">The Bear's Log · WBYC</div><div class="bl-date">${dateStr}</div><div class="bl-who">${who}</div></div>${condHtml}</div>`
     +`<div class="bl-sec">The Score</div>`
     +`<div class="bl-band"><div class="bl-score">${t.s}</div><div class="bl-vs">${vsTxt}${thru}</div>`
     +`<div class="bl-chips"><span class="bl-chip">${t.p} putts</span><span class="bl-chip">${t.fwH}/${t.fwT} fairways</span><span class="bl-chip">${t.gir} greens</span></div></div>`
