@@ -136,6 +136,16 @@ setTimeout(()=>{
     A('replay restarts tracer', !!D3.tracer);
     close3D();
     A('close clears tracer', D3.tracer===null);
+    // The Bear's Log keepsake generates from real round data
+    (()=>{ card.holes[0]={s:3,p:1,f:true}; card.holes[6]={s:2,p:1,f:null}; card.holes[1]={s:5,p:2,f:false};
+      const r=blBuild();
+      A('bearlog builds from a round', !r.empty && r.html.includes("The Bear's Log") && r.html.includes('The Score') && r.html.includes('bl-strip'));
+      A('bearlog notes a birdie', r.html.includes('Birdie on the'));
+      openBearLog();
+      A('bearlog opens', elems['bearlog'].classList.contains('open'));
+      A('bearlog has a memento note field', typeof elems['blNote'].onclick==='function');
+      elems['blClose'].onclick(); A('bearlog closes', !elems['bearlog'].classList.contains('open'));
+    })();
   }catch(e){ console.error('THROW:', e); process.exitCode=1; }
   process.exit();
 }, 80);

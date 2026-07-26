@@ -186,6 +186,71 @@
   #scTot #scThru{font-weight:600;color:var(--dim)}
   #scorecard{position:fixed;inset:0;background:#f2e9d6;z-index:60;display:none;flex-direction:column;padding:4px 12px 10px}
   #scorecard.open{display:flex}
+  /* ---- My Bear's Log button (on the scorecard) ---- */
+  #bearBtn{display:block;width:100%;margin:8px 0 2px;padding:11px 14px;border:none;border-radius:12px;
+    background:#0e6b3a;color:#fffdf7;font-family:'EB Garamond',Garamond,serif;font-style:italic;font-size:18px;
+    letter-spacing:.4px;cursor:pointer;box-shadow:0 3px 10px rgba(14,107,58,.28)}
+  #bearBtn:active{background:#0b5730}
+  /* ---- The Bear's Log keepsake overlay (fixed light design, theme-independent) ---- */
+  #bearlog{position:fixed;inset:0;z-index:70;display:none;overflow:auto;background:#f2e7cf;
+    -webkit-overflow-scrolling:touch}
+  #bearlog.open{display:block}
+  #bearlog .bl-bar{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;
+    padding:10px 14px;background:rgba(242,231,207,.92);backdrop-filter:blur(6px);z-index:2}
+  #bearlog .bl-bar button{border:1px solid #cdbf9e;background:#fffdf7;color:#1a1712;border-radius:999px;
+    padding:7px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif}
+  #bearlog .bl-bar .bl-x{width:40px;height:40px;padding:0;font-size:20px;border-radius:50%}
+  #bearlog .bl-page{max-width:620px;margin:0 auto 40px;background:#fffdf7;border:1px solid #e5dbc4;
+    border-radius:18px;box-shadow:0 14px 42px rgba(60,45,20,.18);padding:22px 30px 26px;position:relative}
+  #bearlog .bl-page:before{content:"";position:absolute;inset:9px;border:1px solid #ece2c9;border-radius:12px;pointer-events:none}
+  #bearlog .bl-mast{display:flex;align-items:flex-start;gap:6px;border-bottom:1px solid #4d84c4;padding-bottom:4px}
+  #bearlog .bl-mast img{width:238px;height:auto;flex:none;margin-top:-16px;margin-left:-26px}
+  #bearlog .bl-t{flex:1;min-width:0}
+  #bearlog .bl-eyebrow{font-family:-apple-system,sans-serif;font-size:11px;letter-spacing:2.6px;text-transform:uppercase;color:#0e6b3a;font-weight:700;white-space:nowrap}
+  #bearlog .bl-date{font-family:'EB Garamond',serif;font-weight:600;font-size:32px;margin:10px 0 0;line-height:1.05;color:#1a1712;white-space:nowrap}
+  #bearlog .bl-who{font-family:'EB Garamond',serif;font-style:italic;font-size:16px;color:#6b6350;margin-top:12px}
+  #bearlog .bl-sec{font-family:'EB Garamond',serif;font-weight:600;font-size:18px;color:#0e6b3a;margin:22px 0 9px}
+  #bearlog .bl-band{display:flex;align-items:baseline;gap:16px;margin:2px 0 4px}
+  #bearlog .bl-score{font-family:'EB Garamond',serif;font-weight:600;font-size:64px;line-height:.9;color:#1a1712}
+  #bearlog .bl-vs{font-family:'EB Garamond',serif;font-size:23px;color:#f000c2;font-weight:600}
+  #bearlog .bl-chips{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  #bearlog .bl-chip{background:#fdeef8;border:1px solid #f2b2df;border-radius:999px;padding:5px 12px;font-size:12.5px;color:#b3018f;font-weight:700;white-space:nowrap;font-family:-apple-system,sans-serif}
+  #bearlog .bl-strip{border:1.4px solid #9fc2ea;border-radius:12px;overflow:hidden;background:#fff}
+  #bearlog table.bl-hs{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed;font-family:-apple-system,sans-serif}
+  #bearlog table.bl-hs td{text-align:center;padding:7px 0;border-right:1px solid #eaf1fb}
+  #bearlog table.bl-hs tr+tr{border-top:1px solid #dceaf6}
+  #bearlog table.bl-hs .bl-lab{font-weight:800;color:#1b3a66;font-size:10.5px;letter-spacing:.5px;width:34px;background:#f4f9ff}
+  #bearlog table.bl-hs .bl-par{color:#7a7362;font-weight:600}
+  #bearlog table.bl-hs .bl-tot{font-weight:800;color:#1b3a66;background:#f4f9ff}
+  #bearlog .bl-mk{display:inline-flex;align-items:center;justify-content:center;width:23px;height:23px;font-weight:700;color:#1b3a66}
+  #bearlog .bl-mk.bl-bird{border:1.7px solid #f000c2;border-radius:50%;color:#f000c2}
+  #bearlog .bl-mk.bl-eagle{border:1.7px solid #f000c2;border-radius:50%;box-shadow:0 0 0 2px #fff,0 0 0 3.4px #f000c2;color:#f000c2}
+  #bearlog .bl-mk.bl-bog{border:1.7px solid #ffa300;border-radius:3px;color:#c9760a}
+  #bearlog .bl-mk.bl-dbl{border:1.7px solid #ffa300;border-radius:3px;box-shadow:0 0 0 2px #fff,0 0 0 3.4px #ffa300;color:#c9760a}
+  #bearlog .bl-cols{display:flex;gap:22px;margin:8px 0 4px;flex-wrap:wrap;align-items:flex-start}
+  #bearlog .bl-moments{flex:1 1 300px;min-width:250px}
+  #bearlog .bl-mom{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px dotted #e5dbc4;font-size:14px;line-height:1.45}
+  #bearlog .bl-dot{flex:none;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;margin-top:1px}
+  #bearlog .bl-map{flex:0 0 210px;text-align:center}
+  #bearlog .bl-map svg{width:210px;height:auto;border-radius:12px}
+  #bearlog .bl-map .bl-cap{font-family:'EB Garamond',serif;font-style:italic;font-size:12.5px;color:#6b6350;margin-top:6px}
+  #bearlog .bl-note{margin:20px 0 6px;background:#fbe3f4;border-left:6px solid #f000c2;border-radius:0 10px 10px 0;
+    padding:16px 22px;font-family:'EB Garamond',serif;font-style:italic;font-size:19px;color:#1a1712;line-height:1.5;cursor:pointer}
+  #bearlog .bl-note.empty{color:#8a8270}
+  #bearlog .bl-stk{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin:6px 0 2px}
+  #bearlog .bl-seal{width:74px;text-align:center}
+  #bearlog .bl-seal .bl-disc{width:56px;height:56px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;border:2px solid;box-shadow:0 3px 9px rgba(60,45,20,.13)}
+  #bearlog .bl-seal .bl-scap{font-family:-apple-system,sans-serif;font-size:10px;font-weight:800;letter-spacing:.4px;margin-top:6px;text-transform:uppercase}
+  #bearlog .bl-seal.b .bl-disc{border-color:#f000c2;background:#fdeaf6} #bearlog .bl-seal.b .bl-scap{color:#f000c2}
+  #bearlog .bl-seal.s .bl-disc{border-color:#5cbf84;background:#eef8f1} #bearlog .bl-seal.s .bl-scap{color:#0e6b3a}
+  #bearlog .bl-seal.d .bl-disc{border-color:#ffa300;background:#fbeeda} #bearlog .bl-seal.d .bl-scap{color:#c9760a}
+  #bearlog .bl-seal.w .bl-disc{border-color:#8fbce0;background:#eaf3fb} #bearlog .bl-seal.w .bl-scap{color:#2f6ea0}
+  #bearlog .bl-hint{text-align:center;font-family:'EB Garamond',serif;font-style:italic;font-size:13px;color:#6b6350;margin:12px auto 0;max-width:440px}
+  #bearlog .bl-bear{position:relative;font-family:'EB Garamond',serif;font-style:italic;font-size:18px;color:#1a1712;text-align:center;margin:30px 0 4px;line-height:1.55;background:#e4f5f3;border:1px solid #bfe3df;border-radius:14px;padding:30px 30px 20px}
+  #bearlog .bl-bear:before{content:"\201C";position:absolute;top:2px;left:20px;font-family:'EB Garamond',serif;font-size:60px;line-height:1;color:#2fb0a8;opacity:.55}
+  #bearlog .bl-bear .bl-sig{display:block;font-family:-apple-system,sans-serif;font-size:13px;color:#6b6350;margin-top:8px;font-style:normal;letter-spacing:1px}
+  #bearlog .bl-foot{border-top:1px solid #e5dbc4;margin-top:20px;padding-top:12px;text-align:center;font-family:-apple-system,sans-serif;font-size:11px;color:#6b6350;letter-spacing:.6px}
+  @media print{ body>*{display:none!important} #bearlog{display:block!important;position:static;background:#fff} #bearlog .bl-bar{display:none!important} #bearlog .bl-page{box-shadow:none;border:none;margin:0} }
   #scbar{display:flex;justify-content:space-between;align-items:center;padding:0 2px 4px;position:relative;z-index:2}
   #scbar span{font-size:13px;font-weight:700;letter-spacing:.5px;color:#1b3a66}
   #scTitleWrap{display:flex;flex-direction:column;line-height:1.15}
@@ -308,6 +373,7 @@
     <span><button id="scStats">STATS</button><button id="scClubs">CLUBS</button><button id="scPost" title="Copy hole-by-hole scores and open GHIN">POST</button><button id="scNew" title="Bank this round to your history and start fresh">NEW</button><button id="scClose">✕</button></span></div>
   <div id="scLogoWrap"><img id="scLogo" alt=""></div>
   <div id="sctab"></div>
+  <button id="bearBtn" title="Open your round keepsake">My Bear's Log</button>
   <div id="scstats"></div>
   <div id="scBackup">
     <button id="scExport" title="Save all your rounds, shots and club data to a file">⤓ Export my data</button>
@@ -315,6 +381,8 @@
     <input id="scImportFile" type="file" accept="application/json,.json" style="display:none">
   </div>
 </div>
+
+<div id="bearlog"></div>
 
 <div id="threeD">
   <div id="threeDbar"><span id="d3Title"></span>
@@ -423,7 +491,7 @@ function pinFor(h){ freshPins(); return pins.p[h.hole_number] || null; }
 function target(h){ return pinFor(h) || h.green.center; } // every distance re-keys to the pin when set
 function savePins(){ localStorage.setItem('wbyc_pins', JSON.stringify(pins)); }
 let wind = {spd:0, dir:null, gust:0, src:null}; // dir = degrees wind blows FROM (meteorological); src: 'live'|'manual'
-let weather = {code:null, day:true}; // WMO weather code + day/night, from Open-Meteo — drives subtle map flourishes
+let weather = {code:null, day:true, temp:null}; // WMO weather code + day/night + °F, from Open-Meteo — drives map flourishes + Bear's Log
 const DIRS=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
 const dirName = d => DIRS[Math.round(d/22.5)%16];
 function brg(a,b){ // compass bearing a→b, flat-earth approx (fine at course scale)
@@ -445,11 +513,11 @@ async function fetchWind(){
   if(!location.protocol.startsWith('http')) return;
   try{
     const c0=course.holes[0].green.center;
-    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c0.lat.toFixed(4)}&longitude=${c0.lng.toFixed(4)}&current=wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code,is_day&wind_speed_unit=mph`);
+    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c0.lat.toFixed(4)}&longitude=${c0.lng.toFixed(4)}&current=wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code,is_day,temperature_2m&wind_speed_unit=mph&temperature_unit=fahrenheit`);
     if(!r.ok) return;
     const j=await r.json();
     if(j.current){
-      if(j.current.weather_code!=null) weather={code:j.current.weather_code, day:j.current.is_day!==0};
+      if(j.current.weather_code!=null) weather={code:j.current.weather_code, day:j.current.is_day!==0, temp:(j.current.temperature_2m!=null?Math.round(j.current.temperature_2m):null)};
       if(wind.src!=='manual'){ // a manual setting wins for the session
         wind={spd:Math.round(j.current.wind_speed_10m), dir:j.current.wind_direction_10m,
               gust:Math.round(j.current.wind_gusts_10m||0), src:'live'};
@@ -599,6 +667,8 @@ function archiveRound(){ // bank the current card into history (called before NE
 let card=blankCard();
 try{ const c=JSON.parse(localStorage.getItem('wbyc_card')); if(c&&c.holes&&c.holes.length===18) card=c; }catch(e){}
 const saveCard=()=>localStorage.setItem('wbyc_card', JSON.stringify(card));
+let notes={}; try{ notes=JSON.parse(localStorage.getItem('wbyc_notes'))||{}; }catch(e){}   // per-round memento lines for The Bear's Log, keyed by date
+const saveNotes=()=>localStorage.setItem('wbyc_notes', JSON.stringify(notes));
 const fwdTee=()=> tee==='Red'||tee==='Green'; // forward sets score against women's par
 const holePar=h=> fwdTee() ? h.par_women : h.par;
 const holeHcp=h=> tee==='Green' ? (h.handicap_index_women_green ?? h.handicap_index_women)
@@ -625,6 +695,90 @@ function renderScore(){
   const t=cardTotals();
   $('scTotV').textContent = t.n ? t.s : '';          // gross strokes; blank (no lonely dash) before any score
   $('scThru').textContent = t.n ? `thru ${t.n}` : '';
+}
+/* ============ THE BEAR'S LOG (round keepsake) ============ */
+function blWx(){
+  const W={0:'Clear',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',45:'Foggy',48:'Foggy',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',56:'Freezing drizzle',57:'Freezing drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',66:'Freezing rain',67:'Freezing rain',71:'Light snow',73:'Snow',75:'Heavy snow',77:'Snow grains',80:'Showers',81:'Showers',82:'Heavy showers',85:'Snow showers',86:'Snow showers',95:'Thunderstorms',96:'Thunderstorms',99:'Thunderstorms'};
+  const c=weather.code; if(c==null) return ''; if(c===0) return weather.day?'Sunny':'Clear'; return W[c]||'';
+}
+const blOrd=n=>{const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);};
+function blBuild(){
+  const t=cardTotals(), H=course.holes;
+  const dd=new Date((card.start||new Date().toISOString().slice(0,10))+'T12:00');
+  const dateStr=dd.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  if(!t.n) return {empty:true, html:`<div class="bl-page" style="text-align:center;padding-top:40px">
+    <div class="bl-sec" style="text-align:center">No round yet</div>
+    <p style="font-family:'EB Garamond',serif;font-style:italic;color:#6b6350">Score a hole and your Bear's Log will start writing itself.</p></div>`};
+  const played=H.map((h,i)=>({h,i,e:card.holes[i],hp:holePar(h),d:card.holes[i].s?card.holes[i].s-holePar(h):0})).filter(x=>x.e.s>0);
+  const cp=[]; const wx=blWx(); if(wx) cp.push('<b>'+wx+'</b>'); if(weather.temp!=null) cp.push(weather.temp+'°F');
+  if(wind.src&&wind.spd>0&&wind.dir!=null) cp.push(dirName(wind.dir)+' wind '+wind.spd+' mph');
+  const mk=(e,hp)=>{ if(!e.s) return '<span class="bl-mk"></span>'; const d=e.s-hp; let c=''; if(d<=-2)c='bl-eagle';else if(d===-1)c='bl-bird';else if(d===1)c='bl-bog';else if(d>=2)c='bl-dbl'; return `<span class="bl-mk ${c}">${e.s}</span>`; };
+  const nine=(a,b,lbl)=>{ let hh='',pp='',yy='',sp=0,sy=0,any=false;
+    for(let i=a;i<b;i++){ const h=H[i],e=card.holes[i],hp=holePar(h); hh+=`<td>${h.hole_number}</td>`; pp+=`<td class="bl-par">${hp}</td>`; yy+=`<td>${mk(e,hp)}</td>`; sp+=hp; if(e.s){sy+=e.s;any=true;} }
+    return `<table class="bl-hs"><tr><td class="bl-lab">HOLE</td>${hh}<td class="bl-tot">${lbl}</td></tr>`
+      +`<tr><td class="bl-lab">PAR</td>${pp}<td class="bl-tot">${sp}</td></tr>`
+      +`<tr><td class="bl-lab">${(pname||'YOU').toUpperCase().slice(0,4)}</td>${yy}<td class="bl-tot">${any?sy:''}</td></tr></table>`; };
+  const strip=`<div class="bl-strip">${nine(0,9,'OUT')}${nine(9,18,'IN')}</div>`;
+  const birdies=played.filter(x=>x.d<=-1).sort((a,b)=>a.d-b.d);
+  const sd=shotDists(); const longest=sd.length?sd.reduce((a,b)=>b.y>a.y?b:a):null;
+  const moment=played.reduce((a,b)=>b.d<a.d?b:a);
+  let moms='';
+  birdies.forEach(x=>{ const lbl=x.d<=-2?'Eagle':'Birdie'; moms+=`<div class="bl-mom"><span class="bl-dot" style="background:#f000c2">&#8595;</span><div><b>${lbl} on the ${blOrd(x.h.hole_number)}</b> — ${x.e.s} on the par ${x.hp}.</div></div>`; });
+  if(longest) moms+=`<div class="bl-mom"><span class="bl-dot" style="background:#ffa300">D</span><div><b>Longest shot</b> — ${Math.round(longest.y)} yards${longest.club?' with the '+longest.club:''}.</div></div>`;
+  const pars=played.filter(x=>x.d===0).length;
+  if(pars) moms+=`<div class="bl-mom"><span class="bl-dot" style="background:#0e6b3a">P</span><div><b>${pars} par${pars>1?'s':''}</b> — steady stuff.</div></div>`;
+  if(!moms) moms=`<div class="bl-mom"><div>A quiet, honest round — the kind the course remembers too.</div></div>`;
+  const mcap=moment.d<=-2?'eagle':moment.d<=-1?'birdie':moment.d===0?'a solid par':'your best hole';
+  const map=`<div class="bl-map"><svg viewBox="0 0 210 190" xmlns="http://www.w3.org/2000/svg">`
+    +`<defs><linearGradient id="blt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9bd79a"/><stop offset="1" stop-color="#69bd79"/></linearGradient>`
+    +`<radialGradient id="blg" cx="50%" cy="40%" r="62%"><stop offset="0" stop-color="#dff7dd"/><stop offset="1" stop-color="#a6e0b3"/></radialGradient></defs>`
+    +`<rect width="210" height="190" rx="12" fill="url(#blt)"/><ellipse cx="106" cy="54" rx="50" ry="35" fill="url(#blg)" stroke="#fff" stroke-width="1.5"/>`
+    +`<ellipse cx="166" cy="138" rx="20" ry="12" fill="#ecd39a" opacity=".95"/>`
+    +`<path d="M103 164 Q76 102 100 66" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="4.5 4.5" opacity=".9"/>`
+    +`<circle cx="103" cy="166" r="5" fill="#fff" stroke="#f5b512" stroke-width="1.4"/>`
+    +`<g transform="translate(100,60)"><path d="M0 -11 L3.2 -3.4 L11 -3.4 L4.6 1.6 L7.1 9.3 L0 4.6 L-7.1 9.3 L-4.6 1.6 L-11 -3.4 L-3.2 -3.4 Z" fill="#f000c2" stroke="#fff" stroke-width="1.1"/></g>`
+    +`<text x="106" y="112" text-anchor="middle" font-family="'EB Garamond',serif" font-style="italic" font-size="14" fill="#0e5a32">the ${blOrd(moment.h.hole_number)}</text>`
+    +`</svg><div class="bl-cap">${mcap}, on the ${blOrd(moment.h.hole_number)}</div></div>`;
+  const nt=(notes[card.start]||'').trim();
+  const noteHtml=`<div class="bl-note${nt?'':' empty'}" id="blNote">${nt?nt.replace(/</g,'&lt;'):'Tap to add a note about your round…'}</div>`;
+  const sunSvg=`<svg width="32" height="32" viewBox="0 0 42 42"><circle cx="21" cy="21" r="8" fill="none" stroke="#2f6ea0" stroke-width="2.6"/><g stroke="#2f6ea0" stroke-width="2.6" stroke-linecap="round"><line x1="21" y1="5" x2="21" y2="10"/><line x1="21" y1="32" x2="21" y2="37"/><line x1="5" y1="21" x2="10" y2="21"/><line x1="32" y1="21" x2="37" y2="21"/><line x1="10" y1="10" x2="13" y2="13"/><line x1="29" y1="29" x2="32" y2="32"/><line x1="32" y1="10" x2="29" y2="13"/><line x1="13" y1="29" x2="10" y2="32"/></g></svg>`;
+  let stk='';
+  if(birdies.length) stk+=`<div class="bl-seal b"><div class="bl-disc"><svg width="30" height="30" viewBox="0 0 40 40"><line x1="14" y1="8" x2="14" y2="32" stroke="#f000c2" stroke-width="2.6"/><path d="M14 9 L30 14 L14 19 Z" fill="#f000c2"/></svg></div><div class="bl-scap">${birdies.length} birdie${birdies.length>1?'s':''}</div></div>`;
+  if(longest) stk+=`<div class="bl-seal d"><div class="bl-disc"><svg width="32" height="32" viewBox="0 0 42 42"><path d="M9 31 L31 13" stroke="#ffa300" stroke-width="3" stroke-linecap="round"/><path d="M23 12 L32 12 L32 21" fill="none" stroke="#ffa300" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="bl-scap">${Math.round(longest.y)}y drive</div></div>`;
+  if(wx) stk+=`<div class="bl-seal w"><div class="bl-disc">${sunSvg}</div><div class="bl-scap">${wx}</div></div>`;
+  if(t.n>=18) stk+=`<div class="bl-seal s"><div class="bl-disc"><svg width="30" height="30" viewBox="0 0 40 40"><path d="M9 21 L17 29 L32 12" fill="none" stroke="#0e6b3a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="bl-scap">18 holes</div></div>`;
+  const stickers=stk?`<div class="bl-sec">Earned today</div><div class="bl-stk">${stk}</div><div class="bl-hint">Earned automatically from your round. Soon you'll tap any hole to add your own.</div>`:'';
+  const ne=played.filter(x=>x.d<=-2).length, nb=birdies.length;
+  let line;
+  if(ne>0) line=`An eagle on the card — a day the ${blOrd(moment.h.hole_number)} won't forget.`;
+  else if(nb>=2) line=`${nb} birdies, and the day held its shape. Well played.`;
+  else if(nb===1) line=`A birdie on the ${blOrd(birdies[0].h.hole_number)} — carry that one home.`;
+  else if(t.n>=18) line=`Eighteen honest holes on the water's edge. Onward.`;
+  else line=`${t.n} holes in the book. The course will keep for next time.`;
+  const vs=t.s-t.par, vsTxt=(vs===0?'E':(vs>0?'+':'')+vs), thru=t.n<18?` · thru ${t.n}`:'';
+  const who=`${pname?pname+' · ':''}${tee} tees`;
+  const page=`<div class="bl-page">`
+    +`<div class="bl-mast"><img class="bl-burgee" alt=""><div class="bl-t">`
+    +`<div class="bl-eyebrow">The Bear's Log · WBYC</div><div class="bl-date">${dateStr}</div><div class="bl-who">${who}</div></div></div>`
+    +`<div class="bl-sec">The Score</div>`
+    +`<div class="bl-band"><div class="bl-score">${t.s}</div><div class="bl-vs">${vsTxt}${thru}</div>`
+    +`<div class="bl-chips"><span class="bl-chip">${t.p} putts</span><span class="bl-chip">${t.fwH}/${t.fwT} fairways</span><span class="bl-chip">${t.gir} greens</span></div></div>`
+    +`<div class="bl-sec">The Card</div>${strip}`
+    +`<div class="bl-sec">The Moments</div><div class="bl-cols"><div class="bl-moments">${moms}</div>${map}</div>`
+    +noteHtml+stickers
+    +`<div class="bl-bear">${line}<span class="bl-sig">— kept for ${pname||'you'} by the WBYC Rangefinder</span></div>`
+    +`<div class="bl-foot">WHITE BEAR YACHT CLUB · EST. 1889 · ${dateStr.toUpperCase()}</div></div>`;
+  return {empty:false, html:page};
+}
+function openBearLog(){
+  const r=blBuild();
+  const bar=`<div class="bl-bar"><button class="bl-x" id="blClose" aria-label="Close">✕</button>${r.empty?'':'<button id="blPrint">Save / Print</button>'}</div>`;
+  $('bearlog').innerHTML=bar+r.html;
+  const lg=$('logo'), bg=document.querySelector('#bearlog .bl-burgee'); if(bg&&lg) bg.src=lg.src;
+  $('blClose').onclick=()=>$('bearlog').classList.remove('open');
+  const pr=$('blPrint'); if(pr) pr.onclick=()=>window.print();
+  const nEl=$('blNote'); if(nEl) nEl.onclick=()=>{ const v=prompt('A line to remember this round by:', notes[card.start]||''); if(v!==null){ if(v.trim()) notes[card.start]=v.trim(); else delete notes[card.start]; saveNotes(); openBearLog(); } };
+  $('bearlog').classList.add('open');
 }
 function renderCard(){
   const row=i=>{
@@ -1946,6 +2100,7 @@ function init(data){
   $('scTot').onclick=()=>{ scMode='card'; scShow(); $('scorecard').classList.add('open'); };
   $('scClubs').onclick=()=>{ scMode=scMode==='clubs'?'card':'clubs'; scShow(); };
   $('scStats').onclick=()=>{ scMode=scMode==='stats'?'card':'stats'; scShow(); };
+  $('bearBtn').onclick=openBearLog;
   // SHOT tracking: club picker + mark button (long-press = undo)
   $('clubSel').innerHTML=CLUBS.map(c=>`<option${c===curClub?' selected':''}>${c}</option>`).join('');
   $('clubSel').onchange=e=>{ curClub=e.target.value; localStorage.setItem('wbyc_club',curClub); render(); };
