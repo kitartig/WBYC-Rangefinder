@@ -159,6 +159,32 @@ setTimeout(()=>{
       A('memory hidden with no history', !elems['holeMemory'].classList.contains('on'));
       rounds.length=0; save.forEach(r=>rounds.push(r)); holeIdx=0; render();
     })();
+    // map-pinned memories: arm, place via a tap, render a star, remove via a tap
+    (()=>{ setDemo(true); holeIdx=0; memories.length=0; render();
+      const h0=course.holes[0], spot={lat:h0.green.center.lat+0.0002, lng:h0.green.center.lng};
+      const svg=mapTransform.svg; svg.getBoundingClientRect=()=>({left:0,top:0,width:300,height:400});
+      // place: arm, then a scripted prompt supplies the note
+      memArm=true; globalThis.prompt=()=>'chip-in from the fringe';
+      // tap somewhere on the map — unrot maps client point to a lat/lng near the hole
+      mapTap({clientX:150,clientY:150});
+      A('memory placed on tap', memories.length===1 && memories[0].h===h0.hole_number && /chip-in/.test(memories[0].note));
+      A('memory disarms after placing', memArm===false);
+      // it renders as a star on this hole
+      render(); A('memory star drawn on its hole', elems['map'].innerHTML.includes('mem-star'));
+      // not shown on a different hole
+      holeIdx=2; render(); A('memory hidden on other holes', !elems['map'].innerHTML.includes('mem-star'));
+      // remove: tap near it with confirm=true
+      holeIdx=0; render();
+      const q=mapTransform, before=memories.length;
+      // place a second one at a known spot then tap it to remove
+      globalThis.confirm=()=>true;
+      memories.push({h:1,lat:spot.lat,lng:spot.lng,note:'x',date:'2026-07-20'});
+      // tap AT that memory: find its screen coords via rot is internal — instead assert removal path by proximity using its own latlng
+      const m=memories[memories.length-1]; mapTransform.unrot=()=>({lat:m.lat,lng:m.lng});
+      mapTap({clientX:10,clientY:10});
+      A('memory removed on tap+confirm', memories.length===before);
+      memories.length=0; globalThis.prompt=()=>null; render();
+    })();
   }catch(e){ console.error('THROW:', e); process.exitCode=1; }
   process.exit();
 }, 80);

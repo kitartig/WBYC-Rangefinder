@@ -153,6 +153,8 @@
     padding:5px 9px;font-size:10px;font-weight:700;letter-spacing:.5px;cursor:pointer;backdrop-filter:blur(2px)}
   body.sun #mapbtns button{background:rgba(255,255,255,.75);color:#111}
   #mapbtns button.on{box-shadow:0 0 0 2px var(--accent)}
+  #memBtn{color:#ff2fd6;font-size:15px} body.sun #memBtn{color:#e0359e}
+  #memBtn.on{box-shadow:0 0 0 2px #f000c2}
   #threeD{position:fixed;inset:0;background:var(--bg);z-index:50;display:none;flex-direction:column}
   #threeD.open{display:flex}
   #d3c{flex:1;touch-action:none;width:100%}
@@ -346,7 +348,7 @@
 
   <div id="mapwrap">
     <svg id="map" xmlns="http://www.w3.org/2000/svg"></svg>
-    <div id="mapbtns"><button id="satBtn">SAT</button><button id="grnBtn" title="Zoom to the green">GRN</button><button id="pinBtn" title="Tap, then tap the green to drop today's pin. All distances re-key to it. Long-press to clear.">PIN</button><button id="d3Btn">3D</button></div>
+    <div id="mapbtns"><button id="satBtn">SAT</button><button id="grnBtn" title="Zoom to the green">GRN</button><button id="pinBtn" title="Tap, then tap the green to drop today's pin. All distances re-key to it. Long-press to clear.">PIN</button><button id="memBtn" title="Pin a memory: tap this, then tap the spot on the map. It resurfaces every time you play this hole. Tap a star to read or remove it.">★</button><button id="d3Btn">3D</button></div>
     <div id="shotbar"><select id="clubSel"></select><button id="shotBtn" title="Mark a shot from your current position. Long-press to undo the last mark.">SHOT</button></div>
     <div id="maphint"></div>
   </div>
@@ -498,6 +500,10 @@ function freshPins(){ if(pins.d !== today()) pins = {d: today(), p: {}}; } // pi
 function pinFor(h){ freshPins(); return pins.p[h.hole_number] || null; }
 function target(h){ return pinFor(h) || h.green.center; } // every distance re-keys to the pin when set
 function savePins(){ localStorage.setItem('wbyc_pins', JSON.stringify(pins)); }
+/* ---- map-pinned memories: a note dropped at a real spot, resurfacing every visit ---- */
+let memories = [], memArm = false;
+try{ const mm=JSON.parse(localStorage.getItem('wbyc_memories')||'[]'); if(Array.isArray(mm)) memories=mm; }catch(e){}
+function saveMemories(){ localStorage.setItem('wbyc_memories', JSON.stringify(memories)); }
 let wind = {spd:0, dir:null, gust:0, src:null}; // dir = degrees wind blows FROM (meteorological); src: 'live'|'manual'
 let weather = {code:null, day:true, temp:null}; // WMO weather code + day/night + °F, from Open-Meteo — drives map flourishes + Bear's Log
 const DIRS=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
@@ -1431,6 +1437,12 @@ function renderMap(h,p,tb){
       +`<path d="M${pp[0].toFixed(1)} ${(pp[1]-fh).toFixed(1)}L${(pp[0]-fh*0.55).toFixed(1)} ${(pp[1]-fh*0.72).toFixed(1)}L${pp[0].toFixed(1)} ${(pp[1]-fh*0.45).toFixed(1)}Z" fill="${TRACER.main}"/>`
       +`<circle cx="${pp[0].toFixed(1)}" cy="${pp[1].toFixed(1)}" r="${greenView?0.5:1.3}" fill="#fff"/></g>`;
   }
+  // pinned memories on this hole — a fuchsia star at each remembered spot (resurfaces every visit)
+  memories.forEach(m=>{ if(m.h!==h.hole_number) return;
+    const q=rot(m), ms=greenView ? Math.max(2.2,w*0.016) : Math.max(4,w*0.022), sc=(ms/11);
+    s+=`<g class="mem-star" transform="translate(${q[0].toFixed(1)} ${q[1].toFixed(1)}) scale(${sc.toFixed(2)})">`
+      +`<path d="M0 -11 L3.2 -3.4 L11 -3.4 L4.6 1.6 L7.1 9.3 L0 4.6 L-7.1 9.3 L-4.6 1.6 L-11 -3.4 L-3.2 -3.4 Z" fill="#f000c2" stroke="#fff" stroke-width="1.6"/></g>`;
+  });
   // player + line to the target (today's pin when set, else green center)
   if(pPt && pNear){
     const cc=rot(target(h));
@@ -1517,6 +1529,7 @@ function renderMap(h,p,tb){
   mapTransform={unrot, svg, base:[minX,minY,w,ht]};
   applyMapZoom(); // sets the viewBox (pinched view if active, else the full hole)
   $('maphint').textContent = pinArm ? 'tap the green to drop today’s pin'
+    : memArm ? 'tap the spot to pin a memory'
     : demo ? 'GPS off — tap anywhere to move' : `hole ${h.hole_number} — ${tee} tee`;
 }
 
@@ -1958,6 +1971,23 @@ function mapTap(ev){
     } else $('maphint').textContent='closer to the green, please';
     return;
   }
+  const hM=hole();
+  if(memArm){ // this tap pins a memory at the tapped spot
+    const note=prompt('A memory to pin here:', '');
+    if(note && note.trim()){
+      memories.push({h:hM.hole_number, lat:+ll.lat.toFixed(6), lng:+ll.lng.toFixed(6), note:note.trim().slice(0,140), date:new Date().toISOString().slice(0,10)});
+      saveMemories(); $('maphint').textContent='★ memory pinned';
+    }
+    memArm=false; $('memBtn').classList.remove('on'); render();
+    return;
+  }
+  { // tap on (near) an existing memory star to read or remove it
+    const cand=memories.filter(m=>m.h===hM.hole_number).map(m=>({m,d:yds(ll,m)})).sort((a,b)=>a.d-b.d)[0];
+    if(cand && cand.d<=14){ const m=cand.m;
+      if(confirm(`“${m.note}”\n— pinned ${m.date}\n\nRemove this memory?`)){ memories=memories.filter(x=>x!==m); saveMemories(); render(); }
+      return;
+    }
+  }
   if(!demo){
     if(pos) return;              // GPS is live — ignore stray taps so the ball stays locked on you
     setDemo(true,'tap');         // no GPS fix yet — a tap enters demo so you can position by hand
@@ -2043,6 +2073,13 @@ function init(data){
     pb.addEventListener('pointerup',()=>clearTimeout(plt));
     pb.addEventListener('pointerleave',()=>clearTimeout(plt));
   }
+  // ★ memory: tap arms the next map tap to pin a memory (tapping a star reads/removes it)
+  $('memBtn').onclick=()=>{
+    memArm=!memArm;
+    if(memArm){ pinArm=false; $('pinBtn').style.color=''; $('pinBtn').style.borderColor=''; }
+    $('memBtn').classList.toggle('on', memArm);
+    render();
+  };
   // flight profile inset: tap the CENTER box to toggle
   const cbx=document.querySelector('.dist .box.center');
   if(cbx){ cbx.title='tap: side-profile of the shot';
@@ -2138,7 +2175,7 @@ function init(data){
   ['pointerup','pointerleave','pointercancel'].forEach(ev=>sb.addEventListener(ev,()=>clearTimeout(slpTimer)));
   $('scClose').onclick=()=>$('scorecard').classList.remove('open');
   // Export / Import — back up or move your whole record between devices (rounds live per-device by design)
-  const BKEYS=['wbyc_card','wbyc_rounds','wbyc_shots','wbyc_club','wbyc_name','wbyc_tee'];
+  const BKEYS=['wbyc_card','wbyc_rounds','wbyc_shots','wbyc_club','wbyc_name','wbyc_tee','wbyc_memories','wbyc_notes'];
   $('scExport').onclick=()=>{
     const data={app:'wbyc-rangefinder', v:1, exported:new Date().toISOString(), store:{}};
     for(const k of BKEYS){ const v=localStorage.getItem(k); if(v!==null) data.store[k]=v; }
