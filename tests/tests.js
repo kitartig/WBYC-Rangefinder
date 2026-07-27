@@ -146,6 +146,19 @@ setTimeout(()=>{
       A('bearlog has a memento note field', typeof elems['blNote'].onclick==='function');
       elems['blClose'].onclick(); A('bearlog closes', !elems['bearlog'].classList.contains('open'));
     })();
+    // self-writing memory line from past rounds
+    (()=>{ const save=rounds.slice(); rounds.length=0;
+      const p0=course.holes[0].par, p1=course.holes[1].par;
+      rounds.push({date:'2026-06-01', tee:'White', holes:Array.from({length:18},(_,i)=>({s:i===0?p0-1:i===1?p1+1:0,p:0,f:null}))});
+      holeIdx=0; render();
+      A('memory surfaces a past birdie', elems['holeMemory'].classList.contains('on') && /birdied/i.test(elems['holeMemory'].textContent));
+      A('memory marked good', elems['holeMemory'].classList.contains('good'));
+      holeIdx=1; render();
+      A('memory shows last-time on a played hole', /Last time here/.test(elems['holeMemory'].textContent));
+      holeIdx=5; render();
+      A('memory hidden with no history', !elems['holeMemory'].classList.contains('on'));
+      rounds.length=0; save.forEach(r=>rounds.push(r)); holeIdx=0; render();
+    })();
   }catch(e){ console.error('THROW:', e); process.exitCode=1; }
   process.exit();
 }, 80);
