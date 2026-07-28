@@ -1,0 +1,21 @@
+{
+  "_note": "WBYC is a brand config like any other. STORE must stay 'wbyc' — changing it orphans every existing member's saved rounds, pins and clubs.",
+  "BRAND": "WBYC",
+  "PRODUCT": "Rangefinder",
+  "CLUB_LINE": "WHITE BEAR YACHT CLUB · EST. 1889 · ",
+  "DIARY": "The Bear's Log",
+  "DIARY_SHORT": "Bear's Log",
+  "DIARY_BUTTON": "My Bear's Log",
+  "CREST_FILE": "assets/wbyc-burgee.webp",
+  "CREST_STYLE": "width:200px;max-width:44vw;height:auto;flex-shrink:1;min-width:0",
+  "CREST_CARD_W": "min(340px,82%)",
+  "CREST_CARD_M": "-36px 0 -42px",
+  "CONTACT_HTML": "<a href=\"tel:651-429-8052\" title=\"Golf House Restaurant (seasonal) — off-season, call the clubhouse: 651-429-4567\">☎ Contact Bar/Dining</a>",
+  "STORE": "wbyc",
+  "accent_sun": "#4a5fae",
+  "outputs": {
+    "app": "wbyc-rangefinder.html",
+    "pwa": "pwa/index.html",
+    "bump_sw": true
+  }
+}

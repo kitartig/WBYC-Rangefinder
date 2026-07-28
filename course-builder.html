@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rangefinder — Course Builder</title>
+<style>
+:root{--bg:#f2e7cf;--card:#fffdf7;--ink:#1a1712;--dim:#6b6350;--line:#e0d5bc;--emerald:#0e6b3a;--blue:#2f6ea0;--pink:#e0359e;--orange:#c9760a;
+  --serif:Garamond,Baskerville,'Times New Roman',serif;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);padding:24px 16px 60px;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto}
+h1{font-family:var(--serif);font-weight:600;font-size:30px;margin:0 0 2px}
+.sub{color:var(--dim);font-size:14px;margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px;box-shadow:0 4px 14px rgba(60,45,20,.08)}
+label{display:block;font-size:13px;font-weight:700;color:var(--dim);margin:10px 0 3px;letter-spacing:.3px}
+input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:15px;font-family:var(--sans);background:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>div{flex:1;min-width:120px}
+button{background:var(--emerald);color:#fffdf7;border:none;border-radius:10px;padding:11px 18px;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px;font-family:var(--sans)}
+button:active{opacity:.85}button.ghost{background:#fff;color:var(--emerald);border:1px solid var(--emerald)}
+button:disabled{opacity:.5;cursor:default}
+.hint{font-size:12.5px;color:var(--dim);margin-top:4px}
+#status{font-size:14px;margin:12px 0;min-height:20px}
+.ok{color:var(--emerald);font-weight:700}.warn{color:var(--orange);font-weight:700}.err{color:#b3261e;font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+td,th{text-align:left;padding:5px 8px;border-bottom:1px solid var(--line)}th{color:var(--dim);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px}
+.metrics{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+.metric{background:#f3f7ef;border:1px solid #d9e6d3;border-radius:10px;padding:8px 14px;font-size:13px}
+.metric b{font-size:20px;display:block;color:var(--emerald)}
+.flags li{font-size:13.5px;margin:3px 0}
+svg{width:100%;max-width:280px;height:auto;background:#cfe6b8;border-radius:12px;display:block;margin:8px auto}
+.split{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}.split>*{flex:1;min-width:240px}
+code{background:#f3efe4;padding:1px 5px;border-radius:4px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Rangefinder · Course Builder</h1>
+  <p class="sub">Turn any course's OpenStreetMap data into a ready-to-load course file — the whole rangefinder, auto-derived, in seconds.</p>
+
+  <div class="card">
+    <label>Course name <span style="font-weight:400;color:var(--dim)">(for the file label)</span></label>
+    <input id="cname" placeholder="e.g. TPC Twin Cities">
+    <div class="row">
+      <div><label>Latitude</label><input id="lat" placeholder="45.177"></div>
+      <div><label>Longitude</label><input id="lng" placeholder="-93.213"></div>
+      <div><label>Radius (m)</label><input id="rad" value="1500"></div>
+    </div>
+    <p class="hint">Get coordinates from Google Maps: right-click the middle of the course → click the lat,lng at the top to copy. Or type the course name and press <b>Find location</b>.</p>
+    <button class="ghost" id="findBtn">Find location by name</button>
+    <button id="buildBtn">Build course data →</button>
+    <div id="status"></div>
+  </div>
+
+  <div class="card" id="result" style="display:none">
+    <div class="split">
+      <div>
+        <div class="metrics" id="metrics"></div>
+        <div id="flags"></div>
+        <table id="teeTable"></table>
+        <button id="dlBtn">⤓ Download course file (.json)</button>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Hole 1 preview</div>
+        <div id="preview"></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="hint" style="text-align:center">Data © OpenStreetMap contributors (ODbL). Quality varies by course — always eyeball the preview and finish tees / stroke-index from the scorecard.</p>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const OVERPASS=["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter"];
+const D=Math.PI/180,R=6371000;
+const yd=(a,b)=>{const la1=a.lat*D,la2=b.lat*D,dla=(b.lat-a.lat)*D,dlo=(b.lng-a.lng)*D;const x=Math.sin(dla/2)**2+Math.cos(la1)*Math.cos(la2)*Math.sin(dlo/2)**2;return 2*R*Math.asin(Math.sqrt(x))*1.09361;};
+const cen=g=>{let a=0,o=0;g.forEach(p=>{a+=p.lat;o+=p.lng;});return{lat:a/g.length,lng:o/g.length};};
+const geo=e=>(e.geometry||[]).map(p=>({lat:p.lat,lng:p.lon}));
+let COURSE=null;
+
+async function overpass(q){
+  let lastErr;
+  for(const url of OVERPASS){
+    try{
+      const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),55000);
+      const r=await fetch(url,{method:"POST",body:q,signal:ctrl.signal}); clearTimeout(to);
+      const t=await r.text();
+      try{ return JSON.parse(t); }catch(_){ lastErr="server busy — retrying a mirror…"; }
+    }catch(e){ lastErr=String(e); }
+  }
+  throw new Error(lastErr||"Overpass unreachable");
+}
+
+$('findBtn').onclick=async()=>{
+  const name=$('cname').value.trim(); if(!name){ setStatus('Type a course name first.','err'); return; }
+  setStatus('Looking up '+name+'…');
+  try{
+    const r=await fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q="+encodeURIComponent(name+" golf course"),{headers:{"Accept":"application/json"}});
+    const j=await r.json();
+    if(j&&j[0]){ $('lat').value=(+j[0].lat).toFixed(5); $('lng').value=(+j[0].lon).toFixed(5); setStatus('Found — coordinates filled in. Now press Build.','ok'); }
+    else setStatus('No match — enter coordinates manually from Google Maps.','warn');
+  }catch(e){ setStatus('Lookup failed — enter coordinates manually.','warn'); }
+};
+
+$('buildBtn').onclick=async()=>{
+  const lat=+$('lat').value, lng=+$('lng').value, rad=+$('rad').value||1500;
+  if(!lat||!lng){ setStatus('Enter latitude and longitude (or use Find).','err'); return; }
+  $('buildBtn').disabled=true; setStatus('Querying OpenStreetMap for every hole, green, tee and hazard…');
+  try{
+    const q=`[out:json][timeout:90];(way(around:${rad},${lat},${lng})["golf"~"^(hole|green|tee|bunker|water_hazard|lateral_water_hazard)$"];node(around:${rad},${lat},${lng})["golf"="pin"];);out tags geom;`;
+    const j=await overpass(q);
+    const c=convert(j.elements||[], $('cname').value.trim()||'Course');
+    COURSE=c.course;
+    showResult(c);
+    setStatus('Built — review the preview and flags, then download.','ok');
+  }catch(e){ setStatus('Could not build: '+e.message,'err'); }
+  $('buildBtn').disabled=false;
+};
+
+function convert(els, name){
+  const holes=els.filter(e=>e.tags&&e.tags.golf==="hole"&&e.geometry).map(e=>({ref:+(e.tags.ref||0),par:+(e.tags.par||0),line:geo(e)})).filter(h=>h.ref&&h.line.length>1);
+  const greens=els.filter(e=>e.tags&&e.tags.golf==="green"&&e.geometry).map(e=>({poly:geo(e),c:cen(geo(e))}));
+  const tees=els.filter(e=>e.tags&&e.tags.golf==="tee"&&e.geometry).map(e=>({ref:e.tags.ref?+e.tags.ref:null,c:cen(geo(e))}));
+  const haz=els.filter(e=>e.tags&&/^(bunker|water_hazard|lateral_water_hazard)$/.test(e.tags.golf)&&e.geometry).map(e=>({type:e.tags.golf==="bunker"?"bunker":"water",points:geo(e),c:cen(geo(e))}));
+  const near=(p,arr)=>{let b=null,bd=1e18;arr.forEach(x=>{const d=yd(p,x.c);if(d<bd){bd=d;b=x;}});return b;};
+  const TEENAMES=["Championship","Back","Middle","Forward","Front"], teeTotals={};
+  const seen=new Set(), out=[], flags=[];
+  holes.sort((a,b)=>a.ref-b.ref).forEach(h=>{
+    if(seen.has(h.ref)){ flags.push("Hole "+h.ref+" mapped twice in OSM — kept the first, dropped the duplicate."); return; }
+    seen.add(h.ref);
+    const grEnd=h.line[h.line.length-1], gr=near(grEnd,greens);
+    if(!gr){ flags.push("Hole "+h.ref+": no green found nearby — needs manual green."); return; }
+    const c=gr.c, p0=h.line[h.line.length-2], p1=grEnd;
+    const av={x:(p1.lng-p0.lng)*Math.cos(c.lat*D),y:(p1.lat-p0.lat)}, an=Math.hypot(av.x,av.y)||1; av.x/=an; av.y/=an;
+    let fv=c,bv=c,fmin=1e18,bmax=-1e18;
+    gr.poly.forEach(v=>{const t=((v.lng-c.lng)*Math.cos(c.lat*D))*av.x+((v.lat-c.lat))*av.y; if(t<fmin){fmin=t;fv=v;} if(t>bmax){bmax=t;bv=v;}});
+    const teeEnd=h.line[0];
+    const mine=tees.filter(t=>(t.ref&&t.ref===h.ref)||(!t.ref&&yd(t.c,teeEnd)<70)).map(t=>({c:t.c,yd:Math.round(yd(t.c,c))})).sort((a,b)=>b.yd-a.yd);
+    const uniq=[]; mine.forEach(t=>{if(!uniq.some(u=>Math.abs(u.yd-t.yd)<5))uniq.push(t);});
+    const tb=uniq.slice(0,5).map((t,i)=>({name:TEENAMES[i]||("Tee"+(i+1)),lat:+t.c.lat.toFixed(6),lng:+t.c.lng.toFixed(6),yardage:t.yd}));
+    if(!tb.length) flags.push("Hole "+h.ref+": no tee boxes in OSM — add from scorecard.");
+    tb.forEach(t=>teeTotals[t.name]=(teeTotals[t.name]||0)+t.yardage);
+    const hz=haz.filter(z=>h.line.some(pt=>yd(z.c,pt)<45)).map(z=>({type:z.type,points:z.points.map(p=>({lat:+p.lat.toFixed(6),lng:+p.lng.toFixed(6)}))}));
+    out.push({hole_number:h.ref,par:h.par,par_women:h.par,handicap_index:h.ref,handicap_index_women:h.ref,
+      tee_boxes:tb,
+      green:{front:{lat:+fv.lat.toFixed(6),lng:+fv.lng.toFixed(6)},center:{lat:+c.lat.toFixed(6),lng:+c.lng.toFixed(6)},back:{lat:+bv.lat.toFixed(6),lng:+bv.lng.toFixed(6)},depth_yds:Math.round(yd(fv,bv)),polygon:gr.poly.map(p=>({lat:+p.lat.toFixed(6),lng:+p.lng.toFixed(6)}))},
+      hazards:hz, centerline:h.line.map(p=>({lat:+p.lat.toFixed(6),lng:+p.lng.toFixed(6)}))});
+  });
+  const par=out.reduce((s,h)=>s+h.par,0);
+  if(out.length!==18) flags.push("Built "+out.length+" holes (expected 18) — check for missing/extra holes in OSM.");
+  const teeSets=TEENAMES.filter(n=>teeTotals[n]).map(n=>({name:n,gender:"men",total_yardage:teeTotals[n]}));
+  const incomplete=teeSets.filter(t=>t.total_yardage < par*40); // rough: a full set is ~5000+ yds
+  if(incomplete.length) flags.push("Tee sets "+incomplete.map(t=>t.name).join(", ")+" are incomplete (not every hole had them mapped) — finish from the scorecard.");
+  flags.push("Stroke-index (handicap) is placeholder (= hole number) — OSM has none; set from the scorecard.");
+  const course={course_name:name,location:"",data_source:"OpenStreetMap (auto-generated)",par,par_women:par,tees:teeSets,holes:out,attribution:"Course geometry © OpenStreetMap contributors (ODbL)."};
+  return {course, flags, par, holes:out.length, teeSets};
+}
+
+function showResult(c){
+  $('result').style.display='';
+  $('metrics').innerHTML=`<div class="metric"><b>${c.holes}</b>holes</div><div class="metric"><b>${c.par}</b>par</div><div class="metric"><b>${c.teeSets.length}</b>tee sets</div>`;
+  $('flags').innerHTML='<ul class="flags">'+c.flags.map(f=>'<li>'+(/incomplete|twice|expected|no /.test(f)?'⚠ ':'· ')+f+'</li>').join('')+'</ul>';
+  $('teeTable').innerHTML='<tr><th>Tee set</th><th>Total yards</th></tr>'+c.teeSets.map(t=>`<tr><td>${t.name}</td><td>${t.total_yardage.toLocaleString()}</td></tr>`).join('');
+  $('preview').innerHTML=miniMap(c.course.holes[0]);
+}
+
+function miniMap(h){
+  if(!h) return '<p class="hint">No hole to preview.</p>';
+  const all=[...h.centerline, ...h.green.polygon]; h.hazards.forEach(z=>all.push(...z.points));
+  let minLa=1e9,maxLa=-1e9,minLo=1e9,maxLo=-1e9;
+  all.forEach(p=>{minLa=Math.min(minLa,p.lat);maxLa=Math.max(maxLa,p.lat);minLo=Math.min(minLo,p.lng);maxLo=Math.max(maxLo,p.lng);});
+  const cLat=(minLa+maxLa)/2, W=280, H=360, pad=20;
+  const mx=Math.cos(cLat*D);
+  const sx=(maxLo-minLo)*mx||1e-6, sy=(maxLa-minLa)||1e-6;
+  const sc=Math.min((W-2*pad)/sx,(H-2*pad)/sy);
+  const X=p=>W/2+((p.lng-(minLo+maxLo)/2)*mx)*sc, Y=p=>H/2-((p.lat-(minLa+maxLa)/2))*sc;
+  const path=pts=>pts.map((p,i)=>(i?'L':'M')+X(p).toFixed(1)+' '+Y(p).toFixed(1)).join(' ');
+  let s=`<svg viewBox="0 0 ${W} ${H}">`;
+  s+=`<path d="${path(h.centerline)}" fill="none" stroke="#3a2f22" stroke-width="2" stroke-dasharray="5 5" opacity=".7"/>`;
+  h.hazards.forEach(z=>{ s+=`<path d="${path(z.points)}Z" fill="${z.type==='water'?'#1e4d8c':'#e8c878'}" opacity=".9"/>`; });
+  s+=`<path d="${path(h.green.polygon)}Z" fill="#249a55" stroke="#eafff0" stroke-width="1.4"/>`;
+  s+=`<circle cx="${X(h.green.front).toFixed(1)}" cy="${Y(h.green.front).toFixed(1)}" r="3" fill="#fff"/>`;
+  s+=`<circle cx="${X(h.green.back).toFixed(1)}" cy="${Y(h.green.back).toFixed(1)}" r="3" fill="#fff"/>`;
+  const t=h.tee_boxes[0]; if(t){ s+=`<rect x="${(X(t)-4).toFixed(1)}" y="${(Y(t)-4).toFixed(1)}" width="8" height="8" rx="2" fill="#b45309"/>`; }
+  s+=`</svg>`;
+  return s;
+}
+
+$('dlBtn').onclick=()=>{
+  if(!COURSE) return;
+  const name=(COURSE.course_name||'course').replace(/[^a-z0-9]+/gi,'-').toLowerCase();
+  const blob=new Blob([JSON.stringify(COURSE)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name+'-course-data.json'; document.body.appendChild(a); a.click(); a.remove();
+};
+function setStatus(t,cls){ $('status').innerHTML='<span class="'+(cls||'')+'">'+t+'</span>'; }
+</script>
+</body>
+</html>

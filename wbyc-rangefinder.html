@@ -312,6 +312,39 @@
 
   footer{font-size:7px;color:var(--dim);text-align:center;margin-top:16px;line-height:1.4;opacity:.35}
   footer a{color:var(--dim)}
+
+  /* ---- memory sheet: replaces window.prompt(), which is an unstyled system
+     dialog on iOS and the weakest moment in the app ---- */
+  .bp-sheet{position:fixed;inset:0;z-index:96;display:none;align-items:flex-end;justify-content:center;
+    background:rgba(12,14,16,.55);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+  .bp-sheet.open{display:flex}
+  .bp-card{background:var(--card);color:var(--text);width:min(460px,100%);border-radius:18px 18px 0 0;
+    padding:18px 18px 16px;box-shadow:0 -10px 40px rgba(0,0,0,.35)}
+  @media(min-width:520px){.bp-sheet{align-items:center}.bp-card{border-radius:18px}}
+  .bp-card h3{margin:0 0 2px;font-size:17px}
+  .bp-card .bp-sub{font-size:12.5px;color:var(--dim);margin:0 0 12px}
+  .bp-card textarea{width:100%;min-height:88px;resize:none;border:1px solid var(--line);border-radius:12px;
+    padding:11px 12px;font-size:15px;line-height:1.45;background:var(--card2);color:var(--text);font-family:inherit}
+  .bp-card textarea:focus{outline:none;border-color:var(--accent)}
+  .bp-count{font-size:11.5px;color:var(--dim);text-align:right;margin:5px 2px 12px}
+  .bp-row{display:flex;gap:9px}
+  .bp-btn{flex:1;border:none;border-radius:12px;padding:12px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:inherit}
+  .bp-btn.primary{background:var(--accent);color:#fff}
+  .bp-btn.ghost{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+  /* ---- photographs on the keepsake ---- */
+  #bpPhotos{margin:22px 0 4px}
+  #bpPhotos h4{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:#2f7d68;margin:0 0 9px;
+    font-family:-apple-system,sans-serif;font-weight:800}
+  #bpPhotos .bp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+  #bpPhotos figure{margin:0;position:relative}
+  #bpPhotos img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;border:1px solid #e0d6bd;display:block}
+  #bpPhotos .bp-x{position:absolute;top:5px;right:5px;border:none;border-radius:999px;width:23px;height:23px;
+    font-size:13px;line-height:1;cursor:pointer;background:rgba(16,18,20,.62);color:#fff}
+  #bpPhotos .bp-add{border:1.5px dashed #c3b79a;background:transparent;border-radius:10px;aspect-ratio:4/3;width:100%;
+    cursor:pointer;color:#6b6350;font-size:12.5px;font-weight:700;font-family:-apple-system,sans-serif}
+  #bpPhotos .bp-budget{font-size:11px;color:#8a8270;margin-top:8px;font-family:-apple-system,sans-serif}
+  #bpPhotos .bp-warn{color:#b3261e;font-weight:700}
+  @media print{#bpPhotos .bp-add,#bpPhotos .bp-x,#bpPhotos .bp-budget{display:none}}
 </style>
 </head>
 <body>
@@ -405,6 +438,21 @@
   <canvas id="d3c"></canvas>
   <div id="d3hint">drag to orbit · scroll / pinch to zoom</div>
 </div>
+
+
+<div class="bp-sheet" id="bpMemSheet" role="dialog" aria-label="Pin a memory">
+  <div class="bp-card">
+    <h3>Mark this spot</h3>
+    <p class="bp-sub">It comes back every time you play this hole, and it's kept in your Bear's Log.</p>
+    <textarea id="bpMemText" maxlength="140" placeholder="Holed out from the bunker&#8230;"></textarea>
+    <div class="bp-count"><span id="bpMemCount">0</span>/140</div>
+    <div class="bp-row">
+      <button class="bp-btn ghost" id="bpMemCancel">Cancel</button>
+      <button class="bp-btn primary" id="bpMemSave">Pin it</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="bpPhotoInput" accept="image/*" style="display:none">
 
 <script>
 "use strict";
@@ -1973,7 +2021,7 @@ function mapTap(ev){
   }
   const hM=hole();
   if(memArm){ // this tap pins a memory at the tapped spot
-    const note=prompt('A memory to pin here:', '');
+    bpOpenMemorySheet(ll, hM.hole_number); const note=null;
     if(note && note.trim()){
       memories.push({h:hM.hole_number, lat:+ll.lat.toFixed(6), lng:+ll.lng.toFixed(6), note:note.trim().slice(0,140), date:new Date().toISOString().slice(0,10)});
       saveMemories(); $('maphint').textContent='★ memory pinned';
@@ -2225,7 +2273,7 @@ function init(data){
   };
   if(!TOPO) $('d3Btn').style.display='none';
   $('d3Btn').onclick=open3D;
-  wire3D();
+  wire3D(); wireMemoryAndPhotos();
   initMapGestures();
   probeAerials();
   render();
@@ -2292,6 +2340,99 @@ function initPwa(){
   initTheme();
   initPwa();
 })();
+
+/* ============ MEMORY SHEET + KEEPSAKE PHOTOGRAPHS ============ */
+/* The note used to be captured with window.prompt() — a system dialog that
+   can't be styled and looks broken on iOS. Same data, better door. */
+let bpPend = null;
+function bpOpenMemorySheet(ll, holeNumber){
+  bpPend = {ll:ll, hole:holeNumber};
+  const t=$('bpMemText'); t.value=''; $('bpMemCount').textContent='0';
+  $('bpMemSheet').classList.add('open');
+  setTimeout(()=>t.focus(), 60);
+}
+function bpCloseMemorySheet(){ $('bpMemSheet').classList.remove('open'); bpPend=null; }
+function bpCommitMemory(){
+  const t=$('bpMemText').value.trim();
+  if(t && bpPend){
+    memories.push({h:bpPend.hole, lat:+bpPend.ll.lat.toFixed(6), lng:+bpPend.ll.lng.toFixed(6),
+                   note:t.slice(0,140), date:new Date().toISOString().slice(0,10)});
+    saveMemories(); render();
+  }
+  bpCloseMemorySheet();
+}
+
+/* Photographs attached to a round. Stored as compressed data URIs in
+   localStorage, which is a ~5MB budget shared with rounds, shots and clubs —
+   hence the 900px/q0.62 downscale, the per-round cap, the visible budget and an
+   explicit quota failure. IndexedDB is the durable answer when this fills. */
+const BP_PHOTO_KEY='wbyc_photos', BP_MAXEDGE=900, BP_QUALITY=0.62, BP_CAP=4;
+function bpLoadPhotos(){ try{ return JSON.parse(localStorage.getItem(BP_PHOTO_KEY))||{}; }catch(e){ return {}; } }
+function bpSavePhotos(o){ localStorage.setItem(BP_PHOTO_KEY, JSON.stringify(o)); }
+function bpStorageKB(){ let n=0; for(const k in localStorage) if(localStorage.hasOwnProperty(k)) n+=localStorage[k].length; return Math.round(n/1024); }
+function bpShrink(file, cb){
+  if(typeof FileReader==='undefined'){ cb(null); return; }
+  const fr=new FileReader();
+  fr.onload=()=>{ const img=new Image();
+    img.onload=()=>{ const s=Math.min(1, BP_MAXEDGE/Math.max(img.width,img.height));
+      const c=document.createElement('canvas'); c.width=Math.round(img.width*s); c.height=Math.round(img.height*s);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height); cb(c.toDataURL('image/jpeg',BP_QUALITY)); };
+    img.onerror=()=>cb(null); img.src=fr.result; };
+  fr.onerror=()=>cb(null); fr.readAsDataURL(file);
+}
+function bpAddPhoto(uri, day){
+  const all=bpLoadPhotos(), d=day||today();
+  all[d]=all[d]||[];
+  if(all[d].length>=BP_CAP) return 'cap';
+  all[d].push(uri);
+  try{ bpSavePhotos(all); }catch(e){ return 'full'; }
+  return 'ok';
+}
+function bpRemovePhoto(i, day){
+  const all=bpLoadPhotos(), d=day||today();
+  if(!all[d]) return; all[d].splice(i,1);
+  try{ bpSavePhotos(all); }catch(e){}
+}
+function bpRenderPhotos(){
+  const log=$('bearlog'); if(!log||!log.classList.contains('open')) return;
+  const foot=log.querySelector('.bl-foot'); if(!foot) return;
+  let wrap=$('bpPhotos');
+  if(!wrap){ wrap=document.createElement('div'); wrap.id='bpPhotos'; foot.parentNode.insertBefore(wrap, foot); }
+  const list=(bpLoadPhotos()[today()])||[], kb=bpStorageKB(), tight=kb>3600;
+  wrap.innerHTML='<h4>The Photographs</h4><div class="bp-grid">'
+    + list.map((src,i)=>`<figure><img src="${src}" alt=""><button class="bp-x" data-i="${i}" aria-label="Remove">\u00d7</button></figure>`).join('')
+    + (list.length<BP_CAP ? '<button class="bp-add" id="bpAdd">+ add a photograph</button>' : '')
+    + '</div><div class="bp-budget'+(tight?' bp-warn':'')+'">'
+    + list.length+' of '+BP_CAP+' \u00b7 '+kb+'KB of roughly 5000KB used'+(tight?' \u2014 running low':'')+'</div>';
+  const add=$('bpAdd'); if(add) add.onclick=()=>$('bpPhotoInput').click();
+  wrap.querySelectorAll('.bp-x').forEach(b=>{ b.onclick=()=>{ bpRemovePhoto(+b.dataset.i); bpRenderPhotos(); }; });
+}
+function wireMemoryAndPhotos(){
+  // Defensive: the DOM-stub harness has no textarea, FileReader or
+  // MutationObserver. Wiring must degrade quietly rather than throw, or one
+  // missing browser API takes the whole app down at init.
+  const t=$('bpMemText'); if(!t || !t.addEventListener) return;
+  t.addEventListener('input', ()=>{ $('bpMemCount').textContent=t.value.length; });
+  $('bpMemCancel').onclick=bpCloseMemorySheet;
+  $('bpMemSave').onclick=bpCommitMemory;
+  $('bpMemSheet').addEventListener('click', e=>{ if(e.target===$('bpMemSheet')) bpCloseMemorySheet(); });
+  const inp=$('bpPhotoInput');
+  if(inp && inp.addEventListener) inp.addEventListener('change', ()=>{
+    const f=inp.files&&inp.files[0]; inp.value='';
+    if(!f) return;
+    bpShrink(f, uri=>{
+      if(!uri){ alert('That image could not be read.'); return; }
+      const r=bpAddPhoto(uri);
+      if(r==='cap') alert(BP_CAP+' photographs per round \u2014 that\'s the limit for now.');
+      else if(r==='full') alert('Storage is full, so that photograph was not saved.\n\nPhotographs share about 5MB with your rounds, shots and clubs.');
+      else bpRenderPhotos();
+    });
+  });
+  const log=$('bearlog');
+  if(log && typeof MutationObserver!=='undefined')
+    new MutationObserver(()=>setTimeout(bpRenderPhotos,0))
+      .observe(log,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+}
 </script>
 </body>
 </html>

@@ -1,0 +1,23 @@
+{
+  "_note": "The product's own demo build — no club identity anywhere. Borrows WBYC geometry, so course identity is neutralised at build time.",
+  "BRAND": "BACK POCKET",
+  "PRODUCT": "Rangefinder Caddie",
+  "CLUB_LINE": "",
+  "DIARY": "The Round Log",
+  "DIARY_SHORT": "Round Log",
+  "DIARY_BUTTON": "My Round Log",
+  "CREST_FILE": "assets/backpocket-mark.svg",
+  "CREST_STYLE": "width:52px;height:52px;flex-shrink:0",
+  "CREST_CARD_W": "118px",
+  "CREST_CARD_M": "4px 0 2px",
+  "CONTACT_HTML": "<span></span>",
+  "STORE": "bp",
+  "accent_sun": "#15497f",
+  "course": "demo-course-data.json",
+  "neutralise_course": true,
+  "outputs": {
+    "app": "demo-backpocket.html",
+    "pwa": null,
+    "bump_sw": false
+  }
+}

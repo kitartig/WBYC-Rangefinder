@@ -1,2 +1,8 @@
 .DS_Store
 wbyc-rangefinder-site.zip
+marketing/*.mp4
+marketing/*.gif
+deploy-*/
+deploy-*.zip
+demo-tpc-*.html
+*-preview.html

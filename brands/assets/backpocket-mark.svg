@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Back Pocket">
+  <!-- Back Pocket mark.
+       Flag-dominant: the flag reads first, which is what carries the mark at
+       24-28px where the pocket alone is just a silhouette. Solid shapes, no
+       interior knockout, so it holds together small and on any background.
+       Ramp: robin's egg blue -> lush light green. -->
+  <defs>
+    <linearGradient id="bpGrad" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#5CE4EA"/>
+      <stop offset="1" stop-color="#9BEE8C"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#bpGrad)">
+    <rect x="62" y="0" width="7" height="38" rx="3.5"/>
+    <path d="M71 1 L100 13 L71 25 Z"/>
+    <path d="M27 34 H71 A4 4 0 0 1 75 38.2 L72.6 75 A4 4 0 0 1 70.7 78.2 L52 89 A4.5 4.5 0 0 1 48 89 L29.3 78.2 A4 4 0 0 1 27.4 75 L23 38.2 A4 4 0 0 1 27 34 Z"/>
+  </g>
+</svg>

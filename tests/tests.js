@@ -164,11 +164,21 @@ setTimeout(()=>{
       const h0=course.holes[0], spot={lat:h0.green.center.lat+0.0002, lng:h0.green.center.lng};
       const svg=mapTransform.svg; svg.getBoundingClientRect=()=>({left:0,top:0,width:300,height:400});
       // place: arm, then a scripted prompt supplies the note
-      memArm=true; globalThis.prompt=()=>'chip-in from the fringe';
+      memArm=true;
       // tap somewhere on the map — unrot maps client point to a lat/lng near the hole
       mapTap({clientX:150,clientY:150});
-      A('memory placed on tap', memories.length===1 && memories[0].h===h0.hole_number && /chip-in/.test(memories[0].note));
+      // the note is now captured by an in-app sheet, not window.prompt()
+      A('tap opens the memory sheet', elems['bpMemSheet'].classList.contains('open'));
+      A('nothing written before the sheet is confirmed', memories.length===0);
       A('memory disarms after placing', memArm===false);
+      elems['bpMemText'].value='chip-in from the fringe';
+      bpCommitMemory();
+      A('memory placed on commit', memories.length===1 && memories[0].h===h0.hole_number && /chip-in/.test(memories[0].note));
+      A('sheet closes after commit', !elems['bpMemSheet'].classList.contains('open'));
+      // cancelling discards
+      memArm=true; mapTap({clientX:150,clientY:150});
+      elems['bpMemText'].value='discard me'; bpCloseMemorySheet();
+      A('cancel writes nothing', memories.length===1);
       // it renders as a star on this hole
       render(); A('memory star drawn on its hole', elems['map'].innerHTML.includes('mem-star'));
       // not shown on a different hole
@@ -184,6 +194,22 @@ setTimeout(()=>{
       mapTap({clientX:10,clientY:10});
       A('memory removed on tap+confirm', memories.length===before);
       memories.length=0; globalThis.prompt=()=>null; render();
+    })();
+    // keepsake photographs: add, cap, remove, and a quota failure that must not be silent
+    (()=>{ const day='2026-07-27';
+      localStorage.removeItem(BP_PHOTO_KEY);
+      A('photo added', bpAddPhoto('data:image/jpeg;base64,AAA', day)==='ok');
+      A('photo stored against the round', (bpLoadPhotos()[day]||[]).length===1);
+      while((bpLoadPhotos()[day]||[]).length < BP_CAP) bpAddPhoto('data:,x', day);
+      A('per-round cap enforced', (bpLoadPhotos()[day]||[]).length===BP_CAP);
+      A('cap refuses further photos', bpAddPhoto('data:,y', day)==='cap');
+      bpRemovePhoto(0, day);
+      A('photo removed', (bpLoadPhotos()[day]||[]).length===BP_CAP-1);
+      const realSet=localStorage.setItem;
+      localStorage.setItem=()=>{ throw new Error('QuotaExceededError'); };
+      A('quota failure is reported, never silent', bpAddPhoto('data:,z', day)==='full');
+      localStorage.setItem=realSet;
+      localStorage.removeItem(BP_PHOTO_KEY);
     })();
   }catch(e){ console.error('THROW:', e); process.exitCode=1; }
   process.exit();
