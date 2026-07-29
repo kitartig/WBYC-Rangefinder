@@ -12,7 +12,7 @@ what you want anyway: a club shouldn't be handed another club's guide.
 
 Outputs (WBYC): pwa/guide/index.html  +  WBYC-Rangefinder-Guide.html
 """
-import base64, json, os, re, sys, urllib.parse
+import base64, datetime, json, os, re, sys, urllib.parse
 
 here = os.path.dirname(os.path.abspath(__file__))
 brand_path = sys.argv[1] if len(sys.argv) > 1 else 'brands/wbyc.json'
@@ -38,14 +38,36 @@ crest = ('data:image/svg+xml;utf8,' + urllib.parse.quote(raw.decode('utf-8'))
          if mime == 'image/svg+xml'
          else f'data:{mime};base64,' + base64.b64encode(raw).decode())
 
+# The edition stamp used to be typed into the template by hand and went stale
+# immediately — it read v138 while the app was on v170. Read it from the service
+# worker instead, which build.py bumps on every build.
+sw = open(os.path.join(here, 'pwa/sw.js'), encoding='utf-8').read()
+m = re.search(r"VERSION\s*=\s*'[a-z]+-v(\d+)'", sw)
+assert m, "couldn't read the app version out of pwa/sw.js"
+appver = m.group(1)
+guidedate = datetime.date.today().strftime('%B %Y')
+
 out = (tpl.replace('/*__FONTS__*/', fonts_css)
           .replace('__BURGEE__', crest)
           .replace('{{BRAND}}', brand['BRAND'])
           .replace('{{PRODUCT}}', brand['PRODUCT'])
-          .replace('{{DIARY}}', brand['DIARY']))
+          .replace('{{DIARY_BUTTON}}', brand['DIARY_BUTTON'])
+          .replace('{{DIARY}}', brand['DIARY'])
+          .replace('{{APPVER}}', appver)
+          .replace('{{GUIDEDATE}}', guidedate))
 assert '/*__FONTS__*/' not in out and '__BURGEE__' not in out, "placeholders not fully replaced"
+leftover = re.findall(r'\{\{[A-Z_]+\}\}', out)
+assert not leftover, f"unreplaced placeholders in the guide: {sorted(set(leftover))}"
 
-outputs = brand.get('guide_outputs') or ['pwa/guide/index.html', 'WBYC-Rangefinder-Guide.html']
+# These defaults are WBYC's own output paths. Any other brand MUST declare its
+# own guide_outputs — otherwise `build_guide.py brands/<other>.json` silently
+# overwrites WBYC's live guide with another club's. (It did, once.)
+outputs = brand.get('guide_outputs')
+if not outputs:
+    assert brand['STORE'] == 'wbyc', (
+        f"brand {brand['BRAND']!r} has no guide_outputs — refusing to write to "
+        "WBYC's guide paths. Add guide_outputs to the brand config.")
+    outputs = ['pwa/guide/index.html', 'WBYC-Rangefinder-Guide.html']
 for rel in outputs:
     p = os.path.join(here, rel)
     os.makedirs(os.path.dirname(p), exist_ok=True)
