@@ -33,10 +33,36 @@ command**. One failure cascades.
 |---|---|
 | Stage + commit | `GIT_INDEX_FILE=/tmp/alt-index git read-tree HEAD && git add … && git commit` |
 | Move a branch to another commit | `git update-ref refs/heads/main <branch>` — touches no index, no working tree |
-| Clear a stuck lock | `mv .git/index.lock .git/index.lock.old` — rename works, delete doesn't |
+| Clear a stuck lock | **Nothing Claude can do — see below.** |
+| Commit without touching `HEAD.lock` | `git write-tree` → `git commit-tree` → `printf '%s\n' $SHA > .git/refs/heads/main` |
 | Read anything | All read-only git commands are fine |
 
-`update-ref` is the one to reach for. A fast-forward merge is *only* a pointer
+**Correction (2026-07-28): `mv` does not clear a lock either.** On this mount a
+rename is copy-then-unlink, and the unlink is the half that's denied — so
+`mv .git/HEAD.lock .git/HEAD.lock.old` leaves *both* files and the next commit
+fails identically. `.git/` has accumulated a drawer of `index.lock.NNNN` and
+`HEAD.lock.NNNN` corpses as proof. Clearing them is a Terminal job:
+
+```
+cd "path/to/WBYC Rangefinder" && find .git -name '*.lock*' -delete
+```
+
+What works instead of `git commit` when `HEAD.lock` is jammed: build the commit
+object by hand and write the ref file, neither of which takes a ref lock.
+
+```
+export GIT_INDEX_FILE=$HOME/alt-index
+git read-tree HEAD && git add <files>
+TREE=$(git write-tree)
+SHA=$(git commit-tree $TREE -p $(git rev-parse HEAD) -m "message")
+printf '%s\n' "$SHA" > .git/refs/heads/main
+```
+
+Writing a loose ref works because overwriting `refs/heads/main` in place is
+permitted; it's only *unlink* that isn't. A loose ref also wins over
+`packed-refs`, so this is safe even after a `git gc`.
+
+`update-ref` is the one to reach for when the locks are clean. A fast-forward merge is *only* a pointer
 move; if the working tree already matches the target commit, `update-ref`
 achieves the whole thing with none of the machinery that fails here.
 
