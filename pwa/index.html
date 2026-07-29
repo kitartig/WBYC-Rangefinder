@@ -103,6 +103,8 @@
     box-shadow:0 1px 3px rgba(220,160,80,.18);transform:translateY(-8px)}
   #tagline a:active{background:linear-gradient(135deg,#f6dd9a,#e5a95c)}
 
+  :root{--brightblue:#00a9e0}   /* PMS 306 — the app's bright blue: CARD, Bear's Log */
+
   .holebar{display:flex;align-items:center;gap:8px;margin-bottom:8px}
   .holebar button{background:var(--card);border:1px solid var(--line);color:var(--text);
     border-radius:10px;font-size:20px;width:46px;height:46px;cursor:pointer}
@@ -111,8 +113,13 @@
     height:46px;display:flex;align-items:center;justify-content:center;gap:14px}
   .holeinfo .num{font-size:27px;font-weight:800;white-space:nowrap}
   .holeinfo .meta{font-size:12px;color:var(--dim);line-height:1.25;text-align:left}
-  #autoBtn{font-size:10px;font-weight:700;letter-spacing:.5px}
-  #autoBtn.on{border-color:var(--accent);color:var(--accent)}
+  /* CARD lives on the hole bar now — the scoring strip needed the whole width.
+     Same 46px footprint the AUTO button had; carries the running total so it stays visible. */
+  #scTot{display:flex;flex-direction:column;align-items:center;justify-content:center;
+    line-height:1.05;padding:0;font-size:9.5px;font-weight:800;letter-spacing:.5px;
+    color:var(--brightblue);border-color:var(--brightblue);cursor:pointer}
+  #scTot b{font-size:16px;font-weight:800;color:var(--brightblue);font-variant-numeric:tabular-nums}
+  #scTot #scThru{font-size:7.5px;font-weight:600;color:var(--dim);letter-spacing:0}
 
   .tees{display:flex;gap:6px;margin-bottom:10px}
   .tees button{flex:1;padding:7px 0;border-radius:8px;border:1px solid var(--line);
@@ -153,6 +160,9 @@
     padding:5px 9px;font-size:10px;font-weight:700;letter-spacing:.5px;cursor:pointer;backdrop-filter:blur(2px)}
   body.sun #mapbtns button{background:rgba(255,255,255,.75);color:#111}
   #mapbtns button.on{box-shadow:0 0 0 2px var(--accent)}
+  /* a little flagstick behind the type — PIN is the one button whose job isn't obvious */
+  #pinBtn{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M6.6 22.5V2.2' stroke='%23ff2fd6' stroke-width='1.9' stroke-linecap='round' opacity='.55'/><path d='M6.6 2.6L18 6.1 6.6 9.7z' fill='%23ff2fd6' opacity='.5'/></svg>");
+    background-repeat:no-repeat;background-position:center;background-size:auto 82%}
   #memBtn{color:#ff2fd6;font-size:15px} body.sun #memBtn{color:#e0359e}
   #memBtn.on{box-shadow:0 0 0 2px #f000c2}
   #threeD{position:fixed;inset:0;background:var(--bg);z-index:50;display:none;flex-direction:column}
@@ -181,22 +191,23 @@
   .hazrow .nums b{color:var(--text);font-size:15px;font-weight:700}
 
   /* ---- running scorecard ---- */
-  #scstrip{display:flex;justify-content:space-around;align-items:center;gap:4px;background:var(--card);
-    border:1px solid var(--line);border-radius:12px;padding:5px 10px;margin-bottom:10px}
-  #scstrip .grp{display:flex;align-items:center;gap:3px;font-size:10px;font-weight:800;color:var(--text);letter-spacing:.4px}
-  #scstrip .grp b{font-size:22px;color:var(--text);min-width:22px;text-align:center;font-variant-numeric:tabular-nums}
-  #scstrip button{width:30px;height:38px;border-radius:8px;border:1px solid var(--line);background:none;
-    color:var(--text);font-size:18px;font-weight:700;cursor:pointer;flex:none}
-  #scTot{text-align:center;font-size:14px;font-weight:800;color:var(--accent2);cursor:pointer;line-height:1.35;flex:none;letter-spacing:.5px}
-  #scTot b{color:var(--accent2);font-size:19px}
-  #scTot #scThru{font-weight:600;color:var(--dim)}
+  /* two counters, full width, thumb-sized. Label stacks ABOVE the counter row so
+     "TOTAL SCORE" can't squeeze the buttons on a narrow phone (the old bug). */
+  #scstrip{display:flex;justify-content:space-around;align-items:center;gap:8px;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;padding:9px 10px;margin-bottom:10px}
+  #scstrip .grp{display:flex;flex-direction:column;align-items:center;gap:3px;
+    font-size:11px;font-weight:800;color:var(--text);letter-spacing:.5px}
+  #scstrip .grp .ct{display:flex;align-items:center;gap:7px}
+  #scstrip .grp b{font-size:36px;line-height:1;color:var(--text);min-width:40px;text-align:center;font-variant-numeric:tabular-nums}
+  #scstrip button{width:46px;height:50px;border-radius:10px;border:1px solid var(--line);background:none;
+    color:var(--text);font-size:27px;font-weight:700;cursor:pointer;flex:none;touch-action:manipulation}
   #scorecard{position:fixed;inset:0;background:#f2e9d6;z-index:60;display:none;flex-direction:column;padding:4px 12px 10px}
   #scorecard.open{display:flex}
   /* ---- My Bear's Log button (on the scorecard) ---- */
-  #bearBtn{display:block;width:100%;margin:8px 0 2px;padding:11px 14px;border:none;border-radius:12px;
-    background:#0e6b3a;color:#fffdf7;font-family:'EB Garamond',Garamond,serif;font-style:italic;font-size:18px;
-    letter-spacing:.4px;cursor:pointer;box-shadow:0 3px 10px rgba(14,107,58,.28)}
-  #bearBtn:active{background:#0b5730}
+  #bearBtn{display:block;width:52%;margin:8px auto 2px;padding:11px 14px;border:none;border-radius:12px;
+    background:var(--brightblue);color:#fffdf7;font-family:'EB Garamond',Garamond,serif;font-style:italic;font-size:18px;
+    letter-spacing:.4px;cursor:pointer;box-shadow:0 3px 10px rgba(0,169,224,.30);text-shadow:0 1px 2px rgba(0,60,90,.35)}
+  #bearBtn:active{background:#0089b8}
   /* ---- The Bear's Log keepsake overlay (fixed light design, theme-independent) ---- */
   #bearlog{position:fixed;inset:0;z-index:70;display:none;overflow:auto;background:#f2e7cf;
     -webkit-overflow-scrolling:touch}
@@ -259,12 +270,13 @@
   #bearlog .bl-bear .bl-sig{display:block;font-family:-apple-system,sans-serif;font-size:13px;color:#6b6350;margin-top:8px;font-style:normal;letter-spacing:1px}
   #bearlog .bl-foot{border-top:1px solid #e5dbc4;margin-top:20px;padding-top:12px;text-align:center;font-family:-apple-system,sans-serif;font-size:11px;color:#6b6350;letter-spacing:.6px}
   @media print{ body>*{display:none!important} #bearlog{display:block!important;position:static;background:#fff} #bearlog .bl-bar{display:none!important} #bearlog .bl-page{box-shadow:none;border:none;margin:0} }
-  #scbar{display:flex;justify-content:space-between;align-items:center;padding:0 2px 4px;position:relative;z-index:2}
+  #scbar{display:flex;justify-content:space-between;align-items:center;padding:0 2px 4px;position:relative;z-index:2;flex-wrap:wrap;gap:4px}
+  #scbar>span:last-child{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px;margin-left:auto}
   #scbar span{font-size:13px;font-weight:700;letter-spacing:.5px;color:#1b3a66}
   #scTitleWrap{display:flex;flex-direction:column;line-height:1.15}
   #scBrand{font-size:10px;font-weight:800;letter-spacing:1.4px}
   #scbar button{background:#ffffff;border:1px solid #cfc3a2;color:#1b3a66;border-radius:8px;
-    padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;margin-left:6px}
+    padding:6px 9px;font-size:10.5px;font-weight:700;cursor:pointer;margin-left:0;white-space:nowrap}
   #scClose{min-width:46px;min-height:40px;font-size:20px !important;font-weight:900 !important;line-height:1;padding:6px 10px !important}
   #scbar button{touch-action:manipulation}
   #scLogoWrap{text-align:center;padding:0;pointer-events:none} /* negative logo margins overlap scbar — must not steal taps from ✕ */
@@ -289,7 +301,7 @@
   #sctab tr[data-h]{cursor:pointer}
   #scstats{padding:10px 4px;font-size:11px;color:#867d64;text-align:center}
   #scBackup{text-align:center;padding:2px 0 6px}
-  #scBackup button{background:none;border:none;color:#7b93b8;font-size:11px;font-weight:600;cursor:pointer;padding:6px 10px;text-decoration:underline;text-underline-offset:2px}
+  #scBackup button{background:none;border:none;color:#7b93b8;font-size:14.5px;font-weight:700;cursor:pointer;padding:9px 12px;text-decoration:underline;text-underline-offset:3px;touch-action:manipulation}
   #scBackup button:active{color:#1f5fd0}
 
   #gps{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;color:var(--text);
@@ -308,7 +320,7 @@
   #elevBtn{background:#eab4d9}                                                            /* ± ELEV — PMS 238 pink */
   #elevBtn.on{background:#de5fb0;box-shadow:0 0 10px rgba(222,95,176,.55),0 1px 3px rgba(0,0,0,.22)}
   #demoBtn{background:#45dca0;color:#0b3b29;text-shadow:none}                              /* GPS ON — PMS 3385 mint (dark ink for legibility) */
-  #demoBtn.on{background:#d79626;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.18);box-shadow:0 0 10px rgba(215,150,38,.5),0 1px 3px rgba(0,0,0,.22)} /* GPS OFF — amber */
+  #demoBtn.on{background:#0e6b3a;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.18);box-shadow:0 0 10px rgba(14,107,58,.5),0 1px 3px rgba(0,0,0,.22)} /* GPS OFF — dark green */
 
   footer{font-size:7px;color:var(--dim);text-align:center;margin-top:16px;line-height:1.4;opacity:.35}
   footer a{color:var(--dim)}
@@ -366,7 +378,7 @@
       <span class="meta" id="holeMeta"></span>
     </div>
     <button id="nextBtn" aria-label="Next hole">›</button>
-    <button id="autoBtn" title="Auto-detect hole from GPS">AUTO</button>
+    <button id="scTot" title="Open your scorecard">CARD<b id="scTotV"></b><span id="scThru"></span></button>
   </div>
 
   <div class="tees" id="teeRow"></div>
@@ -381,7 +393,7 @@
 
   <div id="mapwrap">
     <svg id="map" xmlns="http://www.w3.org/2000/svg"></svg>
-    <div id="mapbtns"><button id="satBtn">SAT</button><button id="grnBtn" title="Zoom to the green">GRN</button><button id="pinBtn" title="Tap, then tap the green to drop today's pin. All distances re-key to it. Long-press to clear.">PIN</button><button id="memBtn" title="Pin a memory: tap this, then tap the spot on the map. It resurfaces every time you play this hole. Tap a star to read or remove it.">★</button><button id="d3Btn">3D</button></div>
+    <div id="mapbtns"><button id="satBtn">SAT</button><button id="grnBtn" title="Zoom to the green">GRN</button><button id="pinBtn" title="Today's cup position. Distances normally measure to the middle of the green — tap PIN, then tap where the flag actually is, and FRONT/CENTER/BACK, plays-like, the carry arcs and the 3D flyover all re-measure to that exact spot. Long-press to clear; pins wipe themselves at midnight.">PIN</button><button id="memBtn" title="Pin a memory: tap this, then tap the spot on the map. It resurfaces every time you play this hole. Tap a star to read or remove it.">★</button><button id="d3Btn">3D</button></div>
     <div id="shotbar"><select id="clubSel"></select><button id="shotBtn" title="Mark a shot from your current position. Long-press to undo the last mark.">SHOT</button></div>
     <div id="maphint"></div>
   </div>
@@ -389,9 +401,10 @@
   <div id="profile"></div>
 
   <div id="scstrip">
-    <span class="grp" title="All strokes on this hole, putts included">TOTAL SCORE <button id="scSm">−</button><b id="scS">·</b><button id="scSp">+</button></span>
-    <span class="grp">PUTTS <button id="scPm">−</button><b id="scP">·</b><button id="scPp">+</button></span>
-    <span id="scTot">CARD ▸ <b id="scTotV"></b> <span id="scThru"></span></span>
+    <span class="grp" title="All strokes on this hole, putts included">TOTAL SCORE
+      <span class="ct"><button id="scSm">−</button><b id="scS">·</b><button id="scSp">+</button></span></span>
+    <span class="grp">PUTTS
+      <span class="ct"><button id="scPm">−</button><b id="scP">·</b><button id="scPp">+</button></span></span>
   </div>
 
   <div id="gps">
@@ -413,14 +426,14 @@
 
 <div id="scorecard">
   <div id="scbar"><span id="scTitleWrap"><span id="scBrand">WBYC</span><span id="scTitle">SCORECARD</span></span>
-    <span><button id="scStats">STATS</button><button id="scClubs">CLUBS</button><button id="scPost" title="Copy hole-by-hole scores and open GHIN">POST</button><button id="scNew" title="Bank this round to your history and start fresh">NEW</button><button id="scClose">✕</button></span></div>
+    <span><button id="scStats">STATS</button><button id="scClubs">CLUB TRACKS</button><button id="scPost" title="Copy hole-by-hole scores and open GHIN">POST to GHIN</button><button id="scNew" title="Bank this round to your history and start fresh">NEW</button><button id="scClose">✕</button></span></div>
   <div id="scLogoWrap"><img id="scLogo" alt=""></div>
   <div id="sctab"></div>
   <button id="bearBtn" title="Open your round keepsake">My Bear's Log</button>
   <div id="scstats"></div>
   <div id="scBackup">
     <button id="scExport" title="Save all your rounds, shots and club data to a file">⤓ Export my data</button>
-    <button id="scImport" title="Restore rounds, shots and clubs from an exported file">⤒ Import</button>
+    <button id="scImport" title="Restore rounds, shots and clubs from an exported file">⤒ Import my data</button>
     <input id="scImportFile" type="file" accept="application/json,.json" style="display:none">
   </div>
 </div>
@@ -524,7 +537,7 @@ function polyRange(p, pts){ // min/max distance from p to polygon vertices
 
 /* ============ STATE ============ */
 let course=null, holeIdx=0, tee=localStorage.getItem('wbyc_tee')||'White';
-let autoHole=true, demo=false, demoPos=null;
+let autoHole=true, manualUntil=0, demo=false, demoPos=null;   // manualUntil: ‹ › suspends auto-detect for 3 min
 let elevAdjust = localStorage.getItem('wbyc_elev')!=='off';
 /* ---- wind: live from Open-Meteo when served over http(s); manual long-press entry anywhere ---- */
 let windAdjust = localStorage.getItem('wbyc_wind')!=='off';
@@ -619,7 +632,7 @@ function pushFix(lat,lng,accuracy){
   pos = { lat: fixes.reduce((s,f)=>s+f.lat,0)/fixes.length,
           lng: fixes.reduce((s,f)=>s+f.lng,0)/fixes.length };
   acc = accuracy;
-  if(autoHole && !demo) detectHole();
+  if(autoHole && !demo && Date.now()>manualUntil) detectHole();   // hole follows you unless you've just stepped through manually
   render();
 }
 function startGeo(){
@@ -1556,7 +1569,7 @@ function renderMap(h,p,tb){
     const label = pos ? 'patiently waiting for you!' : 'finding you…';
     s+=`<circle class="you-search" cx="${wcx.toFixed(1)}" cy="${wcy.toFixed(1)}" r="${wr.toFixed(1)}" fill="none" stroke="#ff2fd6" stroke-width="${(w*0.008).toFixed(1)}" opacity=".9"/>`
       +`<circle cx="${wcx.toFixed(1)}" cy="${wcy.toFixed(1)}" r="${(wr*0.5).toFixed(1)}" fill="#ff2fd6"/>`
-      +`<text x="${wcx.toFixed(1)}" y="${(wcy+w*0.085).toFixed(1)}" text-anchor="middle" font-size="${(w*0.036).toFixed(1)}" font-weight="600" font-style="italic" font-family="'EB Garamond',Garamond,serif" fill="#ff2fd6" paint-order="stroke" stroke="${sunMode?'rgba(255,255,255,.85)':'rgba(8,14,10,.6)'}" stroke-width="${(w*0.006).toFixed(1)}">${label}</text>`;
+      +`<text x="${wcx.toFixed(1)}" y="${(wcy+w*0.105).toFixed(1)}" text-anchor="middle" font-size="${(w*0.055).toFixed(1)}" font-weight="700" font-style="italic" font-family="'EB Garamond',Garamond,serif" fill="#ff2fd6" paint-order="stroke" stroke="${sunMode?'rgba(255,255,255,.85)':'rgba(8,14,10,.6)'}" stroke-width="${(w*0.009).toFixed(1)}">${label}</text>`;
   }
   // wind arrow (top-right): points where the wind blows, in this hole's rotated frame
   if(windAdjust && wind.src && wind.spd>=1 && wind.dir!==null){
@@ -2076,10 +2089,8 @@ function init(data){
     : '') + (TOPO ? ' Elevation: USGS 3DEP (public domain).' : '');
   buildTees();
   const snapDemo=()=>{ if(demo){ const tb=teeBox(hole()); demoPos={lat:tb.lat,lng:tb.lng}; } };
-  $('prevBtn').onclick=()=>{autoHole=false;$('autoBtn').classList.remove('on');holeIdx=(holeIdx+17)%18;snapDemo();render();};
-  $('nextBtn').onclick=()=>{autoHole=false;$('autoBtn').classList.remove('on');holeIdx=(holeIdx+1)%18;snapDemo();render();};
-  $('autoBtn').onclick=()=>{autoHole=!autoHole;$('autoBtn').classList.toggle('on',autoHole);if(autoHole){detectHole();render();}};
-  $('autoBtn').classList.toggle('on',autoHole);
+  $('prevBtn').onclick=()=>{manualUntil=Date.now()+18e4;holeIdx=(holeIdx+17)%18;snapDemo();render();};
+  $('nextBtn').onclick=()=>{manualUntil=Date.now()+18e4;holeIdx=(holeIdx+1)%18;snapDemo();render();};
   $('demoBtn').onclick=()=>setDemo(!demo);
   $('scLogo').src=$('logo').src; // burgee tops the scorecard, reusing the embedded artwork
   // player name: tap the header chip to set; signs the scorecard title + GHIN post text
@@ -2190,7 +2201,7 @@ function init(data){
   const scShow=()=>{
     ({card:renderCard, clubs:renderClubs, stats:renderStats})[scMode]();
     $('scTitle').textContent={card:'SCORECARD', clubs:'CLUB DISTANCES', stats:'YOUR GAME'}[scMode];
-    $('scClubs').textContent=scMode==='clubs'?'CARD':'CLUBS';
+    $('scClubs').textContent=scMode==='clubs'?'CARD':'CLUB TRACKS';
     $('scStats').textContent=scMode==='stats'?'CARD':'STATS';
     const off=scMode!=='card'?'none':'';
     $('scNew').style.display=off; $('scPost').style.display=off; };
@@ -2252,7 +2263,7 @@ function init(data){
   $('sctab').onclick=ev=>{ // tap a hole row to jump there
     const tr=ev.target && ev.target.closest ? ev.target.closest('tr[data-h]') : null;
     if(!tr) return;
-    autoHole=false; $('autoBtn').classList.remove('on');
+    manualUntil=Date.now()+18e4;
     holeIdx=+tr.dataset.h; snapDemo();
     $('scorecard').classList.remove('open'); render();
   };
