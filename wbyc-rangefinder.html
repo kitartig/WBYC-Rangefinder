@@ -172,13 +172,22 @@
      and the star is struck into it. Doubled #mapbtns #memBtn because the plain
      id loses to `body.sun #mapbtns button` on specificity. */
   #mapbtns #memBtn, body.sun #mapbtns #memBtn{
-    background:linear-gradient(180deg,#fff58a 0%,#ffcb1f 36%,#ff9d0a 72%,#ff6a00 100%);
-    border-color:#c85a00;font-size:17px;line-height:1;padding:4px 9px;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -2px 3px rgba(160,60,0,.28),0 1px 3px rgba(0,0,0,.3)}
-  /* embossed: light catching the top-left of the glyph, shadow cast bottom-right */
-  #mapbtns #memBtn .star{display:inline-block;line-height:1;color:#ffb02e;
-    text-shadow:-1px -1px 0 rgba(255,252,222,.95), 1px 1px 1px rgba(146,54,0,.85), 0 2px 3px rgba(120,44,0,.4)}
-  #memBtn.on{box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 0 0 2px #ff6a00,0 0 12px rgba(255,144,0,.6)}
+    background:linear-gradient(180deg,#ffe75c 0%,#ffc400 30%,#ff8a00 68%,#ff4d00 100%);
+    border:2px solid #ffffff;border-radius:9px;font-size:24px;line-height:1;padding:3px 11px 5px;
+    transform:scale(1.14);transform-origin:center;
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.75),inset 0 -3px 5px rgba(150,52,0,.32),
+      0 0 0 1.5px rgba(190,70,0,.85),0 2px 6px rgba(0,0,0,.4),0 0 16px rgba(255,140,0,.55)}
+  /* a white star extruded out of the chip: outline, then two hard shadow steps
+     for the raised edge, then a soft cast shadow. Amber-on-amber was the whole
+     problem — the glyph had no value separation from its own background. */
+  #mapbtns #memBtn .star{display:inline-block;line-height:1;color:#ffffff;
+    -webkit-text-stroke:.9px #a83f00;
+    text-shadow:0 1px 0 #c24a00, 0 2px 0 #9c3800, 0 3px 5px rgba(80,28,0,.55);
+    animation:starbreathe 3.4s ease-in-out infinite}
+  @keyframes starbreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
+  /* two ids, or the base rule above out-specifies the armed state and nothing shows */
+  #mapbtns #memBtn.on{box-shadow:inset 0 1.5px 0 rgba(255,255,255,.75),0 0 0 3px #fff,0 0 20px rgba(255,150,0,.95)}
+  #mapbtns #memBtn.on .star{animation:none;transform:scale(1.12)}
   #threeD{position:fixed;inset:0;background:var(--bg);z-index:50;display:none;flex-direction:column}
   #threeD.open{display:flex}
   #d3c{flex:1;touch-action:none;width:100%}
