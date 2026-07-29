@@ -194,10 +194,11 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);
         </g>
         <!-- map buttons -->
         <g class="lbl b" style="font-size:9px" text-anchor="middle">
-          <rect x="176" y="240" width="30" height="17" rx="8.5" fill="#fff" stroke="#4a5fae"/><text x="191" y="252" fill="#1a1712">SAT</text>
-          <rect x="210" y="240" width="30" height="17" rx="8.5" fill="#fff" stroke="#c9c2b2"/><text x="225" y="252" fill="#1a1712">GRN</text>
-          <rect x="244" y="240" width="30" height="17" rx="8.5" fill="#fff" stroke="#c9c2b2"/><text x="259" y="252" fill="#1a1712">PIN</text>
-          <rect x="278" y="240" width="30" height="17" rx="8.5" fill="#fff" stroke="#c9c2b2"/><text x="293" y="252" fill="#1a1712">3D</text>
+          <rect x="176" y="240" width="27" height="17" rx="8.5" fill="#fff" stroke="#4a5fae"/><text x="189" y="252" fill="#1a1712">SAT</text>
+          <rect x="206" y="240" width="27" height="17" rx="8.5" fill="#fff" stroke="#c9c2b2"/><text x="219" y="252" fill="#1a1712">GRN</text>
+          <rect x="236" y="240" width="27" height="17" rx="8.5" fill="#fff" stroke="#c9c2b2"/><text x="249" y="252" fill="#1a1712">PIN</text>
+          <rect x="266" y="240" width="27" height="17" rx="8.5" fill="#fff" stroke="#ffa61a"/><text x="279" y="253" fill="#ff8c00" style="font-size:12px">★</text>
+          <rect x="296" y="240" width="27" height="17" rx="8.5" fill="#fff" stroke="#c9c2b2"/><text x="309" y="252" fill="#1a1712">3D</text>
         </g>
         <!-- shotbar -->
         <g class="lbl b" style="font-size:10px" text-anchor="middle">
@@ -251,7 +252,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);
       <ol class="cal">
         <li><b>Tee selector.</b> <span>Tap your tee — the yardage line and the GPS‑OFF start point follow. Red &amp; Green score against women's par.</span></li>
         <li><b>CENTER distance.</b> <span>The big number is yards to the middle of the green. Under it, "plays like" folds in elevation, wind, and your club (e.g. <i>plays 152 · 7i</i>). Tap the box for a side‑profile of the shot.</span></li>
-        <li><b>Map views.</b> <span>SAT aerial · GRN green zoom · PIN today's cup position · 3D flyover with an animated tracer.</span></li>
+        <li><b>Map views.</b> <span>SAT aerial · GRN green zoom · PIN today's cup position · <b style="color:#e08000">★</b> pin a memory to a spot · 3D flyover with an animated tracer.</span></li>
         <li><b>Wind arrow.</b> <span>Points where the wind blows relative to the hole; the number is mph. Up = tailwind to the green.</span></li>
         <li><b>You.</b> <span>The glowing gold ball is your GPS position — walk and it walks with you. A pink "finding you…" marker shows until it locks on.</span></li>
         <li><b>Shot tracking.</b> <span>Set the club (7i = 7‑iron), tap SHOT at your ball. The app learns your real distances; long‑press to undo.</span></li>
@@ -377,6 +378,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);
     <tr><td>SAT</td><td>Aerial photography under the map.</td></tr>
     <tr><td>GRN</td><td>Zoom to the green — white fall‑line arrows and 1‑ft contours for reading putts.</td></tr>
     <tr><td>PIN</td><td><b>Where the flag is cut today.</b> Every distance in the app is measured to the <i>middle</i> of the green, because that's the only point that's true every day — the cup itself moves, and clubs don't publish where. So when you reach the green and can see the flag, tap PIN and then tap that spot on the map. From then on FRONT / CENTER / BACK, "plays like", the carry rings and the 3D flyover all measure to the real cup instead of the middle: often a two‑club difference on a deep green. It's per hole, so you can set one on the tee if you can see the flag from there. Long‑press PIN to clear it; every pin wipes itself at midnight, so you never play today off yesterday's flag.</td></tr>
+    <tr><td><b style="color:#e08000">★</b></td><td><b>Leave a note on a spot.</b> Tap the star, then tap anywhere on the hole — the app asks what happened and pins your words to that exact place. A gold star appears there, and it comes back <i>every time you play this hole</i>, for as long as you keep the app. Tap a star to read it again, or to remove it.<br><br>It's for the things a scorecard can't hold: <i>"drive of my life, 2 August"</i> · <i>"never go left here"</i> · <i>"Dad's par from the trees"</i> · <i>"wind always fools me on this tee"</i>. Some of it is course knowledge that makes you play the hole better next season; some of it is just the round you don't want to forget. Notes are stored on your phone alone — nobody else sees them — and they travel with Export my data if you change phones.</td></tr>
     <tr><td>3D</td><td>3D terrain flyover with an animated shot tracer (drag to rotate, pinch to zoom, TRACE to replay).</td></tr>
     <tr><td>CENTER box</td><td>Tap the big number to open the side‑profile flight view.</td></tr>
     <tr><td>7i</td><td>Club picker by SHOT (7i = 7‑iron). Drives the carry rings and shot marks.</td></tr>
@@ -394,6 +396,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);
   <div class="grid">
     <div class="fc"><h4>Pinch to zoom</h4><p>Two fingers zoom the hole map up to 8× and pan; pinch back out or change holes to snap back.</p></div>
     <div class="fc"><h4>Ball flight, three ways</h4><p>The pink tracer shows on the hole map, in the tap‑for‑it side profile, and animated over 3D terrain — with yardage stats at the apex.</p></div>
+    <div class="fc"><h4>The hole remembers</h4><p>Tap <b style="color:#e08000">★</b> and then a spot on the map to pin a note there — a shot you want to repeat, a trap you keep falling into, an afternoon worth keeping. It resurfaces every time you play the hole, and it never leaves your phone.</p></div>
     <div class="fc"><h4>Carry arcs</h4><p>Dashed rings show your selected club's reach (and its neighbors) from where you stand. They switch to your learned numbers after a few tracked shots.</p></div>
     <div class="fc"><h4>Reading the green</h4><p>GRN shows a deep‑emerald green with white downhill arrows and 1‑ft contours — read the broad break, not 6‑inch putts.</p></div>
     <div class="fc"><h4>Tournament‑legal</h4><p>Flip WIND and ± ELEV <b>off</b> for the raw, rules‑legal yardage (USGA Rule 4.3a). Leave both on for everyday golf.</p></div>

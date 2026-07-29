@@ -167,8 +167,20 @@
   /* a little flagstick behind the type — PIN is the one button whose job isn't obvious */
   #pinBtn{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M6.6 22.5V2.2' stroke='%23ff2fd6' stroke-width='1.9' stroke-linecap='round' opacity='.55'/><path d='M6.6 2.6L18 6.1 6.6 9.7z' fill='%23ff2fd6' opacity='.5'/></svg>");
     background-repeat:no-repeat;background-position:center;background-size:auto 82%}
-  #memBtn{color:#ff2fd6;font-size:15px} body.sun #memBtn{color:#e0359e}
-  #memBtn.on{box-shadow:0 0 0 2px #f000c2}
+  /* ★ memories — the one button on the map that's an invitation rather than a
+     tool, so it gets to look like one: hot yellow into orange, with a glow.
+     The glyph is wrapped in a span because background-clip:text would otherwise
+     clip away the button's own dark chip. */
+  #memBtn{font-size:17px;line-height:1;padding:4px 8px;border-color:#ffa61a}
+  body.sun #memBtn{border-color:#e07b00}
+  #memBtn .star{display:inline-block;line-height:1;color:#ffb61a}   /* fallback */
+  @supports ((-webkit-background-clip:text) or (background-clip:text)){
+    #memBtn .star{background:linear-gradient(180deg,#fff58a 0%,#ffcb1f 38%,#ff9000 74%,#ff5c00 100%);
+      -webkit-background-clip:text;background-clip:text;
+      -webkit-text-fill-color:transparent;color:transparent;
+      filter:drop-shadow(0 0 5px rgba(255,150,0,.85))}
+  }
+  #memBtn.on{box-shadow:0 0 0 2px #ff9000,0 0 12px rgba(255,144,0,.55)}
   #threeD{position:fixed;inset:0;background:var(--bg);z-index:50;display:none;flex-direction:column}
   #threeD.open{display:flex}
   #d3c{flex:1;touch-action:none;width:100%}
@@ -400,7 +412,7 @@
 
   <div id="mapwrap">
     <svg id="map" xmlns="http://www.w3.org/2000/svg"></svg>
-    <div id="mapbtns"><button id="satBtn">SAT</button><button id="grnBtn" title="Zoom to the green">GRN</button><button id="pinBtn" title="Today's cup position. Distances normally measure to the middle of the green — tap PIN, then tap where the flag actually is, and FRONT/CENTER/BACK, plays-like, the carry arcs and the 3D flyover all re-measure to that exact spot. Long-press to clear; pins wipe themselves at midnight.">PIN</button><button id="memBtn" title="Pin a memory: tap this, then tap the spot on the map. It resurfaces every time you play this hole. Tap a star to read or remove it.">★</button><button id="d3Btn">3D</button></div>
+    <div id="mapbtns"><button id="satBtn">SAT</button><button id="grnBtn" title="Zoom to the green">GRN</button><button id="pinBtn" title="Today's cup position. Distances normally measure to the middle of the green — tap PIN, then tap where the flag actually is, and FRONT/CENTER/BACK, plays-like, the carry arcs and the 3D flyover all re-measure to that exact spot. Long-press to clear; pins wipe themselves at midnight.">PIN</button><button id="memBtn" title="Leave a note on a spot. Tap the star, then tap anywhere on the hole — where the drive went, what the wind did, who was there. It stays pinned to that exact place and comes back every time you play the hole. Tap a star on the map to read it, or to remove it."><span class="star">★</span></button><button id="d3Btn">3D</button></div>
     <div id="shotbar"><select id="clubSel"></select><button id="shotBtn" title="Mark a shot from your current position. Long-press to undo the last mark.">SHOT</button></div>
     <div id="maphint"></div>
   </div>
