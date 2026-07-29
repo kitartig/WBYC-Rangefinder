@@ -18,7 +18,7 @@
     --blue:#85b9ea; --white-tee:#e8f0ea; --gold:#ffc72c; --red:#fb637e;
     --water:#3a6ea5; --sand:#f0dfb8; --green-fill:#1fee75;
     --cl:#4a5c51; --green-stroke:#6bff96; --fcb:#cfe8d5; --chiptext:#0e1512;
-    --topo:#4db3f5; --topo-index:#8ad4ff;
+    --topo:#4db3f5; --topo-index:#8ad4ff; --centertint:#1b2734;
   }
   /* SUN MODE — max contrast for direct sunlight */
   body.sun{
@@ -27,7 +27,7 @@
     --blue:#4d84c4; --white-tee:#cfd4da; --gold:#ffc72c; --red:#fb637e;
     --water:#1e4d8c; --sand:#e8c878; --green-fill:#17d562;
     --cl:#6b6555; --green-stroke:#43f976; --fcb:#ffffff; --chiptext:#ffffff;
-    --topo:#5aa8f0; --topo-index:#1f6fe0;
+    --topo:#5aa8f0; --topo-index:#1f6fe0; --centertint:#e9f1fb;
   }
   body.sun .tees button.sel.White{color:#111}
   body.sun .dist .val{font-weight:900}
@@ -38,7 +38,7 @@
     --blue:#9daafa; --white-tee:#cdd3f5; --gold:#ffc72c; --red:#fb637e;
     --water:#4c6ef5; --sand:#ecdff8; --green-fill:#09fdb8;
     --cl:#5b5b9e; --green-stroke:#6cffd1; --fcb:#ffffff; --chiptext:#0b0b2a;
-    --topo:#4de0ff; --topo-index:#b088ff;
+    --topo:#4de0ff; --topo-index:#b088ff; --centertint:#1d2a66;
   }
   body.dream #map .ctr{stroke-dasharray:5 9;animation:ctrflow 7s linear infinite}
   body.dream #map .ctr.idx{stroke-dasharray:10 6;animation:ctrflowi 11s linear infinite}
@@ -116,10 +116,12 @@
   /* CARD lives on the hole bar now — the scoring strip needed the whole width.
      Same 46px footprint the AUTO button had; carries the running total so it stays visible. */
   #scTot{display:flex;flex-direction:column;align-items:center;justify-content:center;
-    line-height:1.05;padding:0;font-size:9.5px;font-weight:800;letter-spacing:.5px;
+    line-height:1.1;padding:0;font-size:11px;font-weight:800;letter-spacing:.5px;
     color:var(--brightblue);border-color:var(--brightblue);cursor:pointer}
-  #scTot b{font-size:16px;font-weight:800;color:var(--brightblue);font-variant-numeric:tabular-nums}
-  #scTot #scThru{font-size:7.5px;font-weight:600;color:var(--dim);letter-spacing:0}
+  /* the running total is still kept up to date — Kit asked for it off the button
+     (2026-07-28), so it's hidden rather than ripped out. Delete the rule to restore. */
+  #scTot b{display:none}
+  #scTot #scThru{font-size:8.5px;font-weight:600;color:var(--dim);letter-spacing:0}
 
   .tees{display:flex;gap:6px;margin-bottom:10px}
   .tees button{flex:1;padding:7px 0;border-radius:8px;border:1px solid var(--line);
@@ -139,7 +141,9 @@
   .dist{display:flex;gap:8px;margin-bottom:10px}
   .dist .box{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;
     padding:10px 4px;text-align:center}
-  .dist .box.center{background:var(--card2);border-color:var(--accent)}
+  /* the CENTER box used to borrow --card2, which is tinted green to match the
+     terrain. Its own cool blue tint now, so the hero number sits on blue. */
+  .dist .box.center{background:var(--centertint);border-color:var(--accent)}
   .dist .lbl{font-size:10px;color:var(--dim);letter-spacing:1px;font-weight:600}
   .dist .val{font-size:34px;font-weight:800;line-height:1.15;font-variant-numeric:tabular-nums}
   .dist .box.center .val{font-size:44px;color:var(--accent)}
@@ -204,10 +208,13 @@
   #scorecard{position:fixed;inset:0;background:#f2e9d6;z-index:60;display:none;flex-direction:column;padding:4px 12px 10px}
   #scorecard.open{display:flex}
   /* ---- My Bear's Log button (on the scorecard) ---- */
-  #bearBtn{display:block;width:52%;margin:8px auto 2px;padding:11px 14px;border:none;border-radius:12px;
-    background:var(--brightblue);color:#fffdf7;font-family:'EB Garamond',Garamond,serif;font-style:italic;font-size:18px;
-    letter-spacing:.4px;cursor:pointer;box-shadow:0 3px 10px rgba(0,169,224,.30);text-shadow:0 1px 2px rgba(0,60,90,.35)}
-  #bearBtn:active{background:#0089b8}
+  /* burgee blue, sized to sit modestly under the card. min-width keeps a longer
+     club's diary name from wrapping when the % goes narrow on a small phone. */
+  #bearBtn{display:block;width:30%;min-width:118px;max-width:60%;margin:8px auto 2px;
+    padding:10px 12px;border:none;border-radius:12px;white-space:nowrap;
+    background:#1638a8;color:#fffdf7;font-family:'EB Garamond',Garamond,serif;font-style:italic;font-size:15px;
+    letter-spacing:.4px;cursor:pointer;box-shadow:0 3px 10px rgba(22,56,168,.30)}
+  #bearBtn:active{background:#102a80}
   /* ---- The Bear's Log keepsake overlay (fixed light design, theme-independent) ---- */
   #bearlog{position:fixed;inset:0;z-index:70;display:none;overflow:auto;background:#f2e7cf;
     -webkit-overflow-scrolling:touch}
