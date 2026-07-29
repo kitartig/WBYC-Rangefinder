@@ -181,9 +181,18 @@
      for the raised edge, then a soft cast shadow. Amber-on-amber was the whole
      problem — the glyph had no value separation from its own background. */
   #mapbtns #memBtn .star{display:inline-block;line-height:1;color:#ffffff;
-    -webkit-text-stroke:.9px #a83f00;
-    text-shadow:0 1px 0 #c24a00, 0 2px 0 #9c3800, 0 3px 5px rgba(80,28,0,.55);
+    -webkit-text-stroke:.9px #ffffff;
+    text-shadow:0 1px 0 rgba(255,255,255,.7), 0 2px 3px rgba(84,30,0,.6), 0 3px 6px rgba(60,20,0,.35);
     animation:starbreathe 3.4s ease-in-out infinite}
+  /* the star's gradient runs OPPOSITE the chip's: deep orange where the chip is
+     yellow, yellow where the chip is orange. Contrast holds at both ends, which
+     a single flat fill can't do on a gradient background. Falls back to the
+     white glyph above if the browser can't clip a background to text. */
+  @supports ((-webkit-background-clip:text) or (background-clip:text)){
+    #mapbtns #memBtn .star{
+      background:linear-gradient(180deg,#e33d00 0%,#ff7a00 30%,#ffc400 68%,#fff29a 100%);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  }
   @keyframes starbreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
   /* two ids, or the base rule above out-specifies the armed state and nothing shows */
   #mapbtns #memBtn.on{box-shadow:inset 0 1.5px 0 rgba(255,255,255,.75),0 0 0 3px #fff,0 0 20px rgba(255,150,0,.95)}
