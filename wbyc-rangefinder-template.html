@@ -116,12 +116,12 @@
   /* CARD lives on the hole bar now — the scoring strip needed the whole width.
      Same 46px footprint the AUTO button had; carries the running total so it stays visible. */
   #scTot{display:flex;flex-direction:column;align-items:center;justify-content:center;
-    line-height:1.1;padding:0;font-size:11px;font-weight:800;letter-spacing:.5px;
+    line-height:1;padding:0;font-size:13px;font-weight:900;letter-spacing:.8px;
     color:var(--brightblue);border-color:var(--brightblue);cursor:pointer}
-  /* the running total is still kept up to date — Kit asked for it off the button
-     (2026-07-28), so it's hidden rather than ripped out. Delete the rule to restore. */
+  /* the word and nothing else. Total and holes-played are still kept up to date
+     underneath (2026-07-28) — delete these two rules to put either back. */
   #scTot b{display:none}
-  #scTot #scThru{font-size:8.5px;font-weight:600;color:var(--dim);letter-spacing:0}
+  #scTot #scThru{display:none}
 
   .tees{display:flex;gap:6px;margin-bottom:10px}
   .tees button{flex:1;padding:7px 0;border-radius:8px;border:1px solid var(--line);
