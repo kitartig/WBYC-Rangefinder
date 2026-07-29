@@ -84,6 +84,10 @@ open the build with `?nocoach=1` so the first-run card doesn't cover the app.
 
 ---
 
+See **`WORKING-NOTES.md`** before doing anything git-related from Cowork — the
+file mount can't delete or replace files, which breaks `checkout`, `reset` and
+`merge` in ways that look like data loss and aren't.
+
 ## Known gaps
 
 - **`back-pocket-starter-kit/` is dead.** See `DEPRECATED.md` inside it; delete
