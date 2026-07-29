@@ -168,19 +168,17 @@
   #pinBtn{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M6.6 22.5V2.2' stroke='%23ff2fd6' stroke-width='1.9' stroke-linecap='round' opacity='.55'/><path d='M6.6 2.6L18 6.1 6.6 9.7z' fill='%23ff2fd6' opacity='.5'/></svg>");
     background-repeat:no-repeat;background-position:center;background-size:auto 82%}
   /* ★ memories — the one button on the map that's an invitation rather than a
-     tool, so it gets to look like one: hot yellow into orange, with a glow.
-     The glyph is wrapped in a span because background-clip:text would otherwise
-     clip away the button's own dark chip. */
-  #memBtn{font-size:17px;line-height:1;padding:4px 8px;border-color:#ffa61a}
-  body.sun #memBtn{border-color:#e07b00}
-  #memBtn .star{display:inline-block;line-height:1;color:#ffb61a}   /* fallback */
-  @supports ((-webkit-background-clip:text) or (background-clip:text)){
-    #memBtn .star{background:linear-gradient(180deg,#fff58a 0%,#ffcb1f 38%,#ff9000 74%,#ff5c00 100%);
-      -webkit-background-clip:text;background-clip:text;
-      -webkit-text-fill-color:transparent;color:transparent;
-      filter:drop-shadow(0 0 5px rgba(255,150,0,.85))}
-  }
-  #memBtn.on{box-shadow:0 0 0 2px #ff9000,0 0 12px rgba(255,144,0,.55)}
+     tool, so it gets to look like one: the whole chip is hot yellow-to-orange
+     and the star is struck into it. Doubled #mapbtns #memBtn because the plain
+     id loses to `body.sun #mapbtns button` on specificity. */
+  #mapbtns #memBtn, body.sun #mapbtns #memBtn{
+    background:linear-gradient(180deg,#fff58a 0%,#ffcb1f 36%,#ff9d0a 72%,#ff6a00 100%);
+    border-color:#c85a00;font-size:17px;line-height:1;padding:4px 9px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -2px 3px rgba(160,60,0,.28),0 1px 3px rgba(0,0,0,.3)}
+  /* embossed: light catching the top-left of the glyph, shadow cast bottom-right */
+  #mapbtns #memBtn .star{display:inline-block;line-height:1;color:#ffb02e;
+    text-shadow:-1px -1px 0 rgba(255,252,222,.95), 1px 1px 1px rgba(146,54,0,.85), 0 2px 3px rgba(120,44,0,.4)}
+  #memBtn.on{box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 0 0 2px #ff6a00,0 0 12px rgba(255,144,0,.6)}
   #threeD{position:fixed;inset:0;background:var(--bg);z-index:50;display:none;flex-direction:column}
   #threeD.open{display:flex}
   #d3c{flex:1;touch-action:none;width:100%}
