@@ -207,6 +207,27 @@ setTimeout(()=>{
       return today()===local;
     })());
     A('a new card is stamped with the local date', blankCard().start===today());
+    A('save button is quiet with nothing to save', (()=>{
+      card=blankCard(); saveBtnState();
+      return !elems['scNew'].classList.contains('armed') && !elems['scNew'].classList.contains('ready');
+    })());
+    A('save button arms on the first score', (()=>{
+      card=blankCard(); card.holes[0]={s:5,p:2,f:null}; saveBtnState();
+      return elems['scNew'].classList.contains('armed') && !elems['scNew'].classList.contains('ready');
+    })());
+    A('save button goes ready at nine holes', (()=>{
+      card=blankCard(); for(let i=0;i<9;i++) card.holes[i]={s:5,p:2,f:null};
+      saveBtnState();
+      return elems['scNew'].classList.contains('armed') && elems['scNew'].classList.contains('ready');
+    })());
+    A('and again at eighteen, but not at ten', (()=>{
+      card=blankCard(); for(let i=0;i<10;i++) card.holes[i]={s:5,p:2,f:null};
+      saveBtnState(); const mid=elems['scNew'].classList.contains('ready');
+      for(let i=10;i<18;i++) card.holes[i]={s:5,p:2,f:null};
+      saveBtnState(); const full=elems['scNew'].classList.contains('ready');
+      card=blankCard();
+      return mid===false && full===true;
+    })());
     A('tap opens the memory sheet', elems['rfMemSheet'].classList.contains('open'));
       A('nothing written before the sheet is confirmed', memories.length===0);
       A('memory disarms after placing', memArm===false);

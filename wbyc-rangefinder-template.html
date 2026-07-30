@@ -326,10 +326,14 @@
   #scBrand{font-size:10px;font-weight:800;letter-spacing:1.4px}
   #scbar button{background:#ffffff;border:1px solid #cfc3a2;color:#1b3a66;border-radius:8px;
     padding:6px 9px;font-size:10.5px;font-weight:700;cursor:pointer;margin-left:0;white-space:nowrap}
-  /* the one button that commits something — sized and coloured to say so */
-  #scNew{background:#1b3a66;color:#fffdf7;border-color:#1b3a66;font-size:12.5px;
-    padding:9px 16px;letter-spacing:.4px}
-  #scNew:active{background:#12294a}
+  /* The one button that commits something. Quiet while there's nothing to save,
+     solid once a round exists, ringed in gold the moment 9 or 18 holes are in —
+     Kit went days without saving because nothing ever asked to be pressed. */
+  #scNew{background:#fff;color:#93a3b8;border-color:#d8cdb0;font-size:12.5px;
+    padding:9px 16px;letter-spacing:.4px;transition:background .18s,color .18s,box-shadow .18s}
+  #scNew.armed{background:#1b3a66;color:#fffdf7;border-color:#1b3a66}
+  #scNew.ready{box-shadow:0 0 0 2px #f2a413,0 0 12px rgba(242,164,19,.5)}
+  #scNew.armed:active{background:#12294a}
   #scClose{min-width:46px;min-height:40px;font-size:20px !important;font-weight:900 !important;line-height:1;padding:6px 10px !important}
   #scbar button{touch-action:manipulation}
   #scLogoWrap{text-align:center;padding:0;pointer-events:none} /* negative logo margins overlap scbar — must not steal taps from ✕ */
@@ -856,6 +860,15 @@ function renderScore(){
   const t=cardTotals();
   $('scTotV').textContent = t.n ? t.s : '';          // gross strokes; blank (no lonely dash) before any score
   $('scThru').textContent = t.n ? `thru ${t.n}` : '';
+  saveBtnState(t);
+}
+function saveBtnState(t){
+  const b=$('scNew'); if(!b||!b.classList) return;
+  t = t || cardTotals();
+  b.classList.toggle('armed', t.n>0);              // a round exists to save
+  b.classList.toggle('ready', t.n===9||t.n===18);  // and it looks finished
+  b.title = t.n ? `Save this ${t.n}-hole round to your history and start a fresh card`
+                : 'Nothing to save yet — enter a score first';
 }
 /* ============ THE BEAR'S LOG (round keepsake) ============ */
 function blWx(){
@@ -2291,7 +2304,8 @@ function init(data){
     $('scClubs').textContent=scMode==='clubs'?'CARD':'CLUB TRACKS';
     $('scStats').textContent=scMode==='stats'?'CARD':'STATS';
     const off=scMode!=='card'?'none':'';
-    $('scNew').style.display=off; $('scPost').style.display=off; };
+    $('scNew').style.display=off; $('scPost').style.display=off;
+    saveBtnState(); };
   // POST: copy hole-by-hole scores, open GHIN for manual posting (no credentials stored)
   $('scPost').onclick=async()=>{
     const t=cardTotals();

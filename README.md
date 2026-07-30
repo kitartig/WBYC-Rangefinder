@@ -38,7 +38,7 @@ about to copy the engine, don't.
 python3 build.py                        # WBYC → wbyc-rangefinder.html + pwa/ + sw bump
 python3 build.py brands/backpocket.json # Back Pocket's demo build (demo-backpocket.html)
 python3 build_guide.py                  # user guide → pwa/guide/ + WBYC-Rangefinder-Guide.html
-sh tests/run.sh                         # 95 assertions against the built app
+sh tests/run.sh                         # 99 assertions against the built app
 ```
 
 `build.py` refuses to finish if a brand config is missing a key the engine needs,
