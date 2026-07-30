@@ -12,6 +12,7 @@
   --text:#1a1712; --dim:#5b5647; --accent:#4a5fae; --accent2:#b45309;
   --blue:#4d84c4; --gold:#ffc72c; --red:#fb637e; --sand:#e8c878; --water:#1e4d8c;
   --green:#249a55; --green-lt:#4cc97f; --green-dk:#0e6b3a; --pink:#f000c2;
+  --pink-lt:#fdeaf7; --pink-dk:#a1027f;
   --serif:'EB Garamond',Garamond,Baskerville,'Times New Roman',serif;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
 }
@@ -72,9 +73,20 @@ table.btns{width:100%;border-collapse:collapse;margin:10px 0;font-size:16.5px}
 table.btns td{border-bottom:1px solid var(--line);padding:8px 6px;vertical-align:top}
 table.btns td:first-child{white-space:nowrap;font-weight:800;color:var(--accent);width:120px}
 
-.note{background:var(--card2);border-left:3px solid var(--green);border-radius:0 10px 10px 0;
+.note{background:var(--pink-lt);border-left:3px solid var(--pink);border-radius:0 10px 10px 0;
   padding:10px 14px;margin:14px 0;font-size:16.5px}
-.note b{color:var(--green-dk)}
+.note b{color:var(--pink-dk)}
+
+/* the ★ button as it actually looks on the map, resting and armed */
+.starchip{display:inline-block;border:2px solid rgba(236,178,72,.95);border-radius:7px;
+  padding:0 7px 1px;background:#fff;color:#c47f06;font-size:15px;line-height:1.45;
+  vertical-align:-2px;box-shadow:0 1px 3px rgba(60,45,20,.2)}
+.starchip.armed{background:linear-gradient(180deg,#ffd257 0%,#f2a413 100%);
+  border-color:#fff1c9;color:#4a2c00;
+  box-shadow:0 0 0 2px rgba(242,164,19,.45),0 1px 3px rgba(0,0,0,.28)}
+
+/* section 3 reads as prose, so it gets air between paragraphs */
+.prose p{margin:15px 0;max-width:64ch}
 
 footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);
   color:var(--dim);font-size:12.5px}
@@ -104,7 +116,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);
   <p class="lead" style="margin-top:16px">A GPS rangefinder built for one course — every hole, hazard, and green at White Bear Yacht Club, in your pocket and working offline. Here's the whole app in two screens.</p>
 
   <!-- ============ MAIN SCREEN ============ -->
-  <h2><span class="num">1 ·</span> The main screen</h2>
+  <h2><span class="num">1 ·</span> The Main Screen</h2>
   <p class="lead">Stand over your ball; the phone becomes the ball. Everything you need for the shot lives here.</p>
 
   <div class="sch">
@@ -176,7 +188,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);
         <rect x="20" y="156" width="88" height="66" rx="12" fill="#fff" stroke="#c9c2b2"/>
         <text x="64" y="172" text-anchor="middle" class="lbl" fill="#5b5647" style="font-size:9px;letter-spacing:1px">FRONT</text>
         <text x="64" y="203" text-anchor="middle" class="lbl b" fill="#1a1712" style="font-size:30px">374</text>
-        <rect x="114" y="156" width="94" height="66" rx="12" fill="#eff5ea" stroke="#4a5fae" stroke-width="1.5"/>
+        <rect x="114" y="156" width="94" height="66" rx="12" fill="#e9f1fb" stroke="#4a5fae" stroke-width="1.5"/>
         <text x="161" y="172" text-anchor="middle" class="lbl" fill="#4a5fae" style="font-size:9px;letter-spacing:1px">CENTER</text>
         <text x="161" y="202" text-anchor="middle" class="lbl b" fill="#4a5fae" style="font-size:32px">385</text>
         <text x="161" y="216" text-anchor="middle" class="lbl b" fill="#b45309" style="font-size:8.5px">plays 382 (wind −2)</text>
@@ -260,7 +272,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);
       <ol class="cal">
         <li><b>Tee selector.</b> <span>Tap your tee — the yardage line and the GPS‑OFF start point follow. Red &amp; Green score against women's par.</span></li>
         <li><b>CENTER distance.</b> <span>The big number is yards to the middle of the green. Under it, "plays like" folds in elevation, wind, and your club (e.g. <i>plays 152 · 7i</i>). Tap the box for a side‑profile of the shot.</span></li>
-        <li><b>Map views.</b> <span>SAT aerial · GRN green zoom · PIN today's cup position · <b style="color:#c47f06">★</b> pin a memory to a spot · 3D flyover with an animated tracer.</span></li>
+        <li><b>Map views.</b> <span>SAT aerial · GRN green zoom · PIN today's cup position · <span class="starchip">★</span> pin a memory to a spot · 3D flyover with an animated tracer.</span></li>
         <li><b>Wind arrow.</b> <span>Points where the wind blows relative to the hole; the number is mph. Up = tailwind to the green.</span></li>
         <li><b>You.</b> <span>The glowing gold ball is your GPS position — walk and it walks with you. A pink "finding you…" marker shows until it locks on.</span></li>
         <li><b>Shot tracking.</b> <span>Set the club (7i = 7‑iron), tap SHOT at your ball. The app learns your real distances; long‑press to undo.</span></li>
@@ -275,7 +287,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);
   <hr class="rule">
 
   <!-- ============ SCORECARD SCREEN ============ -->
-  <h2><span class="num">2 ·</span> The scorecard</h2>
+  <h2><span class="num">2 ·</span> The Scorecard</h2>
   <p class="lead">Tap <b>CARD ▸</b> to open your round — styled like the printed club card, with three views along the top.</p>
 
   <div class="sch">
@@ -363,17 +375,19 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);
   <hr class="rule">
 
   <!-- ============ WHAT THE APP REMEMBERS ============ -->
-  <h2><span class="num">3 ·</span> What the app remembers</h2>
+  <h2><span class="num">3 ·</span> What the App Remembers</h2>
   <p class="lead">Most of a golf season disappears. The card gets thrown away, and the shot you'll
   still be describing at Christmas leaves no trace at all. This part of the app exists to catch
   the bits worth keeping — some of it useful, some of it just yours.</p>
 
-  <h3>★ &nbsp;Notes pinned to real places</h3>
-  <p>Tap the gold <b>★</b> above the map. <b>It fills with gold to show it's waiting</b> — that's
+  <h3><span class="starchip">★</span> &nbsp;Notes Pinned to Real Places</h3>
+  <div class="prose">
+  <p>Tap the gold <span class="starchip">★</span> above the map. It fills solid —
+  <span class="starchip armed">★</span> — <b>and that's your cue it's armed</b>; that's
   your cue it's armed. Then tap the spot on the hole you mean. The app asks what happened and
   pins your words to that exact place — not to the hole in general, to the <i>spot</i>. A star
   appears there, and it comes back every time you play the hole, for as long as you keep the app.</p>
-  <p>Tap the ★ a second time if you change your mind; the gold drains away and nothing is
+  <p>Tap it a second time if you change your mind; the gold drains away and nothing is
   pinned.</p>
   <p>Two kinds of thing end up in there. The first is course knowledge that makes you play better
   next season: <i>"never go left here"</i> · <i>"the 7‑iron is short when it's into the wind"</i> ·
@@ -384,7 +398,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);
   <p>Tap any star on the map to read it again, or to remove it. Long stories are fine — the note
   sheet takes a good sentence or two.</p>
 
-  <h3>The line above the distances</h3>
+  <h3>The Line Above the Distances</h3>
   <p>Once you've banked a few rounds, a quiet italic line appears above the yardages on holes
   you've played before — <i>birdied here</i>, or <i>last time: bogey</i>. You never write it;
   it comes out of your own history, and it's the app's way of handing you the hole's record
@@ -402,6 +416,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);
   the app says so plainly rather than losing one quietly.</p>
   <p><b>Save</b> or <b>Print</b> turns the page into something you can keep or hand to somebody.
   It's the one part of the app that isn't about the next shot.</p>
+  </div>
 
   <div class="note"><b>All of it stays on your phone.</b> Notes, photographs and rounds are stored
   on the device and nowhere else — there's no account, no server, and nobody at the club or
@@ -411,30 +426,30 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);
   <hr class="rule">
 
   <!-- ============ GETTING STARTED ============ -->
-  <h2><span class="num">4 ·</span> Getting started</h2>
+  <h2><span class="num">4 ·</span> Getting Started</h2>
 
-  <h3>Install it on your phone (~40 seconds)</h3>
+  <h3>Install It on Your Phone (~40 Seconds)</h3>
   <ol class="steps">
-    <li>Open <a href="https://wbyc-rangefinder.netlify.app">wbyc-rangefinder.netlify.app</a> in <b>Safari</b> (iPhone) or <b>Chrome</b> (Android).</li>
+    <li>Open <b><a href="https://wbyc-rangefinder.netlify.app">wbyc-rangefinder.netlify.app</a></b> in <b>Safari</b> (iPhone) or <b>Chrome</b> (Android).</li>
     <li>Tap <b>Allow</b> when it asks for your location.</li>
     <li>Tap the <b>Share</b> button → <b>Add to Home Screen</b> → Add.</li>
     <li>Launch it from the home‑screen icon after that — full screen, offline, screen stays awake during a round.</li>
   </ol>
 
-  <h3>Your name &amp; your record</h3>
+  <h3>Your Name &amp; Your Record</h3>
   <p>Tap <b>+ your name</b> once (top right) — it signs your card and stays on the device. Then just play: every score and shot saves itself. At the last green, open the card and tap <b>NEW</b> to bank the round — that's the move that builds your trend, bests, and club distances.</p>
 
   <div class="note"><b>Is the GPS working?</b> Outdoors, the status card goes green and reads <b>GPS ±5m</b>, and the gold ball sits where you stand. Before it locks on you'll see a pink <i>finding you…</i> marker — normal. Always open the app from the web link (not an old saved copy), tap Allow for location, and be under open sky.</div>
 
   <!-- ============ EVERY BUTTON ============ -->
-  <h2><span class="num">5 ·</span> Every button</h2>
+  <h2><span class="num">5 ·</span> Every Button</h2>
   <table class="btns">
     <tr><td>‹ ›</td><td>Previous / next hole. The app normally follows you from hole to hole on its own; stepping through by hand pauses that for three minutes so it can't pull you back.</td></tr>
     <tr><td>CARD</td><td>On the hole bar. Opens the scorecard.</td></tr>
     <tr><td>SAT</td><td>Aerial photography under the map.</td></tr>
     <tr><td>GRN</td><td>Zoom to the green — white fall‑line arrows and 1‑ft contours for reading putts.</td></tr>
     <tr><td>PIN</td><td><b>Where the flag is cut today.</b> Every distance in the app is measured to the <i>middle</i> of the green, because that's the only point that's true every day — the cup itself moves, and clubs don't publish where. So when you reach the green and can see the flag, tap PIN and then tap that spot on the map. From then on FRONT / CENTER / BACK, "plays like", the carry rings and the 3D flyover all measure to the real cup instead of the middle: often a two‑club difference on a deep green. It's per hole, so you can set one on the tee if you can see the flag from there. Long‑press PIN to clear it; every pin wipes itself at midnight, so you never play today off yesterday's flag.</td></tr>
-    <tr><td><b style="color:#c47f06">★</b></td><td><b>Leave a note on a spot.</b> Tap the star — it fills gold to show it's armed and waiting — then tap anywhere on the hole. The app asks what happened and pins your words to that exact place. A gold star appears there, and it comes back <i>every time you play this hole</i>, for as long as you keep the app. Tap a star to read it again, or to remove it.<br><br>It's for the things a scorecard can't hold: <i>"drive of my life, 2 August"</i> · <i>"never go left here"</i> · <i>"Dad's par from the trees"</i> · <i>"wind always fools me on this tee"</i>. Some of it is course knowledge that makes you play the hole better next season; some of it is just the round you don't want to forget. Notes are stored on your phone alone — nobody else sees them — and they travel with Export my data if you change phones.</td></tr>
+    <tr><td><span class="starchip">★</span></td><td><b>Leave a note on a spot.</b> Tap the star — it fills gold (<span class="starchip armed">★</span>) to show it's armed and waiting — then tap anywhere on the hole. The app asks what happened and pins your words to that exact place. A gold star appears there, and it comes back <i>every time you play this hole</i>, for as long as you keep the app. Tap a star to read it again, or to remove it.<br><br>It's for the things a scorecard can't hold: <i>"drive of my life, 2 August"</i> · <i>"never go left here"</i> · <i>"Dad's par from the trees"</i> · <i>"wind always fools me on this tee"</i>. Some of it is course knowledge that makes you play the hole better next season; some of it is just the round you don't want to forget. Notes are stored on your phone alone — nobody else sees them — and they travel with Export my data if you change phones.</td></tr>
     <tr><td>3D</td><td>3D terrain flyover with an animated shot tracer (drag to rotate, pinch to zoom, TRACE to replay).</td></tr>
     <tr><td>CENTER box</td><td>Tap the big number to open the side‑profile flight view.</td></tr>
     <tr><td>7i</td><td>Club picker by SHOT (7i = 7‑iron). Drives the carry rings and shot marks.</td></tr>
@@ -448,14 +463,14 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);
   </table>
 
   <!-- ============ GOOD TO KNOW ============ -->
-  <h2><span class="num">6 ·</span> Good to know</h2>
+  <h2><span class="num">6 ·</span> Good to Know</h2>
   <div class="grid">
-    <div class="fc"><h4>Pinch to zoom</h4><p>Two fingers zoom the hole map up to 8× and pan; pinch back out or change holes to snap back.</p></div>
-    <div class="fc"><h4>Ball flight, three ways</h4><p>The pink tracer shows on the hole map, in the tap‑for‑it side profile, and animated over 3D terrain — with yardage stats at the apex.</p></div>
-    <div class="fc"><h4>Carry arcs</h4><p>Dashed rings show your selected club's reach (and its neighbors) from where you stand. They switch to your learned numbers after a few tracked shots.</p></div>
-    <div class="fc"><h4>Reading the green</h4><p>GRN shows a deep‑emerald green with white downhill arrows and 1‑ft contours — read the broad break, not 6‑inch putts.</p></div>
-    <div class="fc"><h4>Tournament‑legal</h4><p>Flip WIND and ± ELEV <b>off</b> for the raw, rules‑legal yardage (USGA Rule 4.3a). Leave both on for everyday golf.</p></div>
-    <div class="fc"><h4>Works offline</h4><p>Installed to your home screen, the app and your record survive with no signal. Live wind needs a connection.</p></div>
+    <div class="fc"><h4>Pinch to Zoom</h4><p>Two fingers zoom the hole map up to 8× and pan; pinch back out or change holes to snap back.</p></div>
+    <div class="fc"><h4>Ball Flight, Three Ways</h4><p>The pink tracer shows on the hole map, in the tap‑for‑it side profile, and animated over 3D terrain — with yardage stats at the apex.</p></div>
+    <div class="fc"><h4>Carry Arcs</h4><p>Dashed rings show your selected club's reach (and its neighbors) from where you stand. They switch to your learned numbers after a few tracked shots.</p></div>
+    <div class="fc"><h4>Reading the Green</h4><p>GRN shows a deep‑emerald green with white downhill arrows and 1‑ft contours — read the broad break, not 6‑inch putts.</p></div>
+    <div class="fc"><h4>Tournament‑Legal</h4><p>Flip WIND and ± ELEV <b>off</b> for the raw, rules‑legal yardage (USGA Rule 4.3a). Leave both on for everyday golf.</p></div>
+    <div class="fc"><h4>Works Offline</h4><p>Installed to your home screen, the app and your record survive with no signal. Live wind needs a connection.</p></div>
   </div>
 
   <div class="note">A little whimsy hides in here for those who explore — long‑press <b>± ELEV</b> to golf on the Moon, for one.</div>
