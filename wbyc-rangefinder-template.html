@@ -774,6 +774,8 @@ const holeHcp=h=> tee==='Green' ? (h.handicap_index_women_green ?? h.handicap_in
              : h.handicap_index;
 const fmtDiff=d=> d===0 ? 'E' : (d>0?'+':'')+d;
 function cardTotals(){
+  // fwH/fwT are still computed and banked so archived rounds keep their shape —
+  // the FW logger came off the strip at v118, so nothing DISPLAYS them any more.
   let s=0,p=0,par=0,n=0,fwH=0,fwT=0,gir=0;
   card.holes.forEach((e,i)=>{
     if(e.s>0){
@@ -861,7 +863,7 @@ function blBuild(){
     +`<div class="bl-eyebrow">{{DIARY}} · {{BRAND}}</div><div class="bl-date">${dateStr}</div><div class="bl-who">${who}</div></div>${condHtml}</div>`
     +`<div class="bl-sec">The Score</div>`
     +`<div class="bl-band"><div class="bl-score">${t.s}</div><div class="bl-vs">${vsTxt}${thru}</div>`
-    +`<div class="bl-chips"><span class="bl-chip">${t.p} putts</span><span class="bl-chip">${t.fwH}/${t.fwT} fairways</span><span class="bl-chip">${t.gir} greens</span></div></div>`
+    +`<div class="bl-chips"><span class="bl-chip">${t.p} putts</span><span class="bl-chip">${t.gir} greens</span></div></div>`
     +`<div class="bl-sec">The Card</div>${strip}`
     +`<div class="bl-sec">The Moments</div><div class="bl-cols"><div class="bl-moments">${moms}</div>${map}</div>`
     +noteHtml+stickers
@@ -883,21 +885,20 @@ function renderCard(){
   const row=i=>{
     const h=course.holes[i], e=card.holes[i], hp=holePar(h);
     return `<tr class="${i===holeIdx?'cur':''}" data-h="${i}"><td>${h.hole_number}</td><td>${hp}</td>`
-      +`<td>${e.s||''}</td><td>${e.p||''}</td>`   // raw score only — no per-hole +/- delta
-      +`<td>${hp===3?'—':e.f===true?'✓':e.f===false?'✗':''}</td></tr>`;
+      +`<td>${e.s||''}</td><td>${e.p||''}</td></tr>`;   // raw score only — no per-hole +/- delta
   };
   const half=(a,b,label)=>{
     let s=0,p=0,par=0;
     for(let i=a;i<b;i++){ par+=holePar(course.holes[i]); const e=card.holes[i]; if(e.s>0){s+=e.s;p+=e.p;} }
-    return `<tr class="tot"><td>${label}</td><td>${par}</td><td>${s||''}</td><td>${p||''}</td><td></td></tr>`;
+    return `<tr class="tot"><td>${label}</td><td>${par}</td><td>${s||''}</td><td>${p||''}</td></tr>`;
   };
-  let html='<table class="cardt"><tr><th>HOLE</th><th>PAR</th><th>SCORE</th><th>PUTTS</th><th>FW</th></tr>';
+  let html='<table class="cardt"><tr><th>HOLE</th><th>PAR</th><th>SCORE</th><th>PUTTS</th></tr>';
   for(let i=0;i<9;i++) html+=row(i);  html+=half(0,9,'OUT');
   for(let i=9;i<18;i++) html+=row(i); html+=half(9,18,'IN'); html+=half(0,18,'TOTAL');
   $('sctab').innerHTML=html+'</table>';
   const t=cardTotals();
   $('scstats').textContent = t.n
-    ? `${t.n} holes · ${t.s} strokes · ${t.p} putts · FW ${t.fwH}/${t.fwT} · GIR ${t.gir}`
+    ? `${t.n} holes · ${t.s} strokes · ${t.p} putts · GIR ${t.gir}`
     : 'no scores yet — use the +/− strip on any hole · tap a row to jump there';
 }
 function renderClubs(){
@@ -922,10 +923,10 @@ function renderStats(){
   }
   const row=r=>`<tr><td>${r.date}</td><td>${r.tee}</td>`
     +`<td>${r.s}${r.n===18?` <small>${fmtDiff(r.s-r.par)}</small>`:` <small>(${r.n}h)</small>`}</td>`
-    +`<td>${r.p||''}</td><td>${r.fwT?Math.round(100*r.fwH/r.fwT)+'%':''}</td><td>${r.gir||''}</td></tr>`;
-  html+='<table><tr><th>DATE</th><th>TEE</th><th>SCORE</th><th>PUTTS</th><th>FW</th><th>GIR</th></tr>'
+    +`<td>${r.p||''}</td><td>${r.gir||''}</td></tr>`;
+  html+='<table><tr><th>DATE</th><th>TEE</th><th>SCORE</th><th>PUTTS</th><th>GIR</th></tr>'
     +(rounds.length ? rounds.slice().reverse().slice(0,20).map(row).join('')
-                    : '<tr><td colspan="6" style="text-align:center;color:var(--dim)">no rounds banked yet — finish a round, then tap NEW to save it here</td></tr>')
+                    : '<tr><td colspan="5" style="text-align:center;color:var(--dim)">no rounds banked yet — finish a round, then tap NEW to save it here</td></tr>')
     +'</table>';
   $('sctab').innerHTML=html;
   if(full.length){
@@ -2215,7 +2216,7 @@ function init(data){
   });
   ['pointerup','pointerleave','pointercancel'].forEach(ev=>wb.addEventListener(ev,()=>clearTimeout(wlpTimer)));
   windUI(); fetchWind(); setInterval(fetchWind, 15*60*1000);
-  // SCORECARD: +/− strip, FW cycle, full-card overlay
+  // SCORECARD: +/− strip, full-card overlay
   const bump=(k,d)=>{ const e=card.holes[holeIdx]; e[k]=Math.max(0,Math.min(15,(e[k]||0)+d)); saveCard(); renderScore(); };
   $('scSp').onclick=()=>bump('s',1);  $('scSm').onclick=()=>bump('s',-1);
   $('scPp').onclick=()=>bump('p',1);  $('scPm').onclick=()=>bump('p',-1);

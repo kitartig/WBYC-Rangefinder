@@ -115,8 +115,5 @@ of it either.
   shots, notes and clubs. Capped at 4 per round, downscaled to 900px/q0.62, with
   a visible budget and an explicit quota error. IndexedDB is the durable answer
   when it fills.
-- **A fairways chip with no way to fill it.** The FW logger came off the score
-  strip at v118, but the keepsake still shows `0/N fairways` and the scorecard
-  footer still prints `FW n/m`. Either drop both readouts or put the logger back.
 - **The tour video predates memories and keepsake photographs**, so it shows the
   old flow. Re-shoot lives with Back Pocket now.
