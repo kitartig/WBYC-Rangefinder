@@ -291,6 +291,33 @@
   #bearlog .bl-bear:before{content:"\201C";position:absolute;top:2px;left:20px;font-family:'EB Garamond',serif;font-size:60px;line-height:1;color:#2fb0a8;opacity:.55}
   #bearlog .bl-bear .bl-sig{display:block;font-family:-apple-system,sans-serif;font-size:13px;color:#6b6350;margin-top:8px;font-style:normal;letter-spacing:1px}
   #bearlog .bl-foot{border-top:1px solid #e5dbc4;margin-top:20px;padding-top:12px;text-align:center;font-family:-apple-system,sans-serif;font-size:11px;color:#6b6350;letter-spacing:.6px}
+  /* ---- keepsake on a phone ----
+     The page was laid out at its 620px desktop max-width. The masthead needs
+     ~567px of that (crest 212 + nowrap date 250 + nowrap conditions 94 + gaps)
+     while a phone offers 260–370px, and .bl-t has min-width:0 — so the date,
+     being nowrap, spilled straight off the right edge instead of wrapping.
+     Below 560px the masthead stacks and every fixed width gives way. */
+  @media(max-width:560px){
+    #bearlog .bl-page{padding:18px 16px 22px;border-radius:14px}
+    #bearlog .bl-page:before{inset:7px;border-radius:10px}
+    #bearlog .bl-mast{flex-wrap:wrap;gap:2px}
+    #bearlog .bl-mast img{width:170px;margin-top:-12px;margin-left:-18px}
+    #bearlog .bl-eyebrow{white-space:normal}
+    #bearlog .bl-date{font-size:26px;white-space:normal;margin-top:6px}
+    #bearlog .bl-who{margin-top:6px}
+    #bearlog .bl-cond{flex:1 1 100%;text-align:left;margin-top:6px}
+    #bearlog .bl-band{flex-wrap:wrap;gap:8px}
+    #bearlog .bl-score{font-size:52px}
+    #bearlog .bl-chips{margin-left:0;justify-content:flex-start;width:100%}
+    #bearlog table.bl-hs{font-size:11px}
+    #bearlog table.bl-hs .bl-lab{width:30px;font-size:9.5px}
+    #bearlog .bl-mk{width:20px;height:20px}
+    #bearlog .bl-cols{gap:12px}
+    #bearlog .bl-map{flex:1 1 100%}
+    #bearlog .bl-map svg{width:100%;max-width:260px}
+    #bearlog .bl-note{padding:14px 16px;font-size:17px}
+    #bearlog .bl-bear{padding:24px 18px 16px;font-size:16.5px}
+  }
   @media print{ body>*{display:none!important} #bearlog{display:block!important;position:static;background:#fff} #bearlog .bl-bar{display:none!important} #bearlog .bl-page{box-shadow:none;border:none;margin:0} }
   #scbar{display:flex;justify-content:space-between;align-items:center;padding:0 2px 4px;position:relative;z-index:2;flex-wrap:wrap;gap:4px}
   #scbar>span:last-child{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px;margin-left:auto}
