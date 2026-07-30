@@ -201,6 +201,12 @@ setTimeout(()=>{
       globalThis.confirm=()=>true; card=blankCard();
       return kept;
     })());
+    A('today() is the LOCAL date, not UTC', (()=>{
+      const d=new Date();
+      const local=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      return today()===local;
+    })());
+    A('a new card is stamped with the local date', blankCard().start===today());
     A('tap opens the memory sheet', elems['rfMemSheet'].classList.contains('open'));
       A('nothing written before the sheet is confirmed', memories.length===0);
       A('memory disarms after placing', memArm===false);

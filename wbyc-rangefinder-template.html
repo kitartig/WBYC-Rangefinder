@@ -326,6 +326,10 @@
   #scBrand{font-size:10px;font-weight:800;letter-spacing:1.4px}
   #scbar button{background:#ffffff;border:1px solid #cfc3a2;color:#1b3a66;border-radius:8px;
     padding:6px 9px;font-size:10.5px;font-weight:700;cursor:pointer;margin-left:0;white-space:nowrap}
+  /* the one button that commits something — sized and coloured to say so */
+  #scNew{background:#1b3a66;color:#fffdf7;border-color:#1b3a66;font-size:12.5px;
+    padding:9px 16px;letter-spacing:.4px}
+  #scNew:active{background:#12294a}
   #scClose{min-width:46px;min-height:40px;font-size:20px !important;font-weight:900 !important;line-height:1;padding:6px 10px !important}
   #scbar button{touch-action:manipulation}
   #scLogoWrap{text-align:center;padding:0;pointer-events:none} /* negative logo margins overlap scbar — must not steal taps from ✕ */
@@ -483,7 +487,7 @@
 
 <div id="scorecard">
   <div id="scbar"><span id="scTitleWrap"><span id="scBrand">{{BRAND}}</span><span id="scTitle">SCORECARD</span></span>
-    <span><button id="scStats">STATS</button><button id="scClubs">CLUB TRACKS</button><button id="scPost" title="Copy hole-by-hole scores and open GHIN">POST to GHIN</button><button id="scNew" title="Bank this round to your history and start fresh">NEW</button><button id="scClose">✕</button></span></div>
+    <span><button id="scStats">STATS</button><button id="scClubs">CLUB TRACKS</button><button id="scPost" title="Copy hole-by-hole scores and open GHIN">POST to GHIN</button><button id="scNew" title="Save this round to your history and start a fresh card">SAVE ROUND</button><button id="scClose">✕</button></span></div>
   <div id="scLogoWrap"><img id="scLogo" alt=""></div>
   <div id="sctab"></div>
   <button id="bearBtn" title="Open your round keepsake">{{DIARY_BUTTON}}</button>
@@ -742,7 +746,11 @@ const CLUBS=['D','3W','5W','3H','4i','5i','6i','7i','8i','9i','PW','GW','SW','LW
 let shots=[]; try{ shots=JSON.parse(localStorage.getItem('{{STORE}}_shots'))||[]; }catch(e){}
 const saveShots=()=>localStorage.setItem('{{STORE}}_shots', JSON.stringify(shots));
 let curClub=localStorage.getItem('{{STORE}}_club'); if(!CLUBS.includes(curClub)) curClub='7i';
-const today=()=>new Date().toISOString().slice(0,10);
+// LOCAL date, not UTC. toISOString() is UTC, so in Minnesota (UTC-5/-6) every
+// round played after 7pm was stamped with TOMORROW's date — Kit's export at
+// 10:29pm on the 29th carried a card dated the 30th. Also keys notes, keepsake
+// photographs and pin expiry, all of which were rolling over mid-evening.
+const today=()=>{ const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10); };
 function markShot(){
   const p=playerPos(); if(!p) return;
   shots.push({d:today(), h:hole().hole_number, lat:p.lat, lng:p.lng, t:Date.now(), club:curClub});
@@ -787,7 +795,7 @@ function suggestClub(distYds){ // closest learned median within 25 yds, needs >=
 }
 
 /* ============ SCORECARD ============ */
-const blankCard=()=>({start:new Date().toISOString().slice(0,10), holes:Array.from({length:18},()=>({s:0,p:0,f:null}))});
+const blankCard=()=>({start:today(), holes:Array.from({length:18},()=>({s:0,p:0,f:null}))});
 let rounds=[]; try{ rounds=JSON.parse(localStorage.getItem('{{STORE}}_rounds'))||[]; }catch(e){}
 const saveRounds=()=>localStorage.setItem('{{STORE}}_rounds', JSON.stringify(rounds));
 function archiveRound(){ // bank the current card into history (called before NEW ROUND clears it)
@@ -2338,7 +2346,7 @@ function init(data){
     };
     r.readAsText(f); e.target.value='';
   };
-  $('scNew').onclick=()=>{ if(confirm('Start a new round? This card will be saved to your history.')){ archiveRound(); card=blankCard(); saveCard(); scShow(); renderScore(); } };
+  $('scNew').onclick=()=>{ if(confirm('Save this round to your history and start a fresh card?')){ archiveRound(); card=blankCard(); saveCard(); scShow(); renderScore(); } };
   $('sctab').onclick=ev=>{ // tap a hole row to jump there
     const tr=ev.target && ev.target.closest ? ev.target.closest('tr[data-h]') : null;
     if(!tr) return;
