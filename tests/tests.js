@@ -179,6 +179,28 @@ setTimeout(()=>{
       elems['memBtn'].onclick();
       return memArm===false && !elems['memBtn'].classList.contains('on');
     })());
+    // a card left open from an earlier day used to keep claiming that date
+    A('an untouched card from an earlier day re-dates itself', (()=>{
+      staleAsked=false; card=blankCard(); card.start='2020-01-01';
+      const r=staleCardChecked();
+      return r===true && card.start===today();
+    })());
+    A('a scored card from an earlier day banks when confirmed', (()=>{
+      staleAsked=false; const before=rounds.length;
+      card=blankCard(); card.start='2020-01-01'; card.holes[0]={s:5,p:2,f:null};
+      globalThis.confirm=()=>true;
+      staleCardChecked();
+      return rounds.length===before+1 && card.start===today() && !card.holes.some(e=>e.s>0);
+    })());
+    A('declining keeps the old card exactly as it was', (()=>{
+      staleAsked=false; const before=rounds.length;
+      card=blankCard(); card.start='2020-01-01'; card.holes[0]={s:5,p:2,f:null};
+      globalThis.confirm=()=>false;
+      staleCardChecked();
+      const kept = rounds.length===before && card.start==='2020-01-01' && card.holes[0].s===5;
+      globalThis.confirm=()=>true; card=blankCard();
+      return kept;
+    })());
     A('tap opens the memory sheet', elems['rfMemSheet'].classList.contains('open'));
       A('nothing written before the sheet is confirmed', memories.length===0);
       A('memory disarms after placing', memArm===false);

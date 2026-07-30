@@ -339,6 +339,14 @@
     border-bottom:1px solid #bcd6f2;border-right:1px solid #e2eefb}
   #sctab th:last-child,#sctab td:last-child{border-right:none}
   #sctab tr:last-child td{border-bottom:none}
+  /* overflow:hidden does NOT clip cell backgrounds on a border-collapse:separate
+     table in WebKit, so the white td's squared off the rounded blue frame and
+     bled past it at the corners. Round the corner cells themselves instead.
+     12.5px = the table's 14px radius minus its 1.5px border. */
+  #sctab table tr:first-child th:first-child{border-top-left-radius:12.5px}
+  #sctab table tr:first-child th:last-child{border-top-right-radius:12.5px}
+  #sctab table tr:last-child td:first-child{border-bottom-left-radius:12.5px}
+  #sctab table tr:last-child td:last-child{border-bottom-right-radius:12.5px}
   #sctab th{color:#4a6ea8;font-weight:700;font-size:12px;letter-spacing:.6px}
   #sctab td:first-child,#sctab th:first-child{text-align:left;padding-left:10px}
   /* hole-by-hole card: uniform column grid, everything centered */
@@ -788,8 +796,27 @@ function archiveRound(){ // bank the current card into history (called before NE
                holes:card.holes.map(e=>({s:e.s,p:e.p,f:e.f}))});
   saveRounds();
 }
+// A scored card from an earlier day means two rounds are about to merge. Ask once,
+// on the first stroke of the new day. Answering no is safe — the old card just
+// carries on, which is what someone finishing a round after midnight would want.
+let staleAsked=false;
+function staleCardChecked(){
+  if(staleAsked || card.start===today()) return true;
+  if(!card.holes.some(e=>e.s>0)){ card.start=today(); saveCard(); return true; }
+  staleAsked=true;
+  const d=new Date(card.start+'T12:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  const bank = (typeof confirm==='function')
+    && confirm(`This card is still from ${d}.\n\nBank that round to your history and start a fresh one for today?`);
+  if(bank){ archiveRound(); card=blankCard(); saveCard(); renderScore(); renderHoleMemory(); }
+  return true;
+}
+
 let card=blankCard();
 try{ const c=JSON.parse(localStorage.getItem('{{STORE}}_card')); if(c&&c.holes&&c.holes.length===18) card=c; }catch(e){}
+// card.start is stamped once at creation and nothing used to refresh it, so a card
+// left open from an earlier day claimed that old date forever — the keepsake read
+// "Sunday" for a round played today. An EMPTY stale card silently becomes today's.
+if(card.start!==today() && !card.holes.some(e=>e.s>0)) card.start=today();
 const saveCard=()=>localStorage.setItem('{{STORE}}_card', JSON.stringify(card));
 let notes={}; try{ notes=JSON.parse(localStorage.getItem('{{STORE}}_notes'))||{}; }catch(e){}   // per-round memento lines for The {{DIARY_SHORT}}, keyed by date
 const saveNotes=()=>localStorage.setItem('{{STORE}}_notes', JSON.stringify(notes));
@@ -2244,7 +2271,9 @@ function init(data){
   ['pointerup','pointerleave','pointercancel'].forEach(ev=>wb.addEventListener(ev,()=>clearTimeout(wlpTimer)));
   windUI(); fetchWind(); setInterval(fetchWind, 15*60*1000);
   // SCORECARD: +/− strip, full-card overlay
-  const bump=(k,d)=>{ const e=card.holes[holeIdx]; e[k]=Math.max(0,Math.min(15,(e[k]||0)+d)); saveCard(); renderScore(); };
+  const bump=(k,d)=>{
+    if(!staleCardChecked()) return;              // may bank yesterday's round first
+    const e=card.holes[holeIdx]; e[k]=Math.max(0,Math.min(15,(e[k]||0)+d)); saveCard(); renderScore(); };
   $('scSp').onclick=()=>bump('s',1);  $('scSm').onclick=()=>bump('s',-1);
   $('scPp').onclick=()=>bump('p',1);  $('scPm').onclick=()=>bump('p',-1);
   let scMode='card';
