@@ -168,7 +168,18 @@ setTimeout(()=>{
       // tap somewhere on the map — unrot maps client point to a lat/lng near the hole
       mapTap({clientX:150,clientY:150});
       // the note is now captured by an in-app sheet, not window.prompt()
-      A('tap opens the memory sheet', elems['rfMemSheet'].classList.contains('open'));
+      // the star once armed silently: a white ring on a white border, so the button
+    // looked dead. Assert the class the CSS hangs the armed look on, not just the flag.
+    A('star button arms, and says so in a class the CSS can see', (()=>{
+      memArm=false; elems['memBtn'].classList.remove('on');
+      elems['memBtn'].onclick();
+      return memArm===true && elems['memBtn'].classList.contains('on');
+    })());
+    A('star button disarms on a second tap', (()=>{
+      elems['memBtn'].onclick();
+      return memArm===false && !elems['memBtn'].classList.contains('on');
+    })());
+    A('tap opens the memory sheet', elems['rfMemSheet'].classList.contains('open'));
       A('nothing written before the sheet is confirmed', memories.length===0);
       A('memory disarms after placing', memArm===false);
       elems['rfMemText'].value='chip-in from the fringe';
