@@ -13,13 +13,14 @@ def bear(cx, baseline, h):
             f'<path d="{BEAR}" fill="#ffffff" stroke="{NAVY}" stroke-width="{1.15/s:.2f}" '
             f'stroke-linejoin="round" paint-order="stroke"/></g>')
 
-def wings(cx, cy, h=40, ky=1.0):
-    """Kit's traced sketch. ky narrows the wing ACROSS ITS OWN LONG AXIS — rotate
-    the drawing flat, squash in y, rotate back — rather than squashing the frame's
-    y, which just flattens the diagonal and turns it into a streak."""
+def wings(cx, cy, h=40, kx=1.0):
+    """Kit's traced sketch, CONDENSED — narrowed on x while keeping full height,
+    like condensed type, so it stands tall and thick. (Earlier passes squashed y,
+    or squashed across the wing's own axis; both made it flatter, which is the
+    opposite of what's wanted.)"""
     sc=h/100.0
-    return (f'<g transform="translate({cx:.2f},{cy:.2f}) rotate({WANG:.2f}) scale(1,{ky:.3f}) '
-            f'rotate({-WANG:.2f}) translate({-WW*sc/2:.2f},{-h/2:.2f}) scale({sc:.4f})">'
+    return (f'<g transform="translate({cx:.2f},{cy:.2f}) scale({kx:.3f},1) '
+            f'translate({-WW*sc/2:.2f},{-h/2:.2f}) scale({sc:.4f})">'
             f'<path d="{WING}" fill="{GOLD}" stroke="{NAVY}" stroke-width="{0.7/sc:.2f}" '
             f'vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g>')
 
@@ -46,8 +47,8 @@ GRADS = {
  'g-sun':  [('0%','#f2ffa8'),('50%','#c2ee63'),('100%','#5cb861')],
 }
 SET=[
- dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx-12, cy-4, 34, 0.55) + bear(cx, cy+23, 42)),
- dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx, cy-31) + bear(cx, cy+25, 40)),
+ dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx-9, cy-6, 46, 0.55) + bear(cx, cy+23, 42)),
+ dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx, cy-31) + bear(cx, cy+27, 40)),
  dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+1, cy-21, 17) + bear(cx, cy+22.5, 41)),
 ]
 
