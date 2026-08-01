@@ -10,7 +10,7 @@ NAVY='#1638a8'; GOLD='#ffd257'
 def bear(cx, baseline, h):
     s=h/BH
     return (f'<g transform="translate({cx-BW*s/2:.2f},{baseline-h:.2f}) scale({s:.4f})">'
-            f'<path d="{BEAR}" fill="#ffffff" stroke="{NAVY}" stroke-width="{1.15/s:.2f}" '
+            f'<path d="{BEAR}" fill="#ffffff" stroke="{NAVY}" stroke-width="{0.75/s:.2f}" '
             f'stroke-linejoin="round" paint-order="stroke"/></g>')
 
 def wings(cx, cy, h=40, kx=1.0, root=None):
