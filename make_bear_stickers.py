@@ -68,7 +68,7 @@ GRADS = {
  'g-bird': [('0%','#ff4fd0'),('55%','#d95fe4'),('100%','#a56ae0')],
  'g-rain': [('0%','#c3ecff'),('55%','#7cc2ee'),('100%','#4a8fd0')],
  'g-sun':  [('0%','#f2ffa8'),('50%','#c2ee63'),('100%','#5cb861')],
- 'g-drive':[('0%','#ffe98a'),('50%','#ffb3d1'),('100%','#f26fae')],
+ 'g-drive':[('0%','#f26fae'),('50%','#ffb3d1'),('100%','#ffe98a')],
 }
 SET=[
  dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx, cy-4, 18, 1.0, root=cx-8.2) + bear(cx, cy+23, 42)),
