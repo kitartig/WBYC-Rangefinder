@@ -8,33 +8,36 @@ NAVY='#1638a8'; GOLD='#ffd257'
 def bear(cx, baseline, h):
     s=h/BH
     return (f'<g transform="translate({cx-BW*s/2:.2f},{baseline-h:.2f}) scale({s:.4f})">'
-            f'<path d="{BEAR}" fill="#ffffff" stroke="{NAVY}" stroke-width="{2.0/s:.2f}" '
+            f'<path d="{BEAR}" fill="#ffffff" stroke="{NAVY}" stroke-width="{1.15/s:.2f}" '
             f'stroke-linejoin="round" paint-order="stroke"/></g>')
 
 def wings(cx, cy):
-    """Both wings on the bear's back — its LEFT in frame, since it faces right.
-    Long enough to read as wings: a swept leading edge out to a tip, then three
-    scallops back along the trailing edge."""
-    def w(ax, ay, span, rise, sc):
-        tipx, tipy = ax-span, ay-rise
-        s1x, s1y = ax-span*0.68, ay-rise*0.30
-        s2x, s2y = ax-span*0.44, ay-rise*0.10
-        s3x, s3y = ax-span*0.20, ay+rise*0.06
-        return (f'<path d="M{ax:.1f} {ay:.1f} '
-                f'C{ax-span*0.30:.1f} {ay-rise*0.55:.1f} {ax-span*0.72:.1f} {ay-rise*0.98:.1f} {tipx:.1f} {tipy:.1f} '
-                f'Q{s1x+span*0.10:.1f} {s1y-rise*0.10:.1f} {s1x:.1f} {s1y:.1f} '
-                f'Q{s2x+span*0.10:.1f} {s2y-rise*0.16:.1f} {s2x:.1f} {s2y:.1f} '
-                f'Q{s3x+span*0.09:.1f} {s3y-rise*0.16:.1f} {s3x:.1f} {s3y:.1f} Z" '
-                f'fill="{GOLD}" stroke="{NAVY}" stroke-width="{1.2*sc:.1f}" stroke-linejoin="round"/>')
-    return w(cx-1, cy+9, 27, 25, 1) + w(cx-3, cy+14, 22, 18, 1)
+    """Built from overlapping feathers rather than one outline — a single path
+    kept collapsing into a quill shape. Five teardrops fanned from the shoulder,
+    longest at the top, each a rotated ellipse-with-a-point."""
+    import math
+    ax, ay = cx+4, cy+16                       # shoulder pivot
+    out=[]
+    for i,(ang,L,Wd) in enumerate([(-108,34,7.5),(-96,31,7.2),(-84,27,6.8),(-72,22,6.2),(-60,17,5.6)]):
+        a=math.radians(ang)
+        tx,ty = ax+math.cos(a)*L, ay+math.sin(a)*L
+        # perpendicular offset for the feather's belly
+        px,py = math.cos(a+math.pi/2)*Wd, math.sin(a+math.pi/2)*Wd
+        out.append(
+          f'<path d="M{ax:.1f} {ay:.1f} '
+          f'C{ax+px*0.9:.1f} {ay+py*0.9:.1f} {tx+px*0.75:.1f} {ty+py*0.75:.1f} {tx:.1f} {ty:.1f} '
+          f'C{tx-px*0.75:.1f} {ty-py*0.75:.1f} {ax-px*0.9:.1f} {ay-py*0.9:.1f} {ax:.1f} {ay:.1f} Z" '
+          f'fill="{GOLD}" stroke="{NAVY}" stroke-width=".95" stroke-linejoin="round"/>')
+    return ''.join(out)
 
-def umbrella(cx, top, r=13):
-    return (f'<g stroke="{NAVY}" stroke-width="1.2" stroke-linejoin="round">'
-            f'<path d="M{cx-r} {top+r*0.52} A{r} {r} 0 0 1 {cx+r} {top+r*0.52} '
-            f'Q{cx+r*0.66} {top+r*0.28} {cx+r*0.33} {top+r*0.52} '
-            f'Q{cx} {top+r*0.28} {cx-r*0.33} {top+r*0.52} '
-            f'Q{cx-r*0.66} {top+r*0.28} {cx-r} {top+r*0.52} Z" fill="{GOLD}"/>'
-            f'<path d="M{cx} {top+r*0.52} V{top+r*2.0}" stroke-linecap="round" fill="none"/></g>')
+def umbrella(cx, top, rx=15.5, ry=9.5):
+    """flattened canopy — wider than tall"""
+    return (f'<g stroke="{NAVY}" stroke-width="1.05" stroke-linejoin="round">'
+            f'<path d="M{cx-rx} {top+ry} A{rx} {ry} 0 0 1 {cx+rx} {top+ry} '
+            f'Q{cx+rx*0.66:.1f} {top+ry*0.55:.1f} {cx+rx*0.33:.1f} {top+ry} '
+            f'Q{cx} {top+ry*0.55:.1f} {cx-rx*0.33:.1f} {top+ry} '
+            f'Q{cx-rx*0.66:.1f} {top+ry*0.55:.1f} {cx-rx} {top+ry} Z" fill="{GOLD}"/>'
+            f'<path d="M{cx} {top+ry} V{top+ry+17}" stroke-linecap="round" fill="none"/></g>')
 
 def sunburst(cx, cy, r=20):
     import math
@@ -50,9 +53,9 @@ GRADS = {
  'g-sun':  [('0%','#ffe9a8'),('50%','#ffb020'),('100%','#f2600c')],
 }
 SET=[
- dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx-1, cy-8) + bear(cx+5, cy+23, 46)),
- dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx+3, cy-26) + bear(cx-1, cy+23, 44)),
- dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+2, cy-9) + bear(cx, cy+23, 46)),
+ dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx-7, cy-8) + bear(cx+7, cy+22, 42)),
+ dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx+3, cy-27) + bear(cx-1, cy+22, 41)),
+ dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+2, cy-17) + bear(cx, cy+22, 43)),
 ]
 
 def defs():
@@ -73,7 +76,7 @@ def sheet(scale, y0, label):
         out.append(f'<g transform="translate({cx},{cy}) scale({scale})">'
                    f'<circle cx="0" cy="0" r="34" fill="url(#{s["grad"]})"/>'
                    f'<g clip-path="url(#cl{i})">{s["art"](0,0)}</g>'
-                   f'<circle cx="0" cy="0" r="34" fill="none" stroke="{NAVY}" stroke-width="2.4"/></g>')
+                   f'<circle cx="0" cy="0" r="34" fill="none" stroke="{NAVY}" stroke-width="1.6"/></g>')
         out.append(f'<text x="{cx}" y="{cy+r+15*min(scale,1.3):.0f}" text-anchor="middle" font-family="DejaVu Sans" '
                    f'font-size="{10*min(scale,1.3):.0f}" font-weight="bold" letter-spacing=".4" fill="{NAVY}">{s["cap"]}</text>')
     return ''.join(out), top+r*2+30*min(scale,1.4)
