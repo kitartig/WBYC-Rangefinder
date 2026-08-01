@@ -4,6 +4,7 @@ navy keyline, gold props, three gradient fields, navy rule."""
 import cairosvg
 BEAR=open('bear-path.txt').read(); BW=float(open('bear-vb.txt').read()); BH=100.0
 WING=open('wing-path.txt').read(); WW=float(open('wing-vb.txt').read())
+WANG=float(open('wing-angle.txt').read())   # the drawing's long axis
 NAVY='#1638a8'; GOLD='#ffd257'
 
 def bear(cx, baseline, h):
@@ -13,12 +14,14 @@ def bear(cx, baseline, h):
             f'stroke-linejoin="round" paint-order="stroke"/></g>')
 
 def wings(cx, cy, h=40, ky=1.0):
-    """Kit's own drawing, traced. Seven attempts at generating a wing from curves
-    never read as one; the hand-drawn shape does immediately."""
+    """Kit's traced sketch. ky narrows the wing ACROSS ITS OWN LONG AXIS — rotate
+    the drawing flat, squash in y, rotate back — rather than squashing the frame's
+    y, which just flattens the diagonal and turns it into a streak."""
     sc=h/100.0
-    return (f'<g transform="translate({cx-WW*sc/2:.2f},{cy-h*ky/2:.2f}) scale({sc:.4f},{sc*ky:.4f})">'
-            f'<path d="{WING}" fill="{GOLD}" stroke="{NAVY}" stroke-width="{0.7/sc:.2f}" vector-effect="non-scaling-stroke" '
-            f'stroke-linejoin="round"/></g>')
+    return (f'<g transform="translate({cx:.2f},{cy:.2f}) rotate({WANG:.2f}) scale(1,{ky:.3f}) '
+            f'rotate({-WANG:.2f}) translate({-WW*sc/2:.2f},{-h/2:.2f}) scale({sc:.4f})">'
+            f'<path d="{WING}" fill="{GOLD}" stroke="{NAVY}" stroke-width="{0.7/sc:.2f}" '
+            f'vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g>')
 
 def umbrella(cx, top, rx=15.5, ry=9.5):
     """flattened canopy — wider than tall"""
@@ -38,12 +41,12 @@ def sunburst(cx, cy, r=20, ink="#fff36b"):
     return f'<circle cx="{cx}" cy="{cy}" r="{r*0.5:.1f}" fill="{ink}"/>'+rays
 
 GRADS = {
- 'g-bird': [('0%','#ff9ceb'),('55%','#e46fe0'),('100%','#a56ae0')],
+ 'g-bird': [('0%','#ff4fd0'),('55%','#d95fe4'),('100%','#a56ae0')],
  'g-rain': [('0%','#c3ecff'),('55%','#7cc2ee'),('100%','#4a8fd0')],
  'g-sun':  [('0%','#f2ffa8'),('50%','#c2ee63'),('100%','#5cb861')],
 }
 SET=[
- dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx-12, cy-2, 34, 0.28) + bear(cx, cy+23, 42)),
+ dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx-12, cy-4, 34, 0.55) + bear(cx, cy+23, 42)),
  dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx, cy-31) + bear(cx, cy+25, 40)),
  dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+1, cy-21, 17) + bear(cx, cy+22.5, 41)),
 ]
