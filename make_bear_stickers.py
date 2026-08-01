@@ -4,6 +4,7 @@ navy keyline, gold props, three gradient fields, navy rule."""
 import cairosvg
 BEAR=open('bear-path.txt').read(); BW=float(open('bear-vb.txt').read()); BH=100.0
 WING=open('wing-path.txt').read(); WW=float(open('wing-vb.txt').read())
+CLUB=open('club-path.txt').read(); CW=float(open('club-vb.txt').read())
 WANG=float(open('wing-angle.txt').read())   # the drawing's long axis
 NAVY='#1638a8'; GOLD='#ffd257'
 
@@ -26,28 +27,13 @@ def wings(cx, cy, h=40, kx=1.0, root=None):
             f'vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g>')
 
 
-def club(bx, by, L=22, ang=238, w=2.6, hl=8.4, hh=5.0):
-    """Over the shoulder. Head is a bun: flat face along the bottom, domed back,
-    built from a cubic rather than an elliptical arc (the arc rendered as a
-    scoop). hl = face length, hh = dome height."""
-    import math
-    a=math.radians(ang)
-    tx,ty = bx+math.cos(a)*L, by+math.sin(a)*L
-    px,py = math.cos(a+math.pi/2)*w/2, math.sin(a+math.pi/2)*w/2
-    shaft=(f'<path d="M{bx+px:.1f} {by+py:.1f} L{tx+px:.1f} {ty+py:.1f} '
-           f'L{tx-px:.1f} {ty-py:.1f} L{bx-px:.1f} {by-py:.1f} Z" '
-           f'fill="{GOLD}" stroke="{NAVY}" stroke-width=".7" stroke-linejoin="round"/>')
-    ha=a+math.radians(74)                 # along the face, heel -> toe
-    fx,fy = math.cos(ha), math.sin(ha)
-    ux,uy = math.cos(ha-math.pi/2), math.sin(ha-math.pi/2)   # up, into the dome
-    hx,hy = tx+math.cos(a)*0.6, ty+math.sin(a)*0.6           # heel, at the shaft tip
-    ex,ey = hx+fx*hl, hy+fy*hl                                # toe
-    c1x,c1y = ex+ux*hh*1.45, ey+uy*hh*1.45
-    c2x,c2y = hx+ux*hh*1.45, hy+uy*hh*1.45
-    d=(f'M{hx:.1f} {hy:.1f} L{ex:.1f} {ey:.1f} '
-       f'C{c1x:.1f} {c1y:.1f} {c2x:.1f} {c2y:.1f} {hx:.1f} {hy:.1f} Z')
-    head=f'<path d="{d}" fill="{GOLD}" stroke="{NAVY}" stroke-width=".7" stroke-linejoin="round"/>'
-    return shaft+head
+def club(cx, cy, h=30):
+    """Kit's traced club — head and shaft as one drawn silhouette. Placed so the
+    grip end tucks behind the bear's shoulder."""
+    sc=h/100.0
+    return (f'<g transform="translate({cx-CW*sc/2:.2f},{cy-h/2:.2f}) scale({sc:.4f})">'
+            f'<path d="{CLUB}" fill="{GOLD}" stroke="{NAVY}" stroke-width="{0.7/sc:.2f}" '
+            f'vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g>')
 
 def umbrella(cx, top, rx=15.5, ry=9.5):
     """flattened canopy — wider than tall"""
@@ -76,7 +62,7 @@ SET=[
  dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx, cy-4, 18, 1.0, root=cx-8.2) + bear(cx, cy+23, 42)),
  dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx, cy-25) + bear(cx, cy+27, 40)),
  dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+1, cy-21, 17) + bear(cx, cy+22.5, 41)),
- dict(cap='277Y DRIVE', grad='g-drive', art=lambda cx,cy: club(cx-2, cy-2) + bear(cx, cy+23, 42)),
+ dict(cap='277Y DRIVE', grad='g-drive', art=lambda cx,cy: club(cx-14, cy-8, 32) + bear(cx, cy+23, 42)),
 ]
 
 def defs():
