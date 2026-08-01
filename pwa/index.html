@@ -194,9 +194,6 @@
   #d3hint{text-align:center;font-size:10px;color:var(--dim);padding:8px}
   #map{display:block;width:100%;height:auto;max-height:66vh;margin:0 auto;touch-action:manipulation}
   #maphint{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:10px;color:var(--dim);pointer-events:none}
-  #profile{display:none;background:var(--card);border-radius:10px;margin:8px 0 2px;padding:6px 8px 3px}
-  #profile.on{display:block}
-  #profile svg{width:100%;display:block}
   .dist .box.center{cursor:pointer}
 
   .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}
@@ -462,8 +459,6 @@
     <div id="shotbar"><select id="clubSel"></select><button id="shotBtn" title="Mark a shot from your current position. Long-press to undo the last mark.">SHOT</button></div>
     <div id="maphint"></div>
   </div>
-
-  <div id="profile"></div>
 
   <div id="scstrip">
     <span class="grp" title="All strokes on this hole, putts included">TOTAL SCORE
@@ -1087,7 +1082,6 @@ function render(){
   }
   renderHazards(h,p,g);
   renderMap(h,p,tb);
-  renderProfile(h,p);
   renderScore();
 }
 
@@ -1116,60 +1110,6 @@ function renderHazards(h,p,g){
   $('hazList').innerHTML = rows.map(r=>`<div class="hazrow">${r.html}</div>`).join('');
 }
 
-/* ---- flight profile inset: terrain cross-section + trajectory (tap CENTER to toggle) ---- */
-let profOn = localStorage.getItem('wbyc_prof')==='on';
-function renderProfile(h,p){
-  const el=$('profile');
-  const hide=()=>{ el.classList.remove('on'); el.innerHTML=''; };
-  if(!profOn || !p || !TOPO){ hide(); return; }
-  const c=target(h), dTot=yds(p,c);
-  if(dTot<12){ hide(); return; }
-  const N=44, es=[];
-  for(let i=0;i<=N;i++){
-    const t=i/N;
-    es.push(elevFt({lat:p.lat+(c.lat-p.lat)*t, lng:p.lng+(c.lng-p.lng)*t}));
-  }
-  if(es[0]===null || es[N]===null){ hide(); return; }
-  for(let i=1;i<N;i++) if(es[i]===null){ // bridge interior gaps in the grid
-    let j=i+1; while(j<N && es[j]===null) j++;
-    for(let k2=i;k2<j;k2++) es[k2]=es[i-1]+(es[j]-es[i-1])*(k2-i+1)/(j-i+1);
-    i=j;
-  }
-  const dm=dTot*0.9144, apxFt=apexM(dm)/0.3048;
-  const arcAt=t=>es[0]+(es[N]-es[0])*t + apxFt*arcZ(t);
-  let lo=Infinity, hi=-Infinity;
-  for(let i=0;i<=N;i++){
-    if(es[i]<lo)lo=es[i]; if(es[i]>hi)hi=es[i];
-    const az2=arcAt(i/N); if(az2>hi)hi=az2;
-  }
-  const W=340,H=72,pt2=10,pb=8;
-  const sy=(H-pt2-pb)/Math.max(hi-lo,6);
-  const X=i=>(i/N*W).toFixed(1), Y=v=>(H-pb-(v-lo)*sy).toFixed(1);
-  let terr='M0 '+H;
-  for(let i=0;i<=N;i++) terr+=`L${X(i)} ${Y(es[i])}`;
-  terr+=`L${W} ${H}Z`;
-  // green surface span along the line of play
-  const dF=yds(p,h.green.front), dB=yds(p,h.green.back);
-  const t0g=Math.max(0,Math.min(dF,dB)/dTot), t1g=Math.min(1,Math.max(dF,dB)/dTot);
-  let gseg='';
-  for(let i=Math.ceil(t0g*N); i<=Math.floor(t1g*N); i++) gseg+=(gseg?'L':'M')+X(i)+' '+Y(es[i]);
-  let arc='';
-  for(let i=0;i<=N;i++) arc+=(i?'L':'M')+X(i)+' '+Y(arcAt(i/N));
-  const dFt=Math.round(es[N]-es[0]);
-  const pinY=+Y(es[N]);
-  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:${H}px">`
-    +`<path class="pterr" d="${terr}" fill="var(--topo)" fill-opacity=".28" stroke="var(--topo-index)" stroke-width="1" stroke-opacity=".6"/>`
-    +(gseg?`<path d="${gseg}" fill="none" stroke="var(--green-stroke)" stroke-width="2.4" opacity=".9"/>`:'')
-    +`<path class="parc" d="${arc}" fill="none" stroke="${TRACER.main}" stroke-width="3" opacity=".25"/>`
-    +`<path d="${arc}" fill="none" stroke="${TRACER.bright}" stroke-width="1.3" opacity=".95"/>`
-    +`<circle cx="3" cy="${Y(es[0])}" r="2.6" fill="#fff" stroke="#f5b512" stroke-width="1"/>`
-    +`<line x1="${W-2}" y1="${pinY}" x2="${W-2}" y2="${pinY-13}" stroke="var(--fcb)" stroke-width="1.2"/>`
-    +`<path d="M${W-2} ${pinY-13}L${W-9} ${pinY-10.5}L${W-2} ${pinY-8}Z" fill="var(--fcb)"/>`
-    +`<text x="4" y="12" font-size="11" font-weight="700" fill="var(--dim)">${Math.round(dTot)} yds</text>`
-    +`<text x="${W-4}" y="12" text-anchor="end" font-size="11" font-weight="700" fill="var(--dim)">${dFt>=0?'+':''}${dFt} ft</text>`
-    +'</svg>';
-  el.classList.add('on');
-}
 
 /* ---- SVG map ---- */
 let mapTransform=null; // for tap-to-move inverse
@@ -2237,10 +2177,6 @@ function init(data){
     $('memBtn').classList.toggle('on', memArm);
     render();
   };
-  // flight profile inset: tap the CENTER box to toggle
-  const cbx=document.querySelector('.dist .box.center');
-  if(cbx){ cbx.title='tap: side-profile of the shot';
-    cbx.onclick=()=>{ profOn=!profOn; localStorage.setItem('wbyc_prof', profOn?'on':'off'); render(); }; }
   const eb=$('elevBtn');
   eb.classList.toggle('on', elevAdjust && !!TOPO);
   if(!TOPO) eb.style.display='none';

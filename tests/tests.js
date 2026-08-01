@@ -11,16 +11,6 @@ setTimeout(()=>{
     A('arc apex stat present', map().includes('apex '));
     A('apex dot + leader', map().includes('flight-apex'));
     A('ground shadow kept', map().includes('stroke="var(--accent)"'));
-    // profile inset
-    const prof=elems['profile'];
-    A('profile visible', prof.classList.contains('on'));
-    A('profile terrain', prof.innerHTML.includes('pterr'));
-    A('profile trajectory', prof.innerHTML.includes('parc'));
-    A('profile yardage label', / yds/.test(prof.innerHTML));
-    elems['.dist .box.center'].onclick();
-    A('profile toggles off', !elems['profile'].classList.contains('on'));
-    elems['.dist .box.center'].onclick();
-    A('profile toggles back on', elems['profile'].classList.contains('on'));
     // green view: fine contours, small arrows, no arc
     elems['grnBtn'].onclick();
     A('1-ft fine contours render in green view', map().includes('ctrf'));
