@@ -27,11 +27,12 @@ def wings(cx, cy, h=40, kx=1.0, root=None):
             f'vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g>')
 
 
-def club(cx, cy, h=30):
-    """Kit's traced club — head and shaft as one drawn silhouette. Placed so the
-    grip end tucks behind the bear's shoulder."""
+def club(cx, cy, h=20, rot=0):
+    """Kit's traced club. rot slants it — positive lays the shaft down to the
+    right so it rests on the bear's shoulder."""
     sc=h/100.0
-    return (f'<g transform="translate({cx-CW*sc/2:.2f},{cy-h/2:.2f}) scale({sc:.4f})">'
+    return (f'<g transform="translate({cx:.2f},{cy:.2f}) rotate({rot}) '
+            f'translate({-CW*sc/2:.2f},{-h/2:.2f}) scale({sc:.4f})">'
             f'<path d="{CLUB}" fill="{GOLD}" stroke="{NAVY}" stroke-width="{0.7/sc:.2f}" '
             f'vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g>')
 
@@ -62,7 +63,7 @@ SET=[
  dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx, cy-4, 18, 1.0, root=cx-8.2) + bear(cx, cy+23, 42)),
  dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx, cy-25) + bear(cx, cy+27, 40)),
  dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+1, cy-21, 17) + bear(cx, cy+22.5, 41)),
- dict(cap='277Y DRIVE', grad='g-drive', art=lambda cx,cy: club(cx-14, cy-8, 32) + bear(cx, cy+23, 42)),
+ dict(cap='277Y DRIVE', grad='g-drive', art=lambda cx,cy: club(cx-14, cy-15, 22, -45) + bear(cx, cy+23, 42)),
 ]
 
 def defs():
