@@ -12,32 +12,30 @@ def bear(cx, baseline, h):
             f'stroke-linejoin="round" paint-order="stroke"/></g>')
 
 def wings(cx, cy):
-    """Angel-wing anatomy from Kit's reference: a rounded covert shoulder at the
-    TOP, then long primaries sweeping DOWN and out, longest at the back. Overall
-    silhouette is a comma/scythe, not an even fan."""
+    """Angel-wing pose from Kit's reference: covert shoulder LOW, primaries
+    sweeping UP and outward, longest at the top. (I had it inverted — coverts
+    high with primaries falling, which is a folded wing, not a spread one.)"""
     import math
-    sx, sy = cx+6, cy-17                    # shoulder, high on the bear's back
+    sx, sy = cx+7, cy+14                    # shoulder, low on the bear's back
     out=[]
-    # long primaries, drawn back-to-front so the near ones overlap the far ones
-    prim=[(150,34,4.4),(160,31,4.2),(170,27,4.0),(180,22,3.7),(190,17,3.3)]
+    # up-left in SVG's y-down space is 190-240 deg; longest feather highest
+    prim=[(232,34,4.4),(222,31,4.2),(212,27,4.0),(202,22,3.7),(193,17,3.3)]
     for ang,L,Wd in prim:
         a=math.radians(ang)
-        # curve the feather: tip swings further down than a straight ray
-        tx,ty = sx+math.cos(a)*L*0.86, sy+math.sin(a)*L + L*0.30
-        mx,my = sx+math.cos(a)*L*0.52, sy+math.sin(a)*L*0.46 + L*0.04
+        tx,ty = sx+math.cos(a)*L*0.86, sy+math.sin(a)*L - L*0.10
+        mx,my = sx+math.cos(a)*L*0.52, sy+math.sin(a)*L*0.46
         px,py = math.cos(a+math.pi/2)*Wd, math.sin(a+math.pi/2)*Wd
         out.append(
           f'<path d="M{sx:.1f} {sy:.1f} '
           f'C{mx+px:.1f} {my+py:.1f} {tx+px*0.55:.1f} {ty+py*0.55:.1f} {tx:.1f} {ty:.1f} '
           f'C{tx-px*0.55:.1f} {ty-py*0.55:.1f} {mx-px:.1f} {my-py:.1f} {sx:.1f} {sy:.1f} Z" '
           f'fill="{GOLD}" stroke="{NAVY}" stroke-width=".9" stroke-linejoin="round"/>')
-    # covert shoulder: a rounded cap of small scallops over the primaries' roots
-    r=9.5
-    cov=(f'<path d="M{sx+2:.1f} {sy+5:.1f} '
-         f'C{sx+3:.1f} {sy-6:.1f} {sx-6:.1f} {sy-11:.1f} {sx-13:.1f} {sy-8:.1f} '
-         f'Q{sx-9:.1f} {sy-4:.1f} {sx-12:.1f} {sy-1:.1f} '
-         f'Q{sx-7:.1f} {sy+1:.1f} {sx-9:.1f} {sy+4:.1f} '
-         f'Q{sx-4:.1f} {sy+5:.1f} {sx-5:.1f} {sy+8:.1f} Z" '
+    # covert cap over the roots, now sitting UNDER the fan
+    cov=(f'<path d="M{sx+2:.1f} {sy-5:.1f} '
+         f'C{sx+3:.1f} {sy+6:.1f} {sx-6:.1f} {sy+11:.1f} {sx-13:.1f} {sy+8:.1f} '
+         f'Q{sx-9:.1f} {sy+4:.1f} {sx-12:.1f} {sy+1:.1f} '
+         f'Q{sx-7:.1f} {sy-1:.1f} {sx-9:.1f} {sy-4:.1f} '
+         f'Q{sx-4:.1f} {sy-5:.1f} {sx-5:.1f} {sy-8:.1f} Z" '
          f'fill="{GOLD}" stroke="{NAVY}" stroke-width=".9" stroke-linejoin="round"/>')
     return ''.join(out)+cov
 
@@ -59,14 +57,14 @@ def sunburst(cx, cy, r=20):
     return f'<circle cx="{cx}" cy="{cy}" r="{r*0.5:.1f}" fill="{GOLD}"/>'+rays
 
 GRADS = {
- 'g-bird': [('0%','#ff4fd8'),('55%','#c026d3'),('100%','#6d28d9')],
- 'g-rain': [('0%','#7dd3fc'),('55%','#2f7fce'),('100%','#12377f')],
- 'g-sun':  [('0%','#ffe9a8'),('50%','#ffb020'),('100%','#f2600c')],
+ 'g-bird': [('0%','#ff9ceb'),('55%','#e46fe0'),('100%','#a56ae0')],
+ 'g-rain': [('0%','#c3ecff'),('55%','#7cc2ee'),('100%','#4a8fd0')],
+ 'g-sun':  [('0%','#fff4d2'),('50%','#ffd166'),('100%','#ffa23e')],
 }
 SET=[
- dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx-4, cy-2) + bear(cx+8, cy+22, 42)),
- dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx+3, cy-27) + bear(cx-1, cy+22, 41)),
- dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+2, cy-17) + bear(cx, cy+22, 43)),
+ dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx-4, cy-4) + bear(cx+8, cy+26, 42)),
+ dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx+3, cy-29) + bear(cx-1, cy+26, 40)),
+ dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+2, cy-19) + bear(cx, cy+26, 41)),
 ]
 
 def defs():
