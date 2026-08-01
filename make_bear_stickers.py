@@ -63,7 +63,7 @@ SET=[
  dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx, cy-4, 18, 1.0, root=cx-8.2) + bear(cx, cy+23, 42)),
  dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx, cy-25) + bear(cx, cy+27, 40)),
  dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+1, cy-21, 17) + bear(cx, cy+22.5, 41)),
- dict(cap='277Y DRIVE', grad='g-drive', art=lambda cx,cy: club(cx-14, cy-15, 22, -45) + bear(cx, cy+23, 42)),
+ dict(cap='277Y DRIVE', grad='g-drive', art=lambda cx,cy: club(cx-11, cy-14, 22, -45) + bear(cx, cy+23, 42)),
 ]
 
 def defs():
