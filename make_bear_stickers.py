@@ -71,7 +71,7 @@ def sheet(scale, y0, label):
         out.append(f'<g transform="translate({cx},{cy}) scale({scale})">'
                    f'<circle cx="0" cy="0" r="34" fill="url(#{s["grad"]})"/>'
                    f'<g clip-path="url(#cl{i})">{s["art"](0,0)}</g>'
-                   f'<circle cx="0" cy="0" r="34" fill="none" stroke="{NAVY}" stroke-width="1.6"/></g>')
+                   f'<circle cx="0" cy="0" r="34" fill="none" stroke="{NAVY}" stroke-width="1.1"/></g>')
         out.append(f'<text x="{cx}" y="{cy+r+15*min(scale,1.3):.0f}" text-anchor="middle" font-family="DejaVu Sans" '
                    f'font-size="{10*min(scale,1.3):.0f}" font-weight="bold" letter-spacing=".4" fill="{NAVY}">{s["cap"]}</text>')
     return ''.join(out), top+r*2+30*min(scale,1.4)
