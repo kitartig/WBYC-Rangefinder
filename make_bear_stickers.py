@@ -43,9 +43,9 @@ GRADS = {
  'g-sun':  [('0%','#f2ffa8'),('50%','#c2ee63'),('100%','#5cb861')],
 }
 SET=[
- dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx-12, cy-4, 34, 0.72) + bear(cx, cy+21, 42)),
- dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx, cy-31) + bear(cx, cy+20, 40)),
- dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+1, cy-21, 17) + bear(cx, cy+20.5, 41)),
+ dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx-12, cy-3, 34, 0.56) + bear(cx, cy+23, 42)),
+ dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx, cy-31) + bear(cx, cy+22, 40)),
+ dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+1, cy-21, 17) + bear(cx, cy+22.5, 41)),
 ]
 
 def defs():
