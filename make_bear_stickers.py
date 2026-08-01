@@ -17,19 +17,19 @@ def wings(cx, cy, h=40):
     never read as one; the hand-drawn shape does immediately."""
     sc=h/100.0
     return (f'<g transform="translate({cx-WW*sc/2:.2f},{cy-h/2:.2f}) scale({sc:.4f})">'
-            f'<path d="{WING}" fill="{GOLD}" stroke="{NAVY}" stroke-width="{1.1/sc:.2f}" '
+            f'<path d="{WING}" fill="{GOLD}" stroke="{NAVY}" stroke-width="{0.7/sc:.2f}" '
             f'stroke-linejoin="round"/></g>')
 
 def umbrella(cx, top, rx=15.5, ry=9.5):
     """flattened canopy — wider than tall"""
-    return (f'<g stroke="{NAVY}" stroke-width="1.05" stroke-linejoin="round">'
+    return (f'<g stroke="{NAVY}" stroke-width="0.7" stroke-linejoin="round">'
             f'<path d="M{cx-rx} {top+ry} A{rx} {ry} 0 0 1 {cx+rx} {top+ry} '
             f'Q{cx+rx*0.66:.1f} {top+ry*0.55:.1f} {cx+rx*0.33:.1f} {top+ry} '
             f'Q{cx} {top+ry*0.55:.1f} {cx-rx*0.33:.1f} {top+ry} '
             f'Q{cx-rx*0.66:.1f} {top+ry*0.55:.1f} {cx-rx} {top+ry} Z" fill="{GOLD}"/>'
-            f'<path d="M{cx} {top+ry*0.78:.1f} V{top+ry+44}" stroke-linecap="round" fill="none"/></g>')
+            f'<path d="M{cx} {top+ry*0.78:.1f} V{top+ry+18}" stroke-linecap="round" fill="none"/></g>')
 
-def sunburst(cx, cy, r=20, ink="#fffbe0"):
+def sunburst(cx, cy, r=20, ink="#fffde6"):
     import math
     rays=''.join(
         f'<path d="M{cx+math.cos(math.radians(a))*r*0.62:.1f} {cy+math.sin(math.radians(a))*r*0.62:.1f} '
@@ -40,12 +40,12 @@ def sunburst(cx, cy, r=20, ink="#fffbe0"):
 GRADS = {
  'g-bird': [('0%','#ff9ceb'),('55%','#e46fe0'),('100%','#a56ae0')],
  'g-rain': [('0%','#c3ecff'),('55%','#7cc2ee'),('100%','#4a8fd0')],
- 'g-sun':  [('0%','#fff29a'),('50%','#ffdc45'),('100%','#ffb733')],
+ 'g-sun':  [('0%','#fff7a0'),('50%','#f2e63c'),('100%','#93d13a')],
 }
 SET=[
- dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx-6, cy-7, 24) + bear(cx+8, cy+26, 42)),
- dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx-1, cy-29) + bear(cx-1, cy+26, 40)),
- dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+2, cy-19) + bear(cx, cy+26, 41)),
+ dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx-7, cy+3, 24) + bear(cx, cy+26, 42)),
+ dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx, cy-29) + bear(cx, cy+26, 40)),
+ dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+1, cy-19) + bear(cx, cy+26, 41)),
 ]
 
 def defs():
