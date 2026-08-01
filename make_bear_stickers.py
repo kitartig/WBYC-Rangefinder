@@ -12,30 +12,32 @@ def bear(cx, baseline, h):
             f'stroke-linejoin="round" paint-order="stroke"/></g>')
 
 def wings(cx, cy):
-    """Angel-wing pose from Kit's reference: covert shoulder LOW, primaries
-    sweeping UP and outward, longest at the top. (I had it inverted — coverts
-    high with primaries falling, which is a folded wing, not a spread one.)"""
+    """Spread wing, high on the shoulder. Shorter and blunter than v5 — the tips
+    are rounded rather than converging to a point, which is what made it read as
+    spikes."""
     import math
-    sx, sy = cx+7, cy+14                    # shoulder, low on the bear's back
+    sx, sy = cx+7, cy+3                     # shoulder, up between the shoulders
     out=[]
-    # up-left in SVG's y-down space is 190-240 deg; longest feather highest
-    prim=[(232,34,4.4),(222,31,4.2),(212,27,4.0),(202,22,3.7),(193,17,3.3)]
+    prim=[(230,24,5.4),(220,22,5.2),(210,19,5.0),(199,16,4.6),(188,13,4.1)]
     for ang,L,Wd in prim:
         a=math.radians(ang)
-        tx,ty = sx+math.cos(a)*L*0.86, sy+math.sin(a)*L - L*0.10
-        mx,my = sx+math.cos(a)*L*0.52, sy+math.sin(a)*L*0.46
+        tx,ty = sx+math.cos(a)*L*0.88, sy+math.sin(a)*L - L*0.06
+        mx,my = sx+math.cos(a)*L*0.50, sy+math.sin(a)*L*0.46
         px,py = math.cos(a+math.pi/2)*Wd, math.sin(a+math.pi/2)*Wd
+        t1x,t1y = tx+px*0.34, ty+py*0.34     # blunt tip: two points, not one
+        t2x,t2y = tx-px*0.34, ty-py*0.34
+        ox,oy = math.cos(a)*Wd*0.55, math.sin(a)*Wd*0.55
         out.append(
           f'<path d="M{sx:.1f} {sy:.1f} '
-          f'C{mx+px:.1f} {my+py:.1f} {tx+px*0.55:.1f} {ty+py*0.55:.1f} {tx:.1f} {ty:.1f} '
-          f'C{tx-px*0.55:.1f} {ty-py*0.55:.1f} {mx-px:.1f} {my-py:.1f} {sx:.1f} {sy:.1f} Z" '
+          f'C{mx+px:.1f} {my+py:.1f} {t1x+px*0.35:.1f} {t1y+py*0.35:.1f} {t1x:.1f} {t1y:.1f} '
+          f'Q{tx+ox:.1f} {ty+oy:.1f} {t2x:.1f} {t2y:.1f} '
+          f'C{mx-px:.1f} {my-py:.1f} {sx-px*0.3:.1f} {sy-py*0.3:.1f} {sx:.1f} {sy:.1f} Z" '
           f'fill="{GOLD}" stroke="{NAVY}" stroke-width=".9" stroke-linejoin="round"/>')
-    # covert cap over the roots, now sitting UNDER the fan
-    cov=(f'<path d="M{sx+2:.1f} {sy-5:.1f} '
-         f'C{sx+3:.1f} {sy+6:.1f} {sx-6:.1f} {sy+11:.1f} {sx-13:.1f} {sy+8:.1f} '
-         f'Q{sx-9:.1f} {sy+4:.1f} {sx-12:.1f} {sy+1:.1f} '
-         f'Q{sx-7:.1f} {sy-1:.1f} {sx-9:.1f} {sy-4:.1f} '
-         f'Q{sx-4:.1f} {sy-5:.1f} {sx-5:.1f} {sy-8:.1f} Z" '
+    cov=(f'<path d="M{sx+2:.1f} {sy-4:.1f} '
+         f'C{sx+3:.1f} {sy+5:.1f} {sx-5:.1f} {sy+9:.1f} {sx-11:.1f} {sy+6.5:.1f} '
+         f'Q{sx-7.5:.1f} {sy+3:.1f} {sx-10:.1f} {sy+0.5:.1f} '
+         f'Q{sx-6:.1f} {sy-1:.1f} {sx-7.5:.1f} {sy-3.5:.1f} '
+         f'Q{sx-3.5:.1f} {sy-4.5:.1f} {sx-4:.1f} {sy-7:.1f} Z" '
          f'fill="{GOLD}" stroke="{NAVY}" stroke-width=".9" stroke-linejoin="round"/>')
     return ''.join(out)+cov
 
@@ -46,7 +48,7 @@ def umbrella(cx, top, rx=15.5, ry=9.5):
             f'Q{cx+rx*0.66:.1f} {top+ry*0.55:.1f} {cx+rx*0.33:.1f} {top+ry} '
             f'Q{cx} {top+ry*0.55:.1f} {cx-rx*0.33:.1f} {top+ry} '
             f'Q{cx-rx*0.66:.1f} {top+ry*0.55:.1f} {cx-rx} {top+ry} Z" fill="{GOLD}"/>'
-            f'<path d="M{cx} {top+ry} V{top+ry+17}" stroke-linecap="round" fill="none"/></g>')
+            f'<path d="M{cx} {top+ry} V{top+ry+20}" stroke-linecap="round" fill="none"/></g>')
 
 def sunburst(cx, cy, r=20):
     import math
@@ -59,10 +61,10 @@ def sunburst(cx, cy, r=20):
 GRADS = {
  'g-bird': [('0%','#ff9ceb'),('55%','#e46fe0'),('100%','#a56ae0')],
  'g-rain': [('0%','#c3ecff'),('55%','#7cc2ee'),('100%','#4a8fd0')],
- 'g-sun':  [('0%','#fff4d2'),('50%','#ffd166'),('100%','#ffa23e')],
+ 'g-sun':  [('0%','#fff6cf'),('45%','#ffc247'),('100%','#f2760c')],
 }
 SET=[
- dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx-4, cy-4) + bear(cx+8, cy+26, 42)),
+ dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx-3, cy-6) + bear(cx+8, cy+26, 42)),
  dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx+3, cy-29) + bear(cx-1, cy+26, 40)),
  dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+2, cy-19) + bear(cx, cy+26, 41)),
 ]
