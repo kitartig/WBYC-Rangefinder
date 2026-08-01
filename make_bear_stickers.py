@@ -25,6 +25,28 @@ def wings(cx, cy, h=40, kx=1.0, root=None):
             f'<path d="{WING}" fill="{GOLD}" stroke="{NAVY}" stroke-width="{0.7/sc:.2f}" '
             f'vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g>')
 
+
+def club(bx, by, L=26, ang=218, w=2.9):
+    """Shaft up and back over the bear's shoulder with the head at the far end.
+    Drawn BEHIND the bear, so the grip end is hidden and it reads as carried."""
+    import math
+    a=math.radians(ang)
+    tx,ty = bx+math.cos(a)*L, by+math.sin(a)*L
+    px,py = math.cos(a+math.pi/2)*w/2, math.sin(a+math.pi/2)*w/2
+    shaft=(f'<path d="M{bx+px:.1f} {by+py:.1f} L{tx+px:.1f} {ty+py:.1f} '
+           f'L{tx-px:.1f} {ty-py:.1f} L{bx-px:.1f} {by-py:.1f} Z" '
+           f'fill="{GOLD}" stroke="{NAVY}" stroke-width=".7" stroke-linejoin="round"/>')
+    # head: a blade sitting across the shaft's end, angled forward
+    hx,hy = tx+math.cos(a)*1.5, ty+math.sin(a)*1.5
+    ha=a+math.radians(56); hl, hw = 9.5, 4.6
+    ex,ey = hx+math.cos(ha)*hl, hy+math.sin(ha)*hl
+    qx,qy = math.cos(ha+math.pi/2)*hw/2, math.sin(ha+math.pi/2)*hw/2
+    head=(f'<path d="M{hx+qx:.1f} {hy+qy:.1f} L{ex+qx*0.7:.1f} {ey+qy*0.7:.1f} '
+          f'Q{ex+math.cos(ha)*2:.1f} {ey+math.sin(ha)*2:.1f} {ex-qx*0.7:.1f} {ey-qy*0.7:.1f} '
+          f'L{hx-qx:.1f} {hy-qy:.1f} Z" '
+          f'fill="{GOLD}" stroke="{NAVY}" stroke-width=".7" stroke-linejoin="round"/>')
+    return shaft+head
+
 def umbrella(cx, top, rx=15.5, ry=9.5):
     """flattened canopy — wider than tall"""
     return (f'<g stroke="{NAVY}" stroke-width="0.7" stroke-linejoin="round">'
@@ -46,11 +68,13 @@ GRADS = {
  'g-bird': [('0%','#ff4fd0'),('55%','#d95fe4'),('100%','#a56ae0')],
  'g-rain': [('0%','#c3ecff'),('55%','#7cc2ee'),('100%','#4a8fd0')],
  'g-sun':  [('0%','#f2ffa8'),('50%','#c2ee63'),('100%','#5cb861')],
+ 'g-drive':[('0%','#ffe98a'),('50%','#ffb3d1'),('100%','#f26fae')],
 }
 SET=[
  dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx, cy-4, 18, 1.0, root=cx-8.2) + bear(cx, cy+23, 42)),
  dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx, cy-25) + bear(cx, cy+27, 40)),
  dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+1, cy-21, 17) + bear(cx, cy+22.5, 41)),
+ dict(cap='277Y DRIVE', grad='g-drive', art=lambda cx,cy: club(cx+1, cy+7) + bear(cx, cy+23, 42)),
 ]
 
 def defs():
@@ -58,14 +82,14 @@ def defs():
     for k,stops in GRADS.items():
         out.append(f'<linearGradient id="{k}" x1="0" y1="0" x2="0.35" y2="1">'
                    +''.join(f'<stop offset="{o}" stop-color="{c}"/>' for o,c in stops)+'</linearGradient>')
-    for i in range(3):
+    for i in range(len(SET)):
         out.append(f'<clipPath id="cl{i}"><circle cx="0" cy="0" r="33"/></clipPath>')
     out.append('</defs>')
     return ''.join(out)
 
 def sheet(scale, y0, label):
     out=[f'<text x="26" y="{y0}" font-family="DejaVu Sans" font-size="13" font-weight="bold" fill="#6b6350">{label}</text>']
-    r=34*scale; top=y0+26; pitch=r*2+40*scale
+    r=34*scale; top=y0+26; pitch=r*2+26*scale
     for i,s in enumerate(SET):
         cx=44+r+i*pitch; cy=top+r
         out.append(f'<g transform="translate({cx},{cy}) scale({scale})">'
@@ -78,8 +102,8 @@ def sheet(scale, y0, label):
 
 b1,y=sheet(2.4, 42, 'AT 2.4x')
 b2,y2=sheet(1.0, y+44, 'ACTUAL SIZE — 68px')
-svg=(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 790 {y2+18:.0f}" width="1580" height="{(y2+18)*2:.0f}">'
-     f'<rect width="790" height="{y2+18:.0f}" fill="#fffdf7"/>{defs()}{b1}{b2}</svg>')
+svg=(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 {y2+18:.0f}" width="1800" height="{(y2+18)*2:.0f}">'
+     f'<rect width="900" height="{y2+18:.0f}" fill="#fffdf7"/>{defs()}{b1}{b2}</svg>')
 open('bear-stickers.svg','w').write(svg)
 cairosvg.svg2png(url='bear-stickers.svg', write_to='bear-stickers.png', output_width=1400)
 print('rendered')
