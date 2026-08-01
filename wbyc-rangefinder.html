@@ -912,6 +912,15 @@ function rfUmbrella(cx, top, rx, ry){
     + `Q${(cx-rx*0.66).toFixed(1)} ${(top+ry*0.55).toFixed(1)} ${cx-rx} ${top+ry} Z" fill="${RF_GOLD}"/>`
     + `<path d="M${cx} ${(top+ry*0.78).toFixed(1)} V${top+ry+18}" stroke-linecap="round" fill="none"/></g>`;
 }
+// the round itself: an open ring from bottom-left round to bottom-right, with the
+// ball resting at the end of it — the same figure as the app icon.
+function rfRound(r, a0, a1, ink, w){
+  const p=t=>[r*Math.cos(t*Math.PI/180), r*Math.sin(t*Math.PI/180)];
+  const [x0,y0]=p(a0), [x1,y1]=p(a1);
+  return `<path d="M${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 1 1 ${x1.toFixed(2)} ${y1.toFixed(2)}"`
+       + ` fill="none" stroke="${ink}" stroke-width="${w}" stroke-linecap="round"/>`
+       + `<circle cx="${x1.toFixed(2)}" cy="${y1.toFixed(2)}" r="3.2" fill="#fff" stroke="#f5b512" stroke-width="1.3"/>`;
+}
 function rfSeal(kind, cap){
   const id='sg'+kind+Math.random().toString(36).slice(2,7);
   const stops=RF_GRAD[kind].map(function(p){return `<stop offset="${p[0]}" stop-color="${p[1]}"/>`;}).join('');
@@ -919,7 +928,7 @@ function rfSeal(kind, cap){
   if(kind==='bird')  art=rfWing(-4, 18, -8.2) + rfBear(0, 23, 42);
   else if(kind==='rain')  art=rfUmbrella(0, -25, 15.5, 9.5) + rfBear(0, 27, 40);
   else if(kind==='drive') art=rfShape(RF_CLUB, RF_CW, -10, -13, 18, -45) + rfBear(0, 23, 42);
-  else if(kind==='full')  art=rfBear(0, 22.5, 44);          // a whole round: just the bear
+  else if(kind==='full')  art=rfRound(28.5, 112, 428, '#ffa8e2', 2.8) + rfBear(0, 21, 42);
   else                    art=rfSun(1, -21, 17, '#fff36b') + rfBear(0, 22.5, 41);
   return `<div class="bl-seal"><svg viewBox="-34 -34 68 68" width="68" height="68">`
     + `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0.35" y2="1">${stops}</linearGradient>`

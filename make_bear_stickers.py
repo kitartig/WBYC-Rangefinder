@@ -36,6 +36,16 @@ def club(cx, cy, h=20, rot=0):
             f'<path d="{CLUB}" fill="{GOLD}" stroke="{NAVY}" stroke-width="{0.7/sc:.2f}" '
             f'vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g>')
 
+def rnd(cx, cy, r=28.5, a0=112, a1=428, ink='#ffa8e2', w=2.8):
+    """the round itself — an open ring from bottom-left round to bottom-right with
+    the ball resting at the end, the same figure as the app icon."""
+    import math
+    p=lambda t:(cx+r*math.cos(math.radians(t)), cy+r*math.sin(math.radians(t)))
+    x0,y0=p(a0); x1,y1=p(a1)
+    return (f'<path d="M{x0:.2f} {y0:.2f} A{r} {r} 0 1 1 {x1:.2f} {y1:.2f}" fill="none" '
+            f'stroke="{ink}" stroke-width="{w}" stroke-linecap="round"/>'
+            f'<circle cx="{x1:.2f}" cy="{y1:.2f}" r="3.2" fill="#fff" stroke="#f5b512" stroke-width="1.3"/>')
+
 def umbrella(cx, top, rx=15.5, ry=9.5):
     """flattened canopy — wider than tall"""
     return (f'<g stroke="{NAVY}" stroke-width="0.7" stroke-linejoin="round">'
@@ -58,12 +68,14 @@ GRADS = {
  'g-rain': [('0%','#c3ecff'),('55%','#7cc2ee'),('100%','#4a8fd0')],
  'g-sun':  [('0%','#f2ffa8'),('50%','#c2ee63'),('100%','#5cb861')],
  'g-drive':[('0%','#f26fae'),('50%','#ffb3d1'),('100%','#ffe98a')],
+ 'g-full': [('0%','#fff3c4'),('50%','#ffd257'),('100%','#e0a11a')],
 }
 SET=[
  dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx, cy-4, 18, 1.0, root=cx-8.2) + bear(cx, cy+23, 42)),
  dict(cap='RAIN',      grad='g-rain', art=lambda cx,cy: umbrella(cx, cy-25) + bear(cx, cy+27, 40)),
  dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+1, cy-21, 17) + bear(cx, cy+22.5, 41)),
  dict(cap='277Y DRIVE', grad='g-drive', art=lambda cx,cy: club(cx-10, cy-13, 18, -45) + bear(cx, cy+23, 42)),
+ dict(cap='18 HOLES',  grad='g-full', art=lambda cx,cy: rnd(cx, cy) + bear(cx, cy+21, 42)),
 ]
 
 def defs():
@@ -91,8 +103,8 @@ def sheet(scale, y0, label):
 
 b1,y=sheet(2.4, 42, 'AT 2.4x')
 b2,y2=sheet(1.0, y+44, 'ACTUAL SIZE — 68px')
-svg=(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 {y2+18:.0f}" width="1800" height="{(y2+18)*2:.0f}">'
-     f'<rect width="900" height="{y2+18:.0f}" fill="#fffdf7"/>{defs()}{b1}{b2}</svg>')
+svg=(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 {y2+18:.0f}" width="2400" height="{(y2+18)*2:.0f}">'
+     f'<rect width="1200" height="{y2+18:.0f}" fill="#fffdf7"/>{defs()}{b1}{b2}</svg>')
 open('bear-stickers.svg','w').write(svg)
 cairosvg.svg2png(url='bear-stickers.svg', write_to='bear-stickers.png', output_width=1400)
 print('rendered')
