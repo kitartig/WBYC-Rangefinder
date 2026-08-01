@@ -99,6 +99,9 @@ only when a brand borrows another club's geometry, as the Back Pocket demo does.
 
 ---
 
+See **`SKETCH-TO-VECTOR.md`** for turning a drawing — on paper or inside existing
+artwork — into a path the app can use. The bear and the wing both came through it.
+
 See **`WORKING-NOTES.md`** before doing anything git-related from Cowork — the
 file mount can't delete or replace files, which breaks `checkout`, `reset` and
 `merge` in ways that look like data loss and aren't, and `mv` doesn't get you out
