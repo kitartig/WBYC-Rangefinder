@@ -35,7 +35,7 @@ s.append(f'<line x1="{L}" y1="128" x2="{R}" y2="128" stroke="#4d84c4"/>')
 
 # ---------- the score ----------
 y=164
-t(L, y, "The Score", 18, "#0e6b3a", fam=G, weight="500")
+t(L, y, "The Score", 18, "#1b3a66", fam=G, weight="500")
 t(L, y+58, "78", 64, "#1a1712", fam=G, weight="500")
 t(L+82, y+52, "+4", 23, "#f000c2", fam=G, weight="500")
 cx=R
@@ -47,7 +47,7 @@ for label in ["11 greens","33 putts"]:
 
 # ---------- the card ----------
 y=260
-t(L, y, "The Card", 18, "#0e6b3a", fam=G, weight="500")
+t(L, y, "The Card", 18, "#1b3a66", fam=G, weight="500")
 CY, CH, ROW = y+12, 84, 28
 s.append(f'<rect x="{L}" y="{CY}" width="{R-L}" height="{CH}" rx="12" fill="#fff" stroke="#9fc2ea" stroke-width="1.4"/>')
 cols = 11
@@ -84,7 +84,7 @@ for i in range(1, cols):
 
 # ---------- the moments ----------
 y = CY+CH+38
-t(L, y, "The Moments", 18, "#0e6b3a", fam=G, weight="500")
+t(L, y, "The Moments", 18, "#1b3a66", fam=G, weight="500")
 moms=[("#f000c2","&#8595;","Eagle on the 2nd","&#160;&#8212; 2 on the par 4."),
       ("#f000c2","&#8595;","Birdie on the 5th","&#160;&#8212; 3 on the par 4."),
       ("#ffa300","D","Longest shot","&#160;&#8212; 277 yards with the D."),
@@ -125,7 +125,7 @@ t(L+22, y+38, "Tap to add a note about your round&#8230;", 19, "#8a8270", fam=G,
 
 # ---------- earned today ----------
 y += 96
-t(L, y, "Earned today", 18, "#0e6b3a", fam=G, weight="500")
+t(L, y, "Earned today", 18, "#1b3a66", fam=G, weight="500")
 seals=[("#f000c2","#fdeaf6","#f000c2","3 BIRDIES","pennant"),
        ("#ffa300","#fbeeda","#c9760a","277Y DRIVE","arrow"),
        ("#8fbce0","#eaf3fb","#2f6ea0","SUNNY","sun"),
@@ -162,7 +162,7 @@ t(W/2, y+72, "&#8212; KEPT FOR KIT BY THE WBYC RANGEFINDER", 13, "#6b6350", anch
 
 # ---------- photographs ----------
 y += 130
-t(L, y, "THE PHOTOGRAPHS", 12, "#2f7d68", weight="bold", ls="1.4")
+t(L, y, "THE PHOTOGRAPHS", 12, "#1b3a66", weight="bold", ls="1.4")
 s.append(f'<rect x="{L}" y="{y+14}" width="150" height="112" rx="10" fill="none" stroke="#c3b79a" stroke-width="1.5" stroke-dasharray="5 4"/>')
 t(L+75, y+74, "+ add a photograph", 12.5, "#6b6350", weight="bold", anchor="middle")
 t(L, y+150, "0 of 4 &#183; 2KB of roughly 5000KB used", 11, "#8a8270")
