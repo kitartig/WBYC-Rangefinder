@@ -50,10 +50,18 @@ Source shapes are small (the bear is 49px wide), so the pixel staircase is the
 enemy. Upsample, blur, threshold, trace.
 
 ```python
-up = np.array(Image.fromarray(mask*255).resize((w*16, h*16), Image.BICUBIC))/255
-sm = ndimage.gaussian_filter(up, sigma=2.3) > 0.5
-path = potrace.Bitmap(~sm).trace(turdsize=30, alphamax=0.62, opttolerance=0.15)
+UP = 20
+up = np.array(Image.fromarray(mask*255).resize((w*UP, h*UP), Image.BICUBIC))/255
+sm = ndimage.gaussian_filter(up, sigma=UP) > 0.5          # sigma ~= ONE SOURCE PIXEL
+path = potrace.Bitmap(~sm).trace(turdsize=200, alphamax=1.334, opttolerance=0.9)
 ```
+
+**Read sigma in SOURCE pixels, not upsampled ones.** This is the trap, and it
+cost two rounds of "make it sharper" that made no difference. At ×16 upsample,
+`sigma=2.3` is 0.14 of a source pixel — it cannot remove a staircase whose step
+is a whole pixel. Even `sigma=5.6` is only 0.35. The staircase only goes when
+sigma reaches roughly one source pixel: at ×20 that is `sigma=20`. Divide by the
+upsample factor before you judge whether a number is large.
 
 **`~sm` — potracer traces the FALSE region.** Hand it the mask un-inverted and
 you get the complement: for the whole burgee that came back as only the white
@@ -61,10 +69,18 @@ elements with no outer boundary, which cost an afternoon before it was spotted.
 Always verify by rendering and counting: the filled fraction of the render
 should match `mask.mean()`.
 
-**Sigma is the whole game.** 0.9 keeps the source's pixel staircase and the
-edges look jagged — "sharp" in the wrong sense. 3.2 rounds off the claws and
-the snout. 2.3 with `alphamax` around 0.6 erases the stairs while potrace still
-resolves true corners.
+**Sigma is the whole game, and more of it than feels right.** For the 50px
+burgee bear: 0.35 source pixels leaves every stair visible, 1.0 gives clean
+flowing curves that still resolve the claws and the snout, 1.5 starts melting
+the snout and the rear leg. Push `alphamax` to its 1.334 maximum and
+`opttolerance` to ~0.9 — the smoother the mask, the more aggressively potrace
+can merge segments, and the path gets *smaller*: the bear went from 5,375 to
+3,603 characters while looking better.
+
+**Check the bbox before swapping a path in.** Heavier blur can dilate a shape,
+which would silently change its size against every placement number already
+tuned around it. Measure with `getBBox()` in a real browser; the σ20 bear came
+out 49.02 × 99.99 against the old 49.02 × 100.00, so it dropped straight in.
 
 ## 3. Emit at a known height
 
