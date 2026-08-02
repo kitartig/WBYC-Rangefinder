@@ -24,7 +24,7 @@ def wings(cx, cy, h=40, kx=1.0, root=None):
     return (f'<g transform="translate({cx:.2f},{cy:.2f}) scale({kx:.3f},1) '
             f'translate({-WW*sc/2:.2f},{-h/2:.2f}) scale({sc:.4f})">'
             f'<path d="{WING}" fill="{GOLD}" stroke="{NAVY}" stroke-width="{0.7/sc:.2f}" '
-            f'vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g>')
+            f'stroke-linejoin="round"/></g>')
 
 
 def club(cx, cy, h=20, rot=0):
@@ -34,15 +34,15 @@ def club(cx, cy, h=20, rot=0):
     return (f'<g transform="translate({cx:.2f},{cy:.2f}) rotate({rot}) '
             f'translate({-CW*sc/2:.2f},{-h/2:.2f}) scale({sc:.4f})">'
             f'<path d="{CLUB}" fill="{GOLD}" stroke="{NAVY}" stroke-width="{0.7/sc:.2f}" '
-            f'vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g>')
+            f'stroke-linejoin="round"/></g>')
 
 def rnd(cx, cy, r=28.5, a0=112, a1=428, ink=GOLD, w=2.8):
     """the round itself — an open ring from bottom-left round to bottom-right with
     the ball resting at the end, the same figure as the app icon."""
     import math
     p=lambda t:(cx+r*math.cos(math.radians(t)), cy+r*math.sin(math.radians(t)))
-    x0,y0=p(a0); x1,y1=p(a1)
-    return (f'<path d="M{x0:.2f} {y0:.2f} A{r} {r} 0 1 1 {x1:.2f} {y1:.2f}" fill="none" '
+    x0,y0=p(a0); x1,y1=p(a1); big=1 if (a1-a0)>180 else 0
+    return (f'<path d="M{x0:.2f} {y0:.2f} A{r} {r} 0 {big} 1 {x1:.2f} {y1:.2f}" fill="none" '
             f'stroke="{ink}" stroke-width="{w}" stroke-linecap="round"/>'
             f'<circle cx="{x1:.2f}" cy="{y1:.2f}" r="3.2" fill="#fff" stroke="#f5b512" stroke-width="1.3"/>')
 
@@ -69,6 +69,7 @@ GRADS = {
  'g-sun':  [('0%','#f2ffa8'),('50%','#c2ee63'),('100%','#5cb861')],
  'g-drive':[('0%','#f26fae'),('50%','#ffb3d1'),('100%','#ffe98a')],
  'g-full': [('0%','#ff9fd8'),('50%','#e2429b'),('100%','#96176a')],
+ 'g-half': [('0%','#ff9fd8'),('50%','#e2429b'),('100%','#96176a')],
 }
 SET=[
  dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx, cy-4, 18, 1.0, root=cx-8.2) + bear(cx, cy+23, 42)),
@@ -76,6 +77,7 @@ SET=[
  dict(cap='SUNNY',     grad='g-sun',  art=lambda cx,cy: sunburst(cx+1, cy-21, 17) + bear(cx, cy+22.5, 41)),
  dict(cap='277Y DRIVE', grad='g-drive', art=lambda cx,cy: club(cx-10, cy-13, 18, -45) + bear(cx, cy+23, 42)),
  dict(cap='18 HOLES',  grad='g-full', art=lambda cx,cy: rnd(cx, cy) + bear(cx, cy+21, 42)),
+ dict(cap='9 HOLES',   grad='g-half', art=lambda cx,cy: rnd(cx, cy, a1=270) + bear(cx, cy+21, 42)),
 ]
 
 def defs():
