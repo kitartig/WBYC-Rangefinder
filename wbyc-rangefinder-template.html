@@ -284,7 +284,7 @@
     padding:16px 22px;font-family:'EB Garamond',serif;font-style:italic;font-size:19px;color:#1a1712;line-height:1.5;cursor:pointer}
   #bearlog .bl-note.empty{color:#8a8270}
   #bearlog .bl-stk{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin:6px 0 2px}
-  #bearlog .bl-seal{width:98px;text-align:center}
+  #bearlog .bl-seal{width:85px;text-align:center}   /* 3 across still fits a 286px column */
   #bearlog .bl-seal svg{display:block;margin:0 auto;filter:drop-shadow(0 3px 9px rgba(60,45,20,.16))}
   #bearlog .bl-seal .bl-scap{font-family:-apple-system,sans-serif;font-size:11px;font-weight:800;letter-spacing:.4px;margin-top:7px;text-transform:uppercase;color:#1638a8}
   /* the whole set, small and captionless — six across has to survive a ~310px column */
@@ -946,7 +946,7 @@ function rfSeal(kind, cap, px){
   // antialiased edge with it, flattening the circle at all four cardinal points
   // — visible as soon as the seals grew to 88px. The box is 70 to leave room;
   // width is scaled by 70/68 so `px` still means the disc's diameter.
-  const S=px||88, BOX=Math.round(S*70/68*100)/100;
+  const S=px||77, BOX=Math.round(S*70/68*100)/100;
   const id='sg'+kind+Math.random().toString(36).slice(2,7);
   const stops=RF_GRAD[kind].map(function(p){return `<stop offset="${p[0]}" stop-color="${p[1]}"/>`;}).join('');
   let art='';

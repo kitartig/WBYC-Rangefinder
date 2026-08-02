@@ -282,6 +282,7 @@ setTimeout(()=>{
       A('the set row renders six', (row.match(/<div class="bl-seal">/g)||[]).length===6);
       A('the set row is captionless', !/bl-scap/.test(row));
       A('the set row is drawn small', (row.match(/width="41.18"/g)||[]).length===6);
+      A('an earned seal is drawn larger than a set one', /width="79.26"/.test(rfSeal('bird','3 birdies')));
       // the rule reaches r34.55; a 68-unit box clipped it flat at four points
       A('the disc has room for its own rule', /viewBox="-35 -35 70 70"/.test(row));
       A('9 and 18 holes are not the same drawing',
