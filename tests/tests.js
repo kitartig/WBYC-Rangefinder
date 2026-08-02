@@ -281,7 +281,9 @@ setTimeout(()=>{
       const row=rfSetRow();
       A('the set row renders six', (row.match(/<div class="bl-seal">/g)||[]).length===6);
       A('the set row is captionless', !/bl-scap/.test(row));
-      A('the set row is drawn small', (row.match(/width="40"/g)||[]).length===6);
+      A('the set row is drawn small', (row.match(/width="41.18"/g)||[]).length===6);
+      // the rule reaches r34.55; a 68-unit box clipped it flat at four points
+      A('the disc has room for its own rule', /viewBox="-35 -35 70 70"/.test(row));
       A('9 and 18 holes are not the same drawing',
         rfSeal('half','',40).replace(/sghalf\w+/g,'') !== rfSeal('full','',40).replace(/sgfull\w+/g,''));
     })();
