@@ -124,3 +124,29 @@ Habits worth keeping, each of which caught a real bug here:
 - **Test the failure path.** The keepsake-photo tests mock a `QuotaExceededError`
   and assert it surfaces to the user. Storage filling up is the expected outcome
   of the chosen approach, so silence there would be the real bug.
+
+## 6. There is a browser, if you build it
+
+Every visual proof in this repo was rendered by `cairosvg`, and `cairosvg`
+silently ignores things browsers honour. `vector-effect="non-scaling-stroke"`
+is the one that shipped: it makes a browser read `stroke-width` in viewport
+units, so the wing's keyline drew at 3.89px on a phone and 0.7px in every proof
+I checked. Two renderers, two answers, and I was checking the wrong one.
+
+Chromium runs in the sandbox. Only one system library is missing and apt can't
+supply it — the proxy allows pypi and npm, not ubuntu ports — but headless
+Chromium never calls libXdamage's four symbols without an X display, so a
+four-line no-op stub satisfies the loader:
+
+```sh
+pip install playwright --break-system-packages
+PATH=$PATH:~/.local/bin playwright install chromium
+mkdir -p ~/libs && gcc -shared -fPIC -o ~/libs/libXdamage.so.1 tools/xdamage_stub.c
+export LD_LIBRARY_PATH=$HOME/libs
+python3 tools/shoot.py /tmp/out.png --at "Earned today"
+```
+
+`tools/shoot.py` loads the built app over `file://`, seeds a round, opens the
+keepsake and screenshots at 390px. Use it for anything about layout, wrapping,
+tap targets or stroke weight — measure `getBoundingClientRect()` in the page
+rather than counting pixels in a PNG.
