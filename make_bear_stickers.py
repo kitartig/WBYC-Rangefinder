@@ -36,7 +36,7 @@ def club(cx, cy, h=20, rot=0):
             f'<path d="{CLUB}" fill="{GOLD}" stroke="{NAVY}" stroke-width="{0.7/sc:.2f}" '
             f'vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g>')
 
-def rnd(cx, cy, r=28.5, a0=112, a1=428, ink='#ffa8e2', w=2.8):
+def rnd(cx, cy, r=28.5, a0=112, a1=428, ink=GOLD, w=2.8):
     """the round itself — an open ring from bottom-left round to bottom-right with
     the ball resting at the end, the same figure as the app icon."""
     import math
@@ -68,7 +68,7 @@ GRADS = {
  'g-rain': [('0%','#c3ecff'),('55%','#7cc2ee'),('100%','#4a8fd0')],
  'g-sun':  [('0%','#f2ffa8'),('50%','#c2ee63'),('100%','#5cb861')],
  'g-drive':[('0%','#f26fae'),('50%','#ffb3d1'),('100%','#ffe98a')],
- 'g-full': [('0%','#fff3c4'),('50%','#ffd257'),('100%','#e0a11a')],
+ 'g-full': [('0%','#ff9fd8'),('50%','#e2429b'),('100%','#96176a')],
 }
 SET=[
  dict(cap='3 BIRDIES', grad='g-bird', art=lambda cx,cy: wings(cx, cy-4, 18, 1.0, root=cx-8.2) + bear(cx, cy+23, 42)),

@@ -875,7 +875,7 @@ const RF_GRAD={
   rain:[['0','#c3ecff'],['.55','#7cc2ee'],['1','#4a8fd0']],
   sun :[['0','#f2ffa8'],['.55','#c2ee63'],['1','#5cb861']],
   drive:[['0','#f26fae'],['.5','#ffb3d1'],['1','#ffe98a']],
-  full:[['0','#fff3c4'],['.5','#ffd257'],['1','#e0a11a']]
+  full:[['0','#ff9fd8'],['.5','#e2429b'],['1','#96176a']]
 };
 function rfShape(d, w, cx, cy, h, rot){
   const sc=h/100;
@@ -928,7 +928,7 @@ function rfSeal(kind, cap){
   if(kind==='bird')  art=rfWing(-4, 18, -8.2) + rfBear(0, 23, 42);
   else if(kind==='rain')  art=rfUmbrella(0, -25, 15.5, 9.5) + rfBear(0, 27, 40);
   else if(kind==='drive') art=rfShape(RF_CLUB, RF_CW, -10, -13, 18, -45) + rfBear(0, 23, 42);
-  else if(kind==='full')  art=rfRound(28.5, 112, 428, '#ffa8e2', 2.8) + rfBear(0, 21, 42);
+  else if(kind==='full')  art=rfRound(28.5, 112, 428, RF_GOLD, 2.8) + rfBear(0, 21, 42);
   else                    art=rfSun(1, -21, 17, '#fff36b') + rfBear(0, 22.5, 41);
   return `<div class="bl-seal"><svg viewBox="-34 -34 68 68" width="68" height="68">`
     + `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0.35" y2="1">${stops}</linearGradient>`
