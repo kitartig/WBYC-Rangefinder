@@ -174,10 +174,10 @@
      full inversion — dark star on gold — which is both the elegant resting look
      and the missing feedback. */
   #mapbtns #memBtn, body.sun #mapbtns #memBtn{
-    font-size:14px;line-height:1.35;padding:3px 8px;border-color:rgba(236,178,72,.9)}
-  #mapbtns #memBtn .star{display:inline-block;line-height:1;color:#f2b544;
-    text-shadow:0 1px 1px rgba(0,0,0,.45)}
-  body.sun #mapbtns #memBtn .star{color:#c47f06;text-shadow:0 1px 0 rgba(255,255,255,.6)}
+    font-size:14px;line-height:1.35;padding:3px 8px;
+    background:#1638a8;border-color:rgba(236,178,72,.9)}
+  #mapbtns #memBtn .star, body.sun #mapbtns #memBtn .star{
+    display:inline-block;line-height:1;color:#ffd257;text-shadow:0 1px 1px rgba(0,0,0,.45)}
   /* armed: the chip fills, the star reverses out of it */
   #mapbtns #memBtn.on, body.sun #mapbtns #memBtn.on{
     background:linear-gradient(180deg,#ffd257 0%,#f2a413 100%);border-color:#fff1c9;
@@ -229,13 +229,21 @@
   #bearBtn:active{background:#102a80}
   /* ---- The Bear's Log keepsake overlay (fixed light design, theme-independent) ---- */
   #bearlog{position:fixed;inset:0;z-index:70;display:none;overflow:auto;background:#f2e7cf;
-    -webkit-overflow-scrolling:touch}
+    -webkit-overflow-scrolling:touch;padding-top:calc(64px + env(safe-area-inset-top))}
   #bearlog.open{display:block}
-  #bearlog .bl-bar{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;
-    padding:10px 14px;background:rgba(242,231,207,.92);backdrop-filter:blur(6px);z-index:2}
+  /* The bar was position:sticky inside this momentum-scrolling overlay, which on iOS
+     can leave the sticky element's hit box behind its painted position while the
+     scroll settles — so the close button looked tappable and intermittently wasn't.
+     Fixed has no such failure mode, and the guide's close button (already fixed)
+     has never misbehaved. 46px is also the first size that clears Apple's 44px. */
+  #bearlog .bl-bar{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;
+    align-items:center;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
+    background:rgba(242,231,207,.92);backdrop-filter:blur(6px);z-index:2}
   #bearlog .bl-bar button{border:1px solid #cdbf9e;background:#fffdf7;color:#1a1712;border-radius:999px;
-    padding:7px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif}
-  #bearlog .bl-bar .bl-x{width:40px;height:40px;padding:0;font-size:20px;border-radius:50%}
+    padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  #bearlog .bl-bar button:active{background:#efe6d2}
+  #bearlog .bl-bar .bl-x{width:46px;height:46px;padding:0;font-size:21px;border-radius:50%}
   #bearlog .bl-page{max-width:620px;margin:0 auto 40px;background:#fffdf7;border:1px solid #e5dbc4;
     border-radius:18px;box-shadow:0 14px 42px rgba(60,45,20,.18);padding:22px 30px 26px;position:relative}
   #bearlog .bl-page:before{content:"";position:absolute;inset:9px;border:1px solid #ece2c9;border-radius:12px;pointer-events:none}
@@ -275,13 +283,17 @@
   #bearlog .bl-note{margin:20px 0 6px;background:#fbe3f4;border-left:6px solid #f000c2;border-radius:0 10px 10px 0;
     padding:16px 22px;font-family:'EB Garamond',serif;font-style:italic;font-size:19px;color:#1a1712;line-height:1.5;cursor:pointer}
   #bearlog .bl-note.empty{color:#8a8270}
-  #bearlog .bl-stk{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin:6px 0 2px}
-  #bearlog .bl-seal{width:78px;text-align:center}
+  #bearlog .bl-stk{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin:6px 0 2px}
+  #bearlog .bl-seal{width:98px;text-align:center}
   #bearlog .bl-seal svg{display:block;margin:0 auto;filter:drop-shadow(0 3px 9px rgba(60,45,20,.16))}
-  #bearlog .bl-seal .bl-scap{font-family:-apple-system,sans-serif;font-size:10px;font-weight:800;letter-spacing:.4px;margin-top:6px;text-transform:uppercase;color:#1638a8}
+  #bearlog .bl-seal .bl-scap{font-family:-apple-system,sans-serif;font-size:11px;font-weight:800;letter-spacing:.4px;margin-top:7px;text-transform:uppercase;color:#1638a8}
+  /* the whole set, small and captionless — six across has to survive a ~310px column */
+  #bearlog .bl-set{gap:8px;margin-top:14px;flex-wrap:nowrap}
+  #bearlog .bl-set .bl-seal{width:auto}
+  #bearlog .bl-set .bl-seal svg{filter:drop-shadow(0 2px 5px rgba(60,45,20,.16))}
   #bearlog .bl-hint{text-align:center;font-family:'EB Garamond',serif;font-style:italic;font-size:13px;color:#6b6350;margin:12px auto 0;max-width:440px}
-  #bearlog .bl-bear{position:relative;font-family:'EB Garamond',serif;font-style:italic;font-size:18px;color:#1a1712;text-align:center;margin:30px 0 4px;line-height:1.55;background:#e4f5f3;border:1px solid #bfe3df;border-radius:14px;padding:30px 30px 20px}
-  #bearlog .bl-bear:before{content:"\201C";position:absolute;top:2px;left:20px;font-family:'EB Garamond',serif;font-size:60px;line-height:1;color:#2fb0a8;opacity:.55}
+  #bearlog .bl-bear{position:relative;font-family:'EB Garamond',serif;font-style:italic;font-size:18px;color:#1a1712;text-align:center;margin:22px 0 4px;line-height:1.5;background:#e4f5f3;border:1px solid #bfe3df;border-radius:14px;padding:22px 26px 15px}
+  #bearlog .bl-bear:before{content:"\201C";position:absolute;top:2px;left:20px;font-family:'EB Garamond',serif;font-size:48px;line-height:1;color:#2fb0a8;opacity:.55}
   #bearlog .bl-bear .bl-sig{display:block;font-family:-apple-system,sans-serif;font-size:13px;color:#6b6350;margin-top:8px;font-style:normal;letter-spacing:1px}
   #bearlog .bl-foot{border-top:1px solid #e5dbc4;margin-top:20px;padding-top:12px;text-align:center;font-family:-apple-system,sans-serif;font-size:11px;color:#6b6350;letter-spacing:.6px}
   /* ---- keepsake on a phone ----
@@ -311,7 +323,7 @@
     #bearlog .bl-note{padding:14px 16px;font-size:17px}
     #bearlog .bl-bear{padding:24px 18px 16px;font-size:16.5px}
   }
-  @media print{ body>*{display:none!important} #bearlog{display:block!important;position:static;background:#fff} #bearlog .bl-bar{display:none!important} #bearlog .bl-page{box-shadow:none;border:none;margin:0} }
+  @media print{ body>*{display:none!important} #bearlog{display:block!important;position:static;background:#fff;padding-top:0!important} #bearlog .bl-bar{display:none!important} #bearlog .bl-page{box-shadow:none;border:none;margin:0} }
   #scbar{display:flex;justify-content:space-between;align-items:center;padding:0 2px 4px;position:relative;z-index:2;flex-wrap:wrap;gap:4px}
   #scbar>span:last-child{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px;margin-left:auto}
   #scbar span{font-size:13px;font-weight:700;letter-spacing:.5px;color:#1b3a66}
@@ -324,9 +336,9 @@
      Kit went days without saving because nothing ever asked to be pressed. */
   #scNew{background:#fff;color:#93a3b8;border-color:#d8cdb0;font-size:12.5px;
     padding:9px 16px;letter-spacing:.4px;transition:background .18s,color .18s,box-shadow .18s}
-  #scNew.armed{background:#1b3a66;color:#fffdf7;border-color:#1b3a66}
+  #scNew.armed{background:#96176a;color:#fffdf7;border-color:#96176a}   /* the full-round seal's berry */
   #scNew.ready{box-shadow:0 0 0 2px #f2a413,0 0 12px rgba(242,164,19,.5)}
-  #scNew.armed:active{background:#12294a}
+  #scNew.armed:active{background:#75104f}
   #scClose{min-width:46px;min-height:40px;font-size:20px !important;font-weight:900 !important;line-height:1;padding:6px 10px !important}
   #scbar button{touch-action:manipulation}
   #scLogoWrap{text-align:center;padding:0;pointer-events:none} /* negative logo margins overlap scbar — must not steal taps from ✕ */
@@ -760,10 +772,14 @@ function undoShot(){
   $('maphint').textContent='last shot mark removed';
   render();
 }
-function shotDists(){ // each mark's distance: to the next mark on the same hole, else to that green's center
+function shotDists(day){ // each mark's distance: to the next mark on the same hole, else to that green's center
+  // `shots` accumulates across every round ever marked. Pass a day to get one
+  // round's; clubStats() wants all of them, the keepsake wants only today's —
+  // without the filter the keepsake called an all-time best "Longest shot".
+  const src = day ? shots.filter(q=>q.d===day) : shots;
   const out=[];
-  for(let i=0;i<shots.length;i++){
-    const s=shots[i], nx=shots[i+1];
+  for(let i=0;i<src.length;i++){
+    const s=src[i], nx=src[i+1];
     let end=null;
     if(nx && nx.d===s.d && nx.h===s.h) end={lat:nx.lat,lng:nx.lng};
     else{ const hh=course.holes.find(x=>x.hole_number===s.h); if(hh) end=hh.green.center; }
@@ -922,7 +938,10 @@ function rfRound(r, a0, a1, ink, w){
        + ` fill="none" stroke="${ink}" stroke-width="${w}" stroke-linecap="round"/>`
        + `<circle cx="${x1.toFixed(2)}" cy="${y1.toFixed(2)}" r="3.2" fill="#fff" stroke="#f5b512" stroke-width="1.3"/>`;
 }
-function rfSeal(kind, cap){
+const RF_SET=['bird','drive','sun','rain','half','full'];
+function rfSetRow(){ return RF_SET.map(function(k){ return rfSeal(k, '', 40); }).join(''); }
+function rfSeal(kind, cap, px){
+  const S=px||88;
   const id='sg'+kind+Math.random().toString(36).slice(2,7);
   const stops=RF_GRAD[kind].map(function(p){return `<stop offset="${p[0]}" stop-color="${p[1]}"/>`;}).join('');
   let art='';
@@ -932,13 +951,13 @@ function rfSeal(kind, cap){
   else if(kind==='full')  art=rfRound(28.5, 112, 428, RF_GOLD, 2.8) + rfBear(0, 21, 42);
   else if(kind==='half')  art=rfRound(28.5, 112, 270, RF_GOLD, 2.8) + rfBear(0, 21, 42);  // stops at the turn
   else                    art=rfSun(1, -21, 17, '#fff36b') + rfBear(0, 22.5, 41);
-  return `<div class="bl-seal"><svg viewBox="-34 -34 68 68" width="68" height="68">`
+  return `<div class="bl-seal"><svg viewBox="-34 -34 68 68" width="${S}" height="${S}">`
     + `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0.35" y2="1">${stops}</linearGradient>`
     + `<clipPath id="c${id}"><circle cx="0" cy="0" r="33"/></clipPath></defs>`
     + `<circle cx="0" cy="0" r="34" fill="url(#${id})"/>`
     + `<g clip-path="url(#c${id})">${art}</g>`
     + `<circle cx="0" cy="0" r="34" fill="none" stroke="${RF_NAVY}" stroke-width="1.1"/></svg>`
-    + `<div class="bl-scap">${cap}</div></div>`;
+    + (cap?`<div class="bl-scap">${cap}</div>`:'') + `</div>`;
 }
 
 function blWx(){
@@ -966,7 +985,7 @@ function blBuild(){
       +`<tr><td class="bl-lab">${(pname||'YOU').toUpperCase().slice(0,4)}</td>${yy}<td class="bl-tot">${any?sy:''}</td></tr></table>`; };
   const strip=`<div class="bl-strip">${nine(0,9,'OUT')}${nine(9,18,'IN')}</div>`;
   const birdies=played.filter(x=>x.d<=-1).sort((a,b)=>a.d-b.d);
-  const sd=shotDists(); const longest=sd.length?sd.reduce((a,b)=>b.y>a.y?b:a):null;
+  const sd=shotDists(card.start); const longest=sd.length?sd.reduce((a,b)=>b.y>a.y?b:a):null;
   const moment=played.reduce((a,b)=>b.d<a.d?b:a);
   let moms='';
   birdies.forEach(x=>{ const lbl=x.d<=-2?'Eagle':'Birdie'; moms+=`<div class="bl-mom"><span class="bl-dot" style="background:#f000c2">&#8595;</span><div><b>${lbl} on the ${blOrd(x.h.hole_number)}</b> — ${x.e.s} on the par ${x.hp}.</div></div>`; });
@@ -993,7 +1012,9 @@ function blBuild(){
   if(wx)             stk+=rfSeal(/rain|drizzle|shower|thunder|snow/i.test(wx)?'rain':'sun', wx);
   if(t.n>=18)        stk+=rfSeal('full', '18 holes');
   else if(t.n>=9)    stk+=rfSeal('half', '9 holes');
-  const stickers=stk?`<div class="bl-sec">Earned today</div><div class="bl-stk">${stk}</div><div class="bl-hint">Earned automatically from your round. Soon you'll tap any hole to add your own.</div>`:'';
+  const stickers=stk?`<div class="bl-sec">Earned today</div><div class="bl-stk">${stk}</div>`
+    +`<div class="bl-stk bl-set">${rfSetRow()}</div>`
+    +`<div class="bl-hint">Earned automatically from your round — the small row is all six there are. Soon you'll tap any hole to add your own.</div>`:'';
   const ne=played.filter(x=>x.d<=-2).length, nb=birdies.length;
   let line;
   if(ne>0) line=`An eagle on the card — a day the ${blOrd(moment.h.hole_number)} won't forget.`;

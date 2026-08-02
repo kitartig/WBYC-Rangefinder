@@ -261,6 +261,30 @@ setTimeout(()=>{
       localStorage.setItem=realSet;
       localStorage.removeItem(RF_PHOTO_KEY);
     })();
+    // the keepsake's "Longest shot" must be THIS round's, not the best ever marked
+    (()=>{ const g=course.holes[0].green.center;
+      const near={lat:g.lat-0.0009, lng:g.lng};        // ~100y out
+      const far ={lat:g.lat-0.0027, lng:g.lng};        // ~300y out
+      const keep=shots.splice(0, shots.length);
+      shots.push({d:'2026-07-01', h:1, lat:far.lat,  lng:far.lng,  t:1, club:'D'});
+      shots.push({d:'2026-07-29', h:1, lat:near.lat, lng:near.lng, t:2, club:'D'});
+      const all=shotDists(), one=shotDists('2026-07-29');
+      A('shotDists() still sees every round', all.length===2);
+      A('shotDists(day) sees only that round', one.length===1);
+      A('the older, longer drive is excluded', Math.max(...one.map(r=>r.y)) < Math.max(...all.map(r=>r.y)));
+      shots.length=0; keep.forEach(q=>shots.push(q));
+    })();
+    // the seal set: six designs, each distinct, and the small row carries no captions
+    (()=>{
+      A('six seals in the set', RF_SET.length===6);
+      A('every seal has its own gradient', RF_SET.every(k=>RF_GRAD[k]));
+      const row=rfSetRow();
+      A('the set row renders six', (row.match(/<div class="bl-seal">/g)||[]).length===6);
+      A('the set row is captionless', !/bl-scap/.test(row));
+      A('the set row is drawn small', (row.match(/width="40"/g)||[]).length===6);
+      A('9 and 18 holes are not the same drawing',
+        rfSeal('half','',40).replace(/sghalf\w+/g,'') !== rfSeal('full','',40).replace(/sgfull\w+/g,''));
+    })();
   }catch(e){ console.error('THROW:', e); process.exitCode=1; }
   process.exit();
 }, 80);
