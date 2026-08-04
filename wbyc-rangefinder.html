@@ -256,6 +256,10 @@
   #bearlog .bl-cond{text-align:right;font-size:12.5px;color:#6b6350;line-height:1.55;white-space:nowrap;font-family:-apple-system,sans-serif;flex:none}
   #bearlog .bl-cond b{color:#1a1712;font-weight:700}
   #bearlog .bl-sec{font-family:'EB Garamond',serif;font-weight:600;font-size:18px;color:#1b3a66;margin:22px 0 9px}
+  #bearlog .bl-box{border:1px solid #e5dbc4;border-radius:9px;overflow:hidden;margin:18px 0 6px;background:#fffdf7}
+  #bearlog .bl-secbar{background:#a1d68b;color:#fffdf7;text-align:center;text-transform:uppercase;
+    font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:12px;font-weight:800;letter-spacing:2.5px;padding:7px 0}
+  #bearlog .bl-box .bl-stk{margin:13px 0}
   #bearlog .bl-band{display:flex;align-items:baseline;gap:16px;margin:2px 0 4px}
   #bearlog .bl-score{font-family:'EB Garamond',serif;font-weight:600;font-size:64px;line-height:.9;color:#1a1712}
   #bearlog .bl-vs{font-family:'EB Garamond',serif;font-size:23px;color:#f000c2;font-weight:600}
@@ -277,8 +281,8 @@
   #bearlog .bl-moments{flex:1 1 300px;min-width:250px}
   #bearlog .bl-mom{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px dotted #e5dbc4;font-size:14px;line-height:1.45}
   #bearlog .bl-dot{flex:none;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;margin-top:1px}
-  #bearlog .bl-map{flex:0 0 210px;text-align:center}
-  #bearlog .bl-map svg{width:210px;height:auto;border-radius:12px}
+  #bearlog .bl-map{flex:0 0 150px;text-align:center}
+  #bearlog .bl-map svg{width:150px;height:auto;border-radius:12px}
   #bearlog .bl-map .bl-cap{font-family:'EB Garamond',serif;font-style:italic;font-size:12.5px;color:#6b6350;margin-top:6px}
   #bearlog .bl-note{margin:20px 0 6px;background:#fbe3f4;border-left:6px solid #f000c2;border-radius:0 10px 10px 0;
     padding:16px 22px;font-family:'EB Garamond',serif;font-style:italic;font-size:19px;color:#1a1712;line-height:1.5;cursor:pointer}
@@ -319,7 +323,7 @@
     #bearlog .bl-mk{width:20px;height:20px}
     #bearlog .bl-cols{gap:12px}
     #bearlog .bl-map{flex:1 1 100%}
-    #bearlog .bl-map svg{width:100%;max-width:260px}
+    #bearlog .bl-map svg{width:100%;max-width:200px}
     #bearlog .bl-note{padding:14px 16px;font-size:17px}
     #bearlog .bl-bear{padding:24px 18px 16px;font-size:16.5px}
   }
@@ -334,11 +338,11 @@
   /* The one button that commits something. Quiet while there's nothing to save,
      solid once a round exists, ringed in gold the moment 9 or 18 holes are in —
      Kit went days without saving because nothing ever asked to be pressed. */
-  #scNew{background:#fff;color:#93a3b8;border-color:#d8cdb0;font-size:12.5px;
-    padding:9px 16px;letter-spacing:.4px;transition:background .18s,color .18s,box-shadow .18s}
-  #scNew.armed{background:#96176a;color:#fffdf7;border-color:#96176a}   /* the full-round seal's berry */
-  #scNew.ready{box-shadow:0 0 0 2px #f2a413,0 0 12px rgba(242,164,19,.5)}
-  #scNew.armed:active{background:#75104f}
+  #scNew{background:#fff;color:#1b3a66;border-color:#cfc3a2;font-size:12.5px;
+    padding:9px 16px;letter-spacing:.4px;transition:box-shadow .18s}
+  #scNew.armed{background:#fff;color:#1b3a66;border-color:#cfc3a2}   /* matches the other card buttons — no berry */
+  #scNew.ready{box-shadow:0 0 0 2px #f2a413,0 0 12px rgba(242,164,19,.5)}   /* gold ring is the only nudge once 9/18 holes are in */
+  #scNew.armed:active{background:#f3efe4}
   #scClose{min-width:46px;min-height:40px;font-size:20px !important;font-weight:900 !important;line-height:1;padding:6px 10px !important}
   #scbar button{touch-action:manipulation}
   #scLogoWrap{text-align:center;padding:0;pointer-events:none} /* negative logo margins overlap scbar — must not steal taps from ✕ */
@@ -892,7 +896,9 @@ const RF_GRAD={
   sun :[['0','#f2ffa8'],['.55','#c2ee63'],['1','#5cb861']],
   drive:[['0','#f26fae'],['.5','#ffb3d1'],['1','#ffe98a']],
   full:[['0','#ff9fd8'],['.5','#e2429b'],['1','#96176a']],
-  half:[['0','#ff9fd8'],['.5','#e2429b'],['1','#96176a']]
+  half:[['0','#ff9fd8'],['.5','#e2429b'],['1','#96176a']],
+  cloud:[['0','#5aa6ea'],['.55','#2f6cc4'],['1','#123a8f']],
+  wind :[['0','#eafbff'],['.55','#a7dfec'],['1','#6fbdd2']]
 };
 function rfShape(d, w, cx, cy, h, rot){
   const sc=h/100;
@@ -929,6 +935,57 @@ function rfUmbrella(cx, top, rx, ry){
     + `Q${(cx-rx*0.66).toFixed(1)} ${(top+ry*0.55).toFixed(1)} ${cx-rx} ${top+ry} Z" fill="${RF_GOLD}"/>`
     + `<path d="M${cx} ${(top+ry*0.78).toFixed(1)} V${top+ry+18}" stroke-linecap="round" fill="none"/></g>`;
 }
+// cloud: a stylized emoji puff — lobed top + scalloped bottom, built from a
+// circle cluster and rendered navy-silhouette-then-white so there are no seams.
+function rfCloud(cx, cy, s){
+  const C=[  // [dx, dy, r] in units of s
+    [-1.4,-1.05,1.42],[-2.85,-0.05,0.98],[1.15,-0.85,1.10],[2.5,0.18,0.82],
+    [-3.0,0.98,0.72],[-1.8,1.22,0.84],[-0.35,1.28,0.86],[1.05,1.2,0.82],[2.2,0.98,0.72]
+  ];
+  const shapes=pad=>`<ellipse cx="${cx}" cy="${(cy+0.5*s).toFixed(2)}" rx="${(3.0*s+pad).toFixed(2)}" ry="${(1.2*s+pad).toFixed(2)}"/>`
+    +C.map(c=>`<circle cx="${(cx+c[0]*s).toFixed(2)}" cy="${(cy+c[1]*s).toFixed(2)}" r="${(c[2]*s+pad).toFixed(2)}"/>`).join('');
+  const gid='clg'+Math.random().toString(36).slice(2,7);
+  return `<defs><linearGradient id="${gid}" gradientUnits="userSpaceOnUse" x1="0" y1="${(cy-2.3*s).toFixed(1)}" x2="0" y2="${(cy+2.1*s).toFixed(1)}">`
+      +`<stop offset="0" stop-color="#ffffff"/><stop offset="0.5" stop-color="#dcecfe"/><stop offset="1" stop-color="#a4c8ef"/></linearGradient></defs>`
+    + `<g fill="${RF_NAVY}">${shapes(1.2)}</g>`
+    + `<g fill="url(#${gid})">${shapes(0)}</g>`;
+}
+// wind: clean rounded lines, each curling into a small spiral at the end
+// (Kit's line-icon reference), stroked in a medium-blue gradient.
+function rfWind(cx, cy, s){
+  s=s||1; const id='wg'+Math.random().toString(36).slice(2,7);
+  // Tapered calligraphic ribbon along a centreline: a fine point that swells to a
+  // belly and tapers back to a point (the top ribbon's tip curls into a hook).
+  // Filled shape, not a stroked line — so no rounded lollipop ends.
+  // pr/pf are the rise/fall taper exponents — kept gentle so the ribbon still
+  // carries width where it crosses the disc edge (the taper points sit off-screen),
+  // which is what actually makes the swoosh BLEED off both sides instead of
+  // fading to a hairline before the rim.
+  function ribbon(C, wmax, peak, pr, pf){
+    const n=C.length, L=[], R=[];
+    for(let i=0;i<n;i++){
+      const p=C[i], a=C[Math.max(0,i-1)], b=C[Math.min(n-1,i+1)];
+      let dx=b[0]-a[0], dy=b[1]-a[1]; const m=Math.hypot(dx,dy)||1; dx/=m; dy/=m;
+      const nx=-dy, ny=dx, t=i/(n-1);
+      let w=(t<=peak?Math.pow(t/peak,pr):Math.pow((1-t)/(1-peak),pf))*wmax;
+      L.push([cx+(p[0]+nx*w)*s, cy+(p[1]+ny*w)*s]);
+      R.push([cx+(p[0]-nx*w)*s, cy+(p[1]-ny*w)*s]);
+    }
+    let d='M'+L[0][0].toFixed(2)+' '+L[0][1].toFixed(2);
+    for(let i=1;i<n;i++) d+='L'+L[i][0].toFixed(2)+' '+L[i][1].toFixed(2);
+    for(let i=n-1;i>=0;i--) d+='L'+R[i][0].toFixed(2)+' '+R[i][1].toFixed(2);
+    return d+'Z';
+  }
+  const quad=(x0,y0,mx,my,x1,y1,k)=>{const a=[];for(let i=0;i<=k;i++){const t=i/k,u=1-t;a.push([u*u*x0+2*u*t*mx+t*t*x1,u*u*y0+2*u*t*my+t*t*y1]);}return a;};
+  // Three clean swooshes that run OFF both edges, carrying width to each rim.
+  const top=quad(40,-8,2,-11,-40,-11,28);
+  const mid=quad(44,-1,2,-1,-48,-2,28);
+  const bot=quad(36,8,-2,7,-42,4,28);
+  const F=(C,w,pk,pr,pf)=>`<path d="${ribbon(C,w,pk,pr,pf)}" fill="url(#${id})"/>`;
+  return `<defs><linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${(cx-32*s).toFixed(1)}" y1="0" x2="${(cx+32*s).toFixed(1)}" y2="0">`
+      +`<stop offset="0" stop-color="#93c6f4"/><stop offset="0.5" stop-color="#5f97de"/><stop offset="1" stop-color="#417ccb"/></linearGradient></defs>`
+    + F(top,3.1,0.5,0.7,0.7) + F(mid,3.0,0.5,0.65,0.6) + F(bot,2.7,0.5,0.7,0.65);
+}
 // the round itself: an open ring from bottom-left round to bottom-right, with the
 // ball resting at the end of it — the same figure as the app icon.
 function rfRound(r, a0, a1, ink, w){
@@ -955,6 +1012,8 @@ function rfSeal(kind, cap, px){
   else if(kind==='drive') art=rfShape(RF_CLUB, RF_CW, -10, -13, 18, -45) + rfBear(0, 23, 42);
   else if(kind==='full')  art=rfRound(28.5, 112, 428, RF_GOLD, 2.8) + rfBear(0, 21, 42);
   else if(kind==='half')  art=rfRound(28.5, 112, 270, RF_GOLD, 2.8) + rfBear(0, 21, 42);  // stops at the turn
+  else if(kind==='cloud') art=rfCloud(0, -13, 6.1) + rfBear(0, 30, 44);
+  else if(kind==='wind')  art=rfWind(-8, -4, 1.05) + rfBear(0, 31, 45);  // clean swoosh, bleeds hard off both edges, sweeps behind the bear
   else                    art=rfSun(1, -21, 17, '#fff36b') + rfBear(0, 22.5, 41);
   return `<div class="bl-seal"><svg viewBox="-35 -35 70 70" width="${BOX}" height="${BOX}">`
     + `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0.35" y2="1">${stops}</linearGradient>`
@@ -1011,15 +1070,26 @@ function blBuild(){
     +`</svg><div class="bl-cap">${mcap}, on the ${blOrd(moment.h.hole_number)}</div></div>`;
   const nt=(notes[card.start]||'').trim();
   const noteHtml=`<div class="bl-note${nt?'':' empty'}" id="blNote">${nt?nt.replace(/</g,'&lt;'):'Tap to add a note about your round…'}</div>`;
-  let stk='';
-  if(birdies.length) stk+=rfSeal('bird', `${birdies.length} birdie${birdies.length>1?'s':''}`);
-  if(longest)        stk+=rfSeal('drive', `${Math.round(longest.y)}y drive`);
-  if(wx)             stk+=rfSeal(/rain|drizzle|shower|thunder|snow/i.test(wx)?'rain':'sun', wx);
-  if(t.n>=18)        stk+=rfSeal('full', '18 holes');
-  else if(t.n>=9)    stk+=rfSeal('half', '9 holes');
-  const stickers=stk?`<div class="bl-sec">Earned today</div><div class="bl-stk">${stk}</div>`
-    +`<div class="bl-stk bl-set">${rfSetRow()}</div>`
-    +`<div class="bl-hint">Earned automatically from your round — the small row is all six there are. Soon you'll tap any hole to add your own.</div>`:'';
+  // Earned — what you did out there
+  let earned='';
+  if(birdies.length) earned+=rfSeal('bird', `${birdies.length} birdie${birdies.length>1?'s':''}`);
+  if(longest)        earned+=rfSeal('drive', `${Math.round(longest.y)}y drive`);
+  if(t.n>=18)        earned+=rfSeal('full', '18 holes');
+  else if(t.n>=9)    earned+=rfSeal('half', '9 holes');
+  // Conditions — what the day gave you
+  let cond='';
+  if(wx){
+    const kind=/rain|drizzle|shower|thunder|snow/i.test(wx) ? 'rain'
+             : /cloud|overcast|fog/i.test(wx)               ? 'cloud' : 'sun';
+    cond+=rfSeal(kind, weather.temp!=null ? `${wx} · ${weather.temp}°` : wx);
+  }
+  if(wind.src && wind.spd>=12 && wind.dir!=null) cond+=rfSeal('wind', `${dirName(wind.dir)} ${wind.spd} mph`);
+  const box=(label,seals)=>`<div class="bl-box"><div class="bl-secbar">${label}</div><div class="bl-stk">${seals}</div></div>`;
+  const stickers=(earned||cond)
+    ? (earned?box('Earned',earned):'')
+     +(cond  ?box('Conditions',cond):'')
+     +`<div class="bl-hint">Earned badges come from your round; conditions from the day's weather. Soon you'll tap any hole to add your own.</div>`
+    : '';
   const ne=played.filter(x=>x.d<=-2).length, nb=birdies.length;
   let line;
   if(ne>0) line=`An eagle on the card — a day the ${blOrd(moment.h.hole_number)} won't forget.`;
@@ -2542,12 +2612,18 @@ function rfRemovePhoto(i, day){
   if(!all[d]) return; all[d].splice(i,1);
   try{ rfSavePhotos(all); }catch(e){}
 }
+let rfLogObs=null;   // the MutationObserver that re-renders photos when the log opens
 function rfRenderPhotos(){
   const log=$('bearlog'); if(!log||!log.classList.contains('open')) return;
   const foot=log.querySelector('.bl-foot'); if(!foot) return;
   let wrap=$('rfPhotos');
   if(!wrap){ wrap=document.createElement('div'); wrap.id='rfPhotos'; foot.parentNode.insertBefore(wrap, foot); }
   const list=(rfLoadPhotos()[today()])||[], kb=rfStorageKB(), tight=kb>3600;
+  // Writing innerHTML here is a subtree mutation the observer would see, re-firing
+  // rfRenderPhotos forever \u2014 that self-loop rebuilt the button on every tick, so a
+  // click's mousedown and mouseup landed on different nodes and never registered.
+  // Detach while we write, then reattach.
+  if(rfLogObs) rfLogObs.disconnect();
   wrap.innerHTML='<h4>The Photographs</h4><div class="rf-grid">'
     + list.map((src,i)=>`<figure><img src="${src}" alt=""><button class="rf-x" data-i="${i}" aria-label="Remove">\u00d7</button></figure>`).join('')
     + (list.length<RF_CAP ? '<button class="rf-add" id="rfAdd">+ add a photograph</button>' : '')
@@ -2555,6 +2631,7 @@ function rfRenderPhotos(){
     + list.length+' of '+RF_CAP+' \u00b7 '+kb+'KB of roughly 5000KB used'+(tight?' \u2014 running low':'')+'</div>';
   const add=$('rfAdd'); if(add) add.onclick=()=>$('rfPhotoInput').click();
   wrap.querySelectorAll('.rf-x').forEach(b=>{ b.onclick=()=>{ rfRemovePhoto(+b.dataset.i); rfRenderPhotos(); }; });
+  if(rfLogObs) rfLogObs.observe(log,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
 }
 function wireMemoryAndPhotos(){
   // Defensive: the DOM-stub harness has no textarea, FileReader or
@@ -2578,9 +2655,10 @@ function wireMemoryAndPhotos(){
     });
   });
   const log=$('bearlog');
-  if(log && typeof MutationObserver!=='undefined')
-    new MutationObserver(()=>setTimeout(rfRenderPhotos,0))
-      .observe(log,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+  if(log && typeof MutationObserver!=='undefined'){
+    rfLogObs=new MutationObserver(()=>setTimeout(rfRenderPhotos,0));
+    rfLogObs.observe(log,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+  }
 }
 </script>
 </body>
