@@ -10,3 +10,24 @@ demo-backpocket.html
 split-back-pocket.sh
 WBYC-bear-stickers-v*
 _perm_test
+
+# --- scratch keepsake renders & samples (regenerated on demand) ---
+WBYC-Keepsake-page.png
+WBYC-Keepsake-page.svg
+WBYC-Round-Diary-sample.html
+keepsake-template.html
+
+# --- local restore/backup snapshots ---
+WBYC-restore-*.json
+
+# --- Back Pocket / go-to-market work: keep OUT of the public WBYC repo
+#     until the Back Pocket split is done (delete a line to start tracking one) ---
+sell-sheet.html
+gtm-playbook.md
+brand-tpc.json
+build_demo.py
+deploy_demo.py
+back-pocket-promo-calendar.md
+
+# --- local plugin skill bundles ---
+skills/
