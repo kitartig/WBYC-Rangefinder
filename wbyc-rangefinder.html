@@ -148,6 +148,7 @@
   .dist .val{font-size:34px;font-weight:800;line-height:1.15;font-variant-numeric:tabular-nums}
   .dist .box.center .val{font-size:44px;color:var(--accent)}
   .dist .plays{font-size:11px;font-weight:700;color:var(--accent2);min-height:14px}
+  body.sun .dist .plays{color:#1b3a66}   /* dark blue on the daytime center box (was brown) */
 
   #mapwrap{background:var(--card);border:1px solid var(--line);border-radius:12px;
     margin-bottom:10px;overflow:hidden;position:relative;touch-action:pan-y}
@@ -212,9 +213,9 @@
   #scstrip{display:flex;justify-content:space-around;align-items:center;gap:8px;background:var(--card);
     border:1px solid var(--line);border-radius:12px;padding:9px 10px;margin-bottom:10px}
   #scstrip .grp{display:flex;flex-direction:column;align-items:center;gap:3px;
-    font-size:11px;font-weight:800;color:var(--text);letter-spacing:.5px}
+    font-size:12.5px;font-weight:800;color:var(--text);letter-spacing:.5px}
   #scstrip .grp .ct{display:flex;align-items:center;gap:7px}
-  #scstrip .grp b{font-size:36px;line-height:1;color:var(--text);min-width:40px;text-align:center;font-variant-numeric:tabular-nums}
+  #scstrip .grp b{font-size:44px;line-height:1;color:var(--text);min-width:46px;text-align:center;font-variant-numeric:tabular-nums}
   #scstrip button{width:46px;height:50px;border-radius:10px;border:1px solid var(--line);background:none;
     color:var(--text);font-size:27px;font-weight:700;cursor:pointer;flex:none;touch-action:manipulation}
   #scorecard{position:fixed;inset:0;background:#f2e9d6;z-index:60;display:none;flex-direction:column;padding:4px 12px 10px}
@@ -398,7 +399,7 @@
   #gps{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;color:var(--text);
     background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 12px;margin-bottom:10px;gap:8px}
   #gps .dot{width:11px;height:11px;border-radius:50%;background:#666;display:inline-block;margin-right:7px;flex:none}
-  #gps .dot.ok{background:#45dca0;box-shadow:0 0 6px rgba(69,220,160,.75)} #gps .dot.bad{background:var(--red)} #gps .dot.demo{background:var(--accent2)}
+  #gps .dot.ok{background:#45dca0;box-shadow:0 0 6px rgba(69,220,160,.75)} #gps .dot.bad{background:var(--red)} #gps .dot.demo{background:#0e6b3a}   /* GPS-off dot: dark green (was brown) */
   #gps .dot.ok, #gps.live #gpsText{color:#17a06a}   /* matches the GPS mint chip */
   #gps.live{font-weight:700}
   /* status-card pills — solid colour chips, white type; muted when off, saturated + glow when active */
