@@ -548,6 +548,9 @@
 
 <script>
 "use strict";
+/* Vendored libraries are inlined here by build.py (html2canvas → keepsake image
+   export for Share). Kept out of the template so this file stays readable. */
+/*__VENDOR__*/
 /* ============ DATA ============ */
 const EMBEDDED_COURSE = /*__COURSE_DATA__*/null;
 const TOPO_DATA = /*__TOPO_DATA__*/null;
@@ -762,6 +765,9 @@ function detectHole(){
 /* ============ SHOT TRACKING ============ */
 const CLUBS=['D','3W','5W','3H','4i','5i','6i','7i','8i','9i','PW','GW','SW','LW'];
 let shots=[]; try{ shots=JSON.parse(localStorage.getItem('{{STORE}}_shots'))||[]; }catch(e){}
+let rfLogObs=null;   // Bear's Log photo-panel MutationObserver — declared up here (not
+                     // beside rfRenderPhotos) so it exists before wireMemoryAndPhotos()
+                     // runs at init; a `let` beside the function was in its dead zone.
 const saveShots=()=>localStorage.setItem('{{STORE}}_shots', JSON.stringify(shots));
 let curClub=localStorage.getItem('{{STORE}}_club'); if(!CLUBS.includes(curClub)) curClub='7i';
 // LOCAL date, not UTC. toISOString() is UTC, so in Minnesota (UTC-5/-6) every
@@ -1137,7 +1143,10 @@ function blBuild(){
   return {empty:false, html:page};
 }
 let blCtx=null;   // the stored round being viewed, or null for the live round
-function blActiveDate(){ return (blCtx&&blCtx.date) ? blCtx.date : today(); }
+// The date a keepsake's photos are filed under: a reopened round's own date, else
+// the live card's start (which is today for a normal round, but stays correct for a
+// round begun before midnight — and matches the date the round reopens under).
+function blActiveDate(){ return (blCtx&&blCtx.date) ? blCtx.date : ((typeof card!=='undefined'&&card&&card.start) ? card.start : today()); }
 function openBearLog(round){
   blCtx = round || null;   // a round arg reopens history; no arg = the live card
   const d = blActiveDate();
@@ -1153,42 +1162,34 @@ function openBearLog(round){
   const nEl=$('blNote'); if(nEl) nEl.onclick=()=>{ const v=prompt('A line to remember this round by:', notes[d]||''); if(v!==null){ if(v.trim()) notes[d]=v.trim(); else delete notes[d]; saveNotes(); openBearLog(blCtx); } };
   $('bearlog').classList.add('open');
 }
-// Render the keepsake page to a PNG and hand it to the OS share sheet. HTML→image
-// is done with an SVG <foreignObject> (no external library, keeps the app one file
-// and offline). Some browsers (notably iOS Safari) won't rasterise a foreignObject
-// or taint the canvas — every failure path falls back to Save/Print, which on a
-// phone still yields a shareable PDF. So Share upgrades where it can, never breaks.
+// Render the keepsake page to a PNG and hand it to the OS share sheet. html2canvas
+// (inlined by build.py) walks the DOM and paints to a canvas directly — no SVG
+// foreignObject, so it works on iOS Safari and never taints the canvas. If it is
+// somehow unavailable or fails, we fall back to Save/Print, which on a phone still
+// yields a shareable PDF. So Share upgrades where it can and never breaks.
+function blShareDeliver(blob, d){
+  if(!blob){ window.print(); return; }
+  const fname=`bears-log-${d}.png`, file=new File([blob], fname, {type:'image/png'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    navigator.share({files:[file], title:"{{DIARY}}", text:"My round — kept by the {{BRAND}} {{PRODUCT}}"}).catch(()=>{});
+  }else{
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fname;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+  }
+}
 function blShare(d){
   const page=document.querySelector('#bearlog .bl-page');
-  if(!page){ window.print(); return; }
-  const clone=page.cloneNode(true);
-  clone.querySelectorAll('.rf-add,.rf-budget,.rf-x,.bl-note.empty').forEach(n=>n.remove());
-  const W=Math.round(page.getBoundingClientRect().width)||480, H=Math.round(page.scrollHeight)||640;
-  const css=Array.prototype.map.call(document.querySelectorAll('style'), s=>s.textContent).join('\n');
-  const xhtml=`<div xmlns="http://www.w3.org/1999/xhtml" id="bearlog" class="open" style="position:static;background:#fff;padding:0;width:${W}px">`
-    +`<style>${css}</style>${clone.outerHTML}</div>`;
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><foreignObject x="0" y="0" width="${W}" height="${H}">${xhtml}</foreignObject></svg>`;
-  const img=new Image(); const scale=Math.min(2, window.devicePixelRatio||1);
-  img.onload=()=>{
-    let blobDone=false;
-    try{
-      const c=document.createElement('canvas'); c.width=Math.round(W*scale); c.height=Math.round(H*scale);
-      const ctx=c.getContext('2d'); ctx.scale(scale,scale); ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H); ctx.drawImage(img,0,0);
-      c.toBlob(blob=>{
-        if(!blob){ if(!blobDone) window.print(); return; }
-        blobDone=true;
-        const fname=`bears-log-${d}.png`, file=new File([blob], fname, {type:'image/png'});
-        if(navigator.canShare && navigator.canShare({files:[file]})){
-          navigator.share({files:[file], title:"{{DIARY}}", text:"My round — kept by the {{BRAND}} {{PRODUCT}}"}).catch(()=>{});
-        }else{
-          const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fname;
-          document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
-        }
-      }, 'image/png');
-    }catch(e){ window.print(); }   // tainted canvas (Chrome/Safari security) → print fallback
-  };
-  img.onerror=()=>window.print();
-  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+  if(!page || typeof html2canvas==='undefined'){ window.print(); return; }
+  // leave interactive chrome (add-photo, budget line, remove ×, empty-note prompt)
+  // out of the shared image
+  const ignore=el=>el.classList && (el.classList.contains('rf-add')||el.classList.contains('rf-budget')
+    ||el.classList.contains('rf-x')||(el.classList.contains('bl-note')&&el.classList.contains('empty')));
+  const btn=$('blShare'); if(btn){ btn.disabled=true; btn.textContent='…'; }
+  html2canvas(page,{backgroundColor:'#fffdf7', scale:Math.min(2,window.devicePixelRatio||1),
+      useCORS:true, logging:false, ignoreElements:ignore})
+    .then(c=>{ if(c&&c.toBlob) c.toBlob(b=>blShareDeliver(b,d),'image/png'); else window.print(); })
+    .catch(()=>window.print())
+    .then(()=>{ if(btn){ btn.disabled=false; btn.textContent='Share'; } });
 }
 function renderCard(){
   const row=i=>{
@@ -2687,7 +2688,6 @@ function rfRemovePhoto(i, day){
   if(!all[d]) return; all[d].splice(i,1);
   try{ rfSavePhotos(all); }catch(e){}
 }
-let rfLogObs=null;   // the MutationObserver that re-renders photos when the log opens
 function rfRenderPhotos(){
   const log=$('bearlog'); if(!log||!log.classList.contains('open')) return;
   const foot=log.querySelector('.bl-foot'); if(!foot) return;

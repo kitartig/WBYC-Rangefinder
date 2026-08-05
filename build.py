@@ -97,6 +97,14 @@ if foreign:
     sys.exit('!! another club\'s identity survived: '
              + ', '.join(f'{k}x{v}' for k, v in Counter(foreign).items()))
 
+# ---------------- inline vendored libraries ----------------
+# html2canvas powers the keepsake's Share-as-image. Kept as a separate file so the
+# template stays readable; injected here so the shipped app is still one offline file.
+vendor = open('vendor/html2canvas.min.js', encoding='utf-8').read()
+if out.count('/*__VENDOR__*/') != 1:
+    sys.exit('vendor marker /*__VENDOR__*/ missing or duplicated in the template')
+out = out.replace('/*__VENDOR__*/', vendor)
+
 # ---------------- write ----------------
 o = brand.get('outputs', {})
 app_path = o.get('app', 'app.html')
