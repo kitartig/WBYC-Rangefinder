@@ -136,6 +136,24 @@ setTimeout(()=>{
       A('bearlog has a memento note field', typeof elems['blNote'].onclick==='function');
       elems['blClose'].onclick(); A('bearlog closes', !elems['bearlog'].classList.contains('open'));
     })();
+    // reopening a STORED round (tap a history row) renders its own keepsake, with the
+    // snapshotted weather as Conditions, and points photos at that round's date
+    (()=>{ const p0=course.holes[0].par;
+      const stored={date:'2026-06-15', tee:'White', pname:'Kit',
+        holes:Array.from({length:18},(_,i)=>({s:i===0?p0-1:i===5?4:0,p:1,f:null})),
+        weather:{code:3,temp:58,day:true}, wind:{src:'om',spd:16,dir:315}};
+      openBearLog(stored);
+      A('stored round reopens its keepsake', elems['bearlog'].classList.contains('open')
+        && elems['bearlog'].innerHTML.includes('The Score') && elems['bearlog'].innerHTML.includes('Conditions'));
+      A('reopened keepsake targets the round\'s date for photos', blActiveDate()==='2026-06-15');
+      elems['blClose'].onclick();
+      A('closing a reopened round clears the context', blActiveDate()===today());
+      const legacy={date:'2025-09-01', tee:'White',
+        holes:Array.from({length:18},(_,i)=>({s:i<9?4:0,p:1,f:null}))};   // no weather snapshot
+      openBearLog(legacy);
+      A('legacy round without weather still builds', elems['bearlog'].classList.contains('open') && elems['bearlog'].innerHTML.includes('The Card'));
+      elems['blClose'].onclick();
+    })();
     // self-writing memory line from past rounds
     (()=>{ const save=rounds.slice(); rounds.length=0;
       const p0=course.holes[0].par, p1=course.holes[1].par;

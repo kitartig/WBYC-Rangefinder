@@ -244,6 +244,9 @@
     touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   #bearlog .bl-bar button:active{background:#efe6d2}
   #bearlog .bl-bar .bl-x{width:46px;height:46px;padding:0;font-size:21px;border-radius:50%}
+  #bearlog .bl-bar .bl-actions{display:flex;gap:8px}
+  #bearlog .bl-bar #blShare{background:#1b3a66;color:#fffdf7;border-color:#1b3a66}
+  #bearlog .bl-bar #blShare:active{background:#14305a}
   #bearlog .bl-page{max-width:620px;margin:0 auto 40px;background:#fffdf7;border:1px solid #e5dbc4;
     border-radius:18px;box-shadow:0 14px 42px rgba(60,45,20,.18);padding:22px 30px 26px;position:relative}
   #bearlog .bl-page:before{content:"";position:absolute;inset:9px;border:1px solid #ece2c9;border-radius:12px;pointer-events:none}
@@ -370,6 +373,10 @@
   #sctab table.cardt{table-layout:fixed}
   #sctab table.cardt td:first-child,#sctab table.cardt th:first-child{text-align:center;padding-left:3px}
   #sctab td small{color:#7b93b8;font-size:11px}
+  #sctab tr.bl-open{cursor:pointer}
+  #sctab tr.bl-open:hover td{background:#f4f8ff}
+  #sctab tr.bl-open:active td{background:#e9f0fb}
+  .bl-openhint{text-align:center;font-size:11px;color:#7b8aa3;margin:8px 0 2px;font-family:-apple-system,sans-serif;letter-spacing:.3px}
   #sctab tr.cur td{color:#1f5fd0;font-weight:700}
   #sctab tr.tot td{font-weight:700;border-top:2px solid #9fc2ea}
   #sctab tr[data-h]{cursor:pointer}
@@ -815,8 +822,12 @@ let rounds=[]; try{ rounds=JSON.parse(localStorage.getItem('wbyc_rounds'))||[]; 
 const saveRounds=()=>localStorage.setItem('wbyc_rounds', JSON.stringify(rounds));
 function archiveRound(){ // bank the current card into history (called before NEW ROUND clears it)
   const t=cardTotals(); if(!t.n) return;
-  rounds.push({date:card.start, tee, n:t.n, s:t.s, par:t.par, p:t.p, fwH:t.fwH, fwT:t.fwT, gir:t.gir,
-               holes:card.holes.map(e=>({s:e.s,p:e.p,f:e.f}))});
+  rounds.push({date:card.start, tee, pname, n:t.n, s:t.s, par:t.par, p:t.p, fwH:t.fwH, fwT:t.fwT, gir:t.gir,
+               holes:card.holes.map(e=>({s:e.s,p:e.p,f:e.f})),
+               // snapshot the live weather/wind so the keepsake can be reopened later
+               // with its Conditions intact (both are fetched live, never persisted otherwise)
+               weather:{code:weather.code, temp:weather.temp, day:weather.day},
+               wind:{src:wind.src, spd:wind.spd, dir:wind.dir}});
   saveRounds();
 }
 // A scored card from an earlier day means two rounds are about to merge. Ask once,
@@ -850,11 +861,13 @@ const holeHcp=h=> tee==='Green' ? (h.handicap_index_women_green ?? h.handicap_in
              : tee==='Gold'  ? (h.handicap_index_gold ?? h.handicap_index)
              : h.handicap_index;
 const fmtDiff=d=> d===0 ? 'E' : (d>0?'+':'')+d;
-function cardTotals(){
+function cardTotals(hs){
   // fwH/fwT are still computed and banked so archived rounds keep their shape —
   // the FW logger came off the strip at v118, so nothing DISPLAYS them any more.
+  // Pass a holes array to total a stored round; defaults to the live card.
+  hs=hs||card.holes;
   let s=0,p=0,par=0,n=0,fwH=0,fwT=0,gir=0;
-  card.holes.forEach((e,i)=>{
+  hs.forEach((e,i)=>{
     if(e.s>0){
       const hp=holePar(course.holes[i]);
       s+=e.s; p+=e.p; par+=hp; n++;
@@ -1024,32 +1037,43 @@ function rfSeal(kind, cap, px){
     + (cap?`<div class="bl-scap">${cap}</div>`:'') + `</div>`;
 }
 
-function blWx(){
+function blWx(w){
+  w=w||weather;
   const W={0:'Clear',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',45:'Foggy',48:'Foggy',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',56:'Freezing drizzle',57:'Freezing drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',66:'Freezing rain',67:'Freezing rain',71:'Light snow',73:'Snow',75:'Heavy snow',77:'Snow grains',80:'Showers',81:'Showers',82:'Heavy showers',85:'Snow showers',86:'Snow showers',95:'Thunderstorms',96:'Thunderstorms',99:'Thunderstorms'};
-  const c=weather.code; if(c==null) return ''; if(c===0) return weather.day?'Sunny':'Clear'; return W[c]||'';
+  const c=w.code; if(c==null) return ''; if(c===0) return w.day?'Sunny':'Clear'; return W[c]||'';
 }
 const blOrd=n=>{const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);};
 function blBuild(){
-  const t=cardTotals(), H=course.holes;
-  const dd=new Date((card.start||new Date().toISOString().slice(0,10))+'T12:00');
+  // A keepsake can be built for the LIVE round (blCtx null) or a STORED round
+  // reopened from history (blCtx = that round). Everything downstream reads these
+  // resolved locals, never the live globals, so both paths render identically.
+  const S=(typeof blCtx!=='undefined'&&blCtx)?blCtx:null;
+  const holes    = S ? S.holes : card.holes;
+  const startDate= S ? S.date  : card.start;
+  const teeU     = S ? (S.tee||tee) : tee;
+  const nameU    = S ? (S.pname!=null?S.pname:pname) : pname;
+  const wxObj    = S ? (S.weather||{code:null,temp:null,day:true}) : weather;
+  const wndObj   = S ? (S.wind||{src:null,spd:0,dir:null}) : wind;
+  const t=cardTotals(holes), H=course.holes;
+  const dd=new Date((startDate||new Date().toISOString().slice(0,10))+'T12:00');
   const dateStr=dd.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   if(!t.n) return {empty:true, html:`<div class="bl-page" style="text-align:center;padding-top:40px">
     <div class="bl-sec" style="text-align:center">No round yet</div>
     <p style="font-family:'EB Garamond',serif;font-style:italic;color:#6b6350">Score a hole and your Bear's Log will start writing itself.</p></div>`};
-  const played=H.map((h,i)=>({h,i,e:card.holes[i],hp:holePar(h),d:card.holes[i].s?card.holes[i].s-holePar(h):0})).filter(x=>x.e.s>0);
-  const wx=blWx();
-  const l1=[]; if(wx) l1.push('<b>'+wx+'</b>'); if(weather.temp!=null) l1.push(weather.temp+'°F');
-  const wline=(wind.src&&wind.spd>0&&wind.dir!=null)?`${dirName(wind.dir)} wind ${wind.spd} mph`:'';
+  const played=H.map((h,i)=>({h,i,e:holes[i],hp:holePar(h),d:holes[i].s?holes[i].s-holePar(h):0})).filter(x=>x.e.s>0);
+  const wx=blWx(wxObj);
+  const l1=[]; if(wx) l1.push('<b>'+wx+'</b>'); if(wxObj.temp!=null) l1.push(wxObj.temp+'°F');
+  const wline=(wndObj.src&&wndObj.spd>0&&wndObj.dir!=null)?`${dirName(wndObj.dir)} wind ${wndObj.spd} mph`:'';
   const condHtml=(l1.length||wline)?`<div class="bl-cond">${l1.join(' · ')}${(l1.length&&wline)?'<br>':''}${wline}</div>`:'';
   const mk=(e,hp)=>{ if(!e.s) return '<span class="bl-mk"></span>'; const d=e.s-hp; let c=''; if(d<=-2)c='bl-eagle';else if(d===-1)c='bl-bird';else if(d===1)c='bl-bog';else if(d>=2)c='bl-dbl'; return `<span class="bl-mk ${c}">${e.s}</span>`; };
   const nine=(a,b,lbl)=>{ let hh='',pp='',yy='',sp=0,sy=0,any=false;
-    for(let i=a;i<b;i++){ const h=H[i],e=card.holes[i],hp=holePar(h); hh+=`<td>${h.hole_number}</td>`; pp+=`<td class="bl-par">${hp}</td>`; yy+=`<td>${mk(e,hp)}</td>`; sp+=hp; if(e.s){sy+=e.s;any=true;} }
+    for(let i=a;i<b;i++){ const h=H[i],e=holes[i],hp=holePar(h); hh+=`<td>${h.hole_number}</td>`; pp+=`<td class="bl-par">${hp}</td>`; yy+=`<td>${mk(e,hp)}</td>`; sp+=hp; if(e.s){sy+=e.s;any=true;} }
     return `<table class="bl-hs"><tr><td class="bl-lab">HOLE</td>${hh}<td class="bl-tot">${lbl}</td></tr>`
       +`<tr><td class="bl-lab">PAR</td>${pp}<td class="bl-tot">${sp}</td></tr>`
-      +`<tr><td class="bl-lab">${(pname||'YOU').toUpperCase().slice(0,4)}</td>${yy}<td class="bl-tot">${any?sy:''}</td></tr></table>`; };
+      +`<tr><td class="bl-lab">${(nameU||'YOU').toUpperCase().slice(0,4)}</td>${yy}<td class="bl-tot">${any?sy:''}</td></tr></table>`; };
   const strip=`<div class="bl-strip">${nine(0,9,'OUT')}${nine(9,18,'IN')}</div>`;
   const birdies=played.filter(x=>x.d<=-1).sort((a,b)=>a.d-b.d);
-  const sd=shotDists(card.start); const longest=sd.length?sd.reduce((a,b)=>b.y>a.y?b:a):null;
+  const sd=shotDists(startDate); const longest=sd.length?sd.reduce((a,b)=>b.y>a.y?b:a):null;
   const moment=played.reduce((a,b)=>b.d<a.d?b:a);
   let moms='';
   birdies.forEach(x=>{ const lbl=x.d<=-2?'Eagle':'Birdie'; moms+=`<div class="bl-mom"><span class="bl-dot" style="background:#f000c2">&#8595;</span><div><b>${lbl} on the ${blOrd(x.h.hole_number)}</b> — ${x.e.s} on the par ${x.hp}.</div></div>`; });
@@ -1068,7 +1092,7 @@ function blBuild(){
     +`<g transform="translate(100,60)"><path d="M0 -11 L3.2 -3.4 L11 -3.4 L4.6 1.6 L7.1 9.3 L0 4.6 L-7.1 9.3 L-4.6 1.6 L-11 -3.4 L-3.2 -3.4 Z" fill="#f000c2" stroke="#fff" stroke-width="1.1"/></g>`
     +`<text x="106" y="112" text-anchor="middle" font-family="'EB Garamond',serif" font-style="italic" font-size="14" fill="#0e5a32">the ${blOrd(moment.h.hole_number)}</text>`
     +`</svg><div class="bl-cap">${mcap}, on the ${blOrd(moment.h.hole_number)}</div></div>`;
-  const nt=(notes[card.start]||'').trim();
+  const nt=(notes[startDate]||'').trim();
   const noteHtml=`<div class="bl-note${nt?'':' empty'}" id="blNote">${nt?nt.replace(/</g,'&lt;'):'Tap to add a note about your round…'}</div>`;
   // Earned — what you did out there
   let earned='';
@@ -1081,9 +1105,9 @@ function blBuild(){
   if(wx){
     const kind=/rain|drizzle|shower|thunder|snow/i.test(wx) ? 'rain'
              : /cloud|overcast|fog/i.test(wx)               ? 'cloud' : 'sun';
-    cond+=rfSeal(kind, weather.temp!=null ? `${wx} · ${weather.temp}°` : wx);
+    cond+=rfSeal(kind, wxObj.temp!=null ? `${wx} · ${wxObj.temp}°` : wx);
   }
-  if(wind.src && wind.spd>=12 && wind.dir!=null) cond+=rfSeal('wind', `${dirName(wind.dir)} ${wind.spd} mph`);
+  if(wndObj.src && wndObj.spd>=12 && wndObj.dir!=null) cond+=rfSeal('wind', `${dirName(wndObj.dir)} ${wndObj.spd} mph`);
   const box=(label,seals)=>`<div class="bl-box"><div class="bl-secbar">${label}</div><div class="bl-stk">${seals}</div></div>`;
   const stickers=(earned||cond)
     ? (earned?box('Earned',earned):'')
@@ -1098,7 +1122,7 @@ function blBuild(){
   else if(t.n>=18) line=`Eighteen honest holes on the water's edge. Onward.`;
   else line=`${t.n} holes in the book. The course will keep for next time.`;
   const vs=t.s-t.par, vsTxt=(vs===0?'E':(vs>0?'+':'')+vs), thru=t.n<18?` · thru ${t.n}`:'';
-  const who=`${pname?pname+' · ':''}${tee} tees`;
+  const who=`${nameU?nameU+' · ':''}${teeU} tees`;
   const page=`<div class="bl-page">`
     +`<div class="bl-mast"><img class="bl-burgee" alt=""><div class="bl-t">`
     +`<div class="bl-eyebrow">The Bear's Log · WBYC</div><div class="bl-date">${dateStr}</div><div class="bl-who">${who}</div></div>${condHtml}</div>`
@@ -1108,19 +1132,63 @@ function blBuild(){
     +`<div class="bl-sec">The Card</div>${strip}`
     +`<div class="bl-sec">The Moments</div><div class="bl-cols"><div class="bl-moments">${moms}</div>${map}</div>`
     +noteHtml+stickers
-    +`<div class="bl-bear">${line}<span class="bl-sig">— kept for ${pname||'you'} by the WBYC Rangefinder</span></div>`
+    +`<div class="bl-bear">${line}<span class="bl-sig">— kept for ${nameU||'you'} by the WBYC Rangefinder</span></div>`
     +`<div class="bl-foot">WHITE BEAR YACHT CLUB · EST. 1889 · ${dateStr.toUpperCase()}</div></div>`;
   return {empty:false, html:page};
 }
-function openBearLog(){
+let blCtx=null;   // the stored round being viewed, or null for the live round
+function blActiveDate(){ return (blCtx&&blCtx.date) ? blCtx.date : today(); }
+function openBearLog(round){
+  blCtx = round || null;   // a round arg reopens history; no arg = the live card
+  const d = blActiveDate();
   const r=blBuild();
-  const bar=`<div class="bl-bar"><button class="bl-x" id="blClose" aria-label="Close">✕</button>${r.empty?'':'<button id="blPrint">Save / Print</button>'}</div>`;
+  const bar=`<div class="bl-bar"><button class="bl-x" id="blClose" aria-label="Close">✕</button>`
+    + (r.empty?'':`<span class="bl-actions"><button id="blShare">Share</button><button id="blPrint">Save / Print</button></span>`)
+    + `</div>`;
   $('bearlog').innerHTML=bar+r.html;
   const lg=$('logo'), bg=document.querySelector('#bearlog .bl-burgee'); if(bg&&lg) bg.src=lg.src;
-  $('blClose').onclick=()=>$('bearlog').classList.remove('open');
+  $('blClose').onclick=()=>{ $('bearlog').classList.remove('open'); blCtx=null; };
   const pr=$('blPrint'); if(pr) pr.onclick=()=>window.print();
-  const nEl=$('blNote'); if(nEl) nEl.onclick=()=>{ const v=prompt('A line to remember this round by:', notes[card.start]||''); if(v!==null){ if(v.trim()) notes[card.start]=v.trim(); else delete notes[card.start]; saveNotes(); openBearLog(); } };
+  const sh=$('blShare'); if(sh) sh.onclick=()=>blShare(d);
+  const nEl=$('blNote'); if(nEl) nEl.onclick=()=>{ const v=prompt('A line to remember this round by:', notes[d]||''); if(v!==null){ if(v.trim()) notes[d]=v.trim(); else delete notes[d]; saveNotes(); openBearLog(blCtx); } };
   $('bearlog').classList.add('open');
+}
+// Render the keepsake page to a PNG and hand it to the OS share sheet. HTML→image
+// is done with an SVG <foreignObject> (no external library, keeps the app one file
+// and offline). Some browsers (notably iOS Safari) won't rasterise a foreignObject
+// or taint the canvas — every failure path falls back to Save/Print, which on a
+// phone still yields a shareable PDF. So Share upgrades where it can, never breaks.
+function blShare(d){
+  const page=document.querySelector('#bearlog .bl-page');
+  if(!page){ window.print(); return; }
+  const clone=page.cloneNode(true);
+  clone.querySelectorAll('.rf-add,.rf-budget,.rf-x,.bl-note.empty').forEach(n=>n.remove());
+  const W=Math.round(page.getBoundingClientRect().width)||480, H=Math.round(page.scrollHeight)||640;
+  const css=Array.prototype.map.call(document.querySelectorAll('style'), s=>s.textContent).join('\n');
+  const xhtml=`<div xmlns="http://www.w3.org/1999/xhtml" id="bearlog" class="open" style="position:static;background:#fff;padding:0;width:${W}px">`
+    +`<style>${css}</style>${clone.outerHTML}</div>`;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><foreignObject x="0" y="0" width="${W}" height="${H}">${xhtml}</foreignObject></svg>`;
+  const img=new Image(); const scale=Math.min(2, window.devicePixelRatio||1);
+  img.onload=()=>{
+    let blobDone=false;
+    try{
+      const c=document.createElement('canvas'); c.width=Math.round(W*scale); c.height=Math.round(H*scale);
+      const ctx=c.getContext('2d'); ctx.scale(scale,scale); ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H); ctx.drawImage(img,0,0);
+      c.toBlob(blob=>{
+        if(!blob){ if(!blobDone) window.print(); return; }
+        blobDone=true;
+        const fname=`bears-log-${d}.png`, file=new File([blob], fname, {type:'image/png'});
+        if(navigator.canShare && navigator.canShare({files:[file]})){
+          navigator.share({files:[file], title:"The Bear's Log", text:"My round — kept by the WBYC Rangefinder"}).catch(()=>{});
+        }else{
+          const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fname;
+          document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+        }
+      }, 'image/png');
+    }catch(e){ window.print(); }   // tainted canvas (Chrome/Safari security) → print fallback
+  };
+  img.onerror=()=>window.print();
+  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
 }
 function renderCard(){
   const row=i=>{
@@ -1162,13 +1230,15 @@ function renderStats(){
       +`<polyline points="${xy.map(q=>q.join(',')).join(' ')}" fill="none" stroke="var(--accent2)" stroke-width="2" opacity=".9"/>`
       +xy.map(q=>`<circle cx="${q[0]}" cy="${q[1]}" r="2.5" fill="var(--accent2)"/>`).join('')+'</svg>';
   }
-  const row=r=>`<tr><td>${r.date}</td><td>${r.tee}</td>`
+  // data-ri = index back into `rounds`; tapping a row reopens that round's keepsake
+  const row=(r,i)=>`<tr class="bl-open" data-ri="${rounds.length-1-i}" title="Open this round’s keepsake"><td>${r.date}</td><td>${r.tee}</td>`
     +`<td>${r.s}${r.n===18?` <small>${fmtDiff(r.s-r.par)}</small>`:` <small>(${r.n}h)</small>`}</td>`
     +`<td>${r.p||''}</td><td>${r.gir||''}</td></tr>`;
   html+='<table><tr><th>DATE</th><th>TEE</th><th>SCORE</th><th>PUTTS</th><th>GIR</th></tr>'
     +(rounds.length ? rounds.slice().reverse().slice(0,20).map(row).join('')
                     : '<tr><td colspan="5" style="text-align:center;color:var(--dim)">no rounds banked yet — finish a round, then tap NEW to save it here</td></tr>')
-    +'</table>';
+    +'</table>'
+    +(rounds.length?'<div class="bl-openhint">Tap any round to open its keepsake</div>':'');
   $('sctab').innerHTML=html;
   if(full.length){
     const best=full.reduce((a,r)=>(r.s-r.par)<(a.s-a.par)?r:a);
@@ -2468,8 +2538,13 @@ function init(data){
     r.readAsText(f); e.target.value='';
   };
   $('scNew').onclick=()=>{ if(confirm('Save this round to your history and start a fresh card?')){ archiveRound(); card=blankCard(); saveCard(); scShow(); renderScore(); } };
-  $('sctab').onclick=ev=>{ // tap a hole row to jump there
-    const tr=ev.target && ev.target.closest ? ev.target.closest('tr[data-h]') : null;
+  $('sctab').onclick=ev=>{
+    const cl=ev.target && ev.target.closest ? ev.target : null; if(!cl) return;
+    // tap a banked-round row (STATS view) to reopen that round's keepsake
+    const ro=ev.target.closest('tr[data-ri]');
+    if(ro){ const r=rounds[+ro.dataset.ri]; if(r){ $('scorecard').classList.remove('open'); openBearLog(r); } return; }
+    // tap a hole row (CLUB TRACKS view) to jump there
+    const tr=ev.target.closest('tr[data-h]');
     if(!tr) return;
     manualUntil=Date.now()+18e4;
     holeIdx=+tr.dataset.h; snapDemo();
@@ -2618,7 +2693,8 @@ function rfRenderPhotos(){
   const foot=log.querySelector('.bl-foot'); if(!foot) return;
   let wrap=$('rfPhotos');
   if(!wrap){ wrap=document.createElement('div'); wrap.id='rfPhotos'; foot.parentNode.insertBefore(wrap, foot); }
-  const list=(rfLoadPhotos()[today()])||[], kb=rfStorageKB(), tight=kb>3600;
+  const pd=blActiveDate();   // photos belong to the round on screen (today, or a reopened one)
+  const list=(rfLoadPhotos()[pd])||[], kb=rfStorageKB(), tight=kb>3600;
   // Writing innerHTML here is a subtree mutation the observer would see, re-firing
   // rfRenderPhotos forever \u2014 that self-loop rebuilt the button on every tick, so a
   // click's mousedown and mouseup landed on different nodes and never registered.
@@ -2630,7 +2706,7 @@ function rfRenderPhotos(){
     + '</div><div class="rf-budget'+(tight?' rf-warn':'')+'">'
     + list.length+' of '+RF_CAP+' \u00b7 '+kb+'KB of roughly 5000KB used'+(tight?' \u2014 running low':'')+'</div>';
   const add=$('rfAdd'); if(add) add.onclick=()=>$('rfPhotoInput').click();
-  wrap.querySelectorAll('.rf-x').forEach(b=>{ b.onclick=()=>{ rfRemovePhoto(+b.dataset.i); rfRenderPhotos(); }; });
+  wrap.querySelectorAll('.rf-x').forEach(b=>{ b.onclick=()=>{ rfRemovePhoto(+b.dataset.i, pd); rfRenderPhotos(); }; });
   if(rfLogObs) rfLogObs.observe(log,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
 }
 function wireMemoryAndPhotos(){
@@ -2648,7 +2724,7 @@ function wireMemoryAndPhotos(){
     if(!f) return;
     rfShrink(f, uri=>{
       if(!uri){ alert('That image could not be read.'); return; }
-      const r=rfAddPhoto(uri);
+      const r=rfAddPhoto(uri, blActiveDate());
       if(r==='cap') alert(RF_CAP+' photographs per round \u2014 that\'s the limit for now.');
       else if(r==='full') alert('Storage is full, so that photograph was not saved.\n\nPhotographs share about 5MB with your rounds, shots and clubs.');
       else rfRenderPhotos();
