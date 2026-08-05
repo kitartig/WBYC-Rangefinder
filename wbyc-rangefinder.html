@@ -263,6 +263,16 @@
   #bearlog .bl-secbar{background:#a1d68b;color:#fffdf7;text-align:center;text-transform:uppercase;
     font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:12px;font-weight:800;letter-spacing:2.5px;padding:7px 0}
   #bearlog .bl-box .bl-stk{margin:13px 0}
+  /* the full collection, lined up small under each shelf */
+  #bearlog .bl-collect{display:flex;justify-content:center;gap:11px;flex-wrap:wrap;padding:2px 8px 12px;border-top:1px solid #efe7d3;margin-top:2px}
+  /* Collection minis are laid out with plain flex centering and NO auto margins or
+     CSS filters on the SVG — html2canvas mis-measures `margin:0 auto` / filtered
+     small inline SVGs and clips them to a sliver in the shared image. */
+  #bearlog .bl-collect .bl-mini{display:flex;flex-direction:column;align-items:center;width:58px}
+  #bearlog .bl-collect .bl-seal{width:58px;display:flex;flex-direction:column;align-items:center}
+  #bearlog .bl-collect .bl-seal svg{display:block;margin:0;filter:none}
+  #bearlog .bl-collect .bl-scap{font-size:8px;letter-spacing:.3px;margin-top:4px;line-height:1.15;text-align:center}
+  #bearlog .bl-collect .bl-ghost{opacity:.32}
   #bearlog .bl-band{display:flex;align-items:baseline;gap:16px;margin:2px 0 4px}
   #bearlog .bl-score{font-family:'EB Garamond',serif;font-weight:600;font-size:64px;line-height:.9;color:#1a1712}
   #bearlog .bl-vs{font-family:'EB Garamond',serif;font-size:23px;color:#f000c2;font-weight:600}
@@ -1121,23 +1131,34 @@ function blBuild(){
   const noteHtml=`<div class="bl-note${nt?'':' empty'}" id="blNote">${nt?nt.replace(/</g,'&lt;'):'Tap to add a note about your round…'}</div>`;
   // Earned — what you did out there
   let earned='';
-  if(birdies.length) earned+=rfSeal('bird', `${birdies.length} birdie${birdies.length>1?'s':''}`);
-  if(longest)        earned+=rfSeal('drive', `${Math.round(longest.y)}y drive`);
+  const earnedHas=new Set();
+  if(birdies.length){ earned+=rfSeal('bird', `${birdies.length} birdie${birdies.length>1?'s':''}`); earnedHas.add('bird'); }
+  if(longest){        earned+=rfSeal('drive', `${Math.round(longest.y)}y drive`); earnedHas.add('drive'); }
+  if(t.n>=9)  earnedHas.add('half');
+  if(t.n>=18) earnedHas.add('full');
   if(t.n>=18)        earned+=rfSeal('full', '18 holes');
   else if(t.n>=9)    earned+=rfSeal('half', '9 holes');
   // Conditions — what the day gave you
   let cond='';
+  const condHas=new Set();
   if(wx){
     const kind=/rain|drizzle|shower|thunder|snow/i.test(wx) ? 'rain'
              : /cloud|overcast|fog/i.test(wx)               ? 'cloud' : 'sun';
-    cond+=rfSeal(kind, wxObj.temp!=null ? `${wx} · ${wxObj.temp}°` : wx);
+    cond+=rfSeal(kind, wxObj.temp!=null ? `${wx} · ${wxObj.temp}°` : wx); condHas.add(kind);
   }
-  if(wndObj.src && wndObj.spd>=12 && wndObj.dir!=null) cond+=rfSeal('wind', `${dirName(wndObj.dir)} ${wndObj.spd} mph`);
-  const box=(label,seals)=>`<div class="bl-box"><div class="bl-secbar">${label}</div><div class="bl-stk">${seals}</div></div>`;
+  if(wndObj.src && wndObj.spd>=12 && wndObj.dir!=null){ cond+=rfSeal('wind', `${dirName(wndObj.dir)} ${wndObj.spd} mph`); condHas.add('wind'); }
+  // the full set lined up small under each shelf — vivid where earned, ghosted where not,
+  // so the page reads as a collection you're building over time
+  const SET_LABEL={bird:'Birdie', drive:'Longest drive', half:'9 holes', full:'18 holes',
+                  sun:'Sun', cloud:'Clouds', rain:'Rain', wind:'Wind'};
+  const setRow=(kinds,has)=>`<div class="bl-collect bl-set">`
+    + kinds.map(k=>`<span class="bl-mini${has.has(k)?'':' bl-ghost'}">${rfSeal(k,SET_LABEL[k],34)}</span>`).join('')
+    + `</div>`;
+  const box=(label,seals,strip)=>`<div class="bl-box"><div class="bl-secbar">${label}</div><div class="bl-stk">${seals}</div>${strip||''}</div>`;
   const stickers=(earned||cond)
-    ? (earned?box('Earned',earned):'')
-     +(cond  ?box('Conditions',cond):'')
-     +`<div class="bl-hint">Earned badges come from your round; conditions from the day's weather. Soon you'll tap any hole to add your own.</div>`
+    ? (earned?box('Earned',earned,setRow(['bird','drive','half','full'],earnedHas)):'')
+     +(cond  ?box('Conditions',cond,setRow(['sun','cloud','rain','wind'],condHas)):'')
+     +`<div class="bl-hint">The bright badges are this round's; the faded ones are still yours to collect.</div>`
     : '';
   const ne=played.filter(x=>x.d<=-2).length, nb=birdies.length;
   let line;
