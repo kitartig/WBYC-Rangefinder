@@ -134,6 +134,9 @@ setTimeout(()=>{
       // player headshot flows into the keepsake masthead when set
       avatar='data:image/jpeg;base64,TEST'; A('keepsake shows the headshot when set', blBuild().html.includes('bl-avatar'));
       avatar=''; A('keepsake omits the headshot when unset', !blBuild().html.includes('bl-avatar'));
+      // in-app collections: a round can be filed in a named folder
+      folders[card.start]='Member-Guest'; A('keepsake shows the folder name when filed', blBuild().html.includes('Member-Guest'));
+      delete folders[card.start]; A('keepsake offers to file when no folder set', blBuild().html.includes('File this round'));
       openBearLog();
       A('bearlog opens', elems['bearlog'].classList.contains('open'));
       A('bearlog has a memento note field', typeof elems['blNote'].onclick==='function');

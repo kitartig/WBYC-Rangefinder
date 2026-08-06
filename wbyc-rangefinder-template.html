@@ -322,6 +322,11 @@
   #bearlog .bl-set .bl-seal{width:auto}
   #bearlog .bl-set .bl-seal svg{filter:drop-shadow(0 2px 5px rgba(60,45,20,.16))}
   #bearlog .bl-hint{text-align:center;font-family:'EB Garamond',serif;font-style:italic;font-size:13px;color:#6b6350;margin:12px auto 0;max-width:440px}
+  #bearlog .bl-folder{display:block;margin:8px auto 2px;background:#eef3fb;border:1px solid #cfe0f3;color:#1b3a66;
+    border-radius:999px;padding:6px 14px;font-family:-apple-system,sans-serif;font-size:12px;font-weight:700;letter-spacing:.3px;cursor:pointer}
+  #bearlog .bl-folder.empty{background:#fffdf7;border-style:dashed;border-color:#cfc3a2;color:#6b6350;font-weight:600}
+  #bearlog .bl-folder:active{background:#e2ecf9}
+  @media print{ #bearlog .bl-folder.empty{display:none} }
   #bearlog .bl-bear{position:relative;font-family:'EB Garamond',serif;font-style:italic;font-size:18px;color:#1a1712;text-align:center;margin:22px 0 4px;line-height:1.5;background:#e4f5f3;border:1px solid #bfe3df;border-radius:14px;padding:22px 26px 15px}
   #bearlog .bl-bear:before{content:"\201C";position:absolute;top:2px;left:20px;font-family:'EB Garamond',serif;font-size:48px;line-height:1;color:#2fb0a8;opacity:.55}
   #bearlog .bl-bear .bl-sig{display:block;font-family:-apple-system,sans-serif;font-size:13px;color:#6b6350;margin-top:8px;font-style:normal;letter-spacing:1px}
@@ -396,6 +401,12 @@
   #sctab table.cardt{table-layout:fixed}
   #sctab table.cardt td:first-child,#sctab table.cardt th:first-child{text-align:center;padding-left:3px}
   #sctab td small{color:#7b93b8;font-size:11px}
+  /* in-app collections: folder filter chips + per-row folder tag */
+  #sctab .bl-folders{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:2px 0 10px}
+  #sctab .bl-fchip{border:1px solid #cfc3a2;background:#fff;color:#1b3a66;border-radius:999px;padding:5px 11px;
+    font-size:11.5px;font-weight:700;letter-spacing:.3px;cursor:pointer;white-space:nowrap}
+  #sctab .bl-fchip.on{background:#0e6b3a;border-color:#0e6b3a;color:#fffdf7}
+  #sctab .bl-ftag{font-size:10.5px;font-weight:700;color:#0e6b3a;margin-top:2px;white-space:nowrap}
   #sctab tr.bl-open{cursor:pointer}
   #sctab tr.bl-open:hover td{background:#f4f8ff}
   #sctab tr.bl-open:active td{background:#e9f0fb}
@@ -885,6 +896,9 @@ if(card.start!==today() && !card.holes.some(e=>e.s>0)) card.start=today();
 const saveCard=()=>localStorage.setItem('{{STORE}}_card', JSON.stringify(card));
 let notes={}; try{ notes=JSON.parse(localStorage.getItem('{{STORE}}_notes'))||{}; }catch(e){}   // per-round memento lines for The {{DIARY_SHORT}}, keyed by date
 const saveNotes=()=>localStorage.setItem('{{STORE}}_notes', JSON.stringify(notes));
+let folders={}; try{ folders=JSON.parse(localStorage.getItem('{{STORE}}_folders'))||{}; }catch(e){}   // in-app collections: {date: folder name}
+const saveFolders=()=>localStorage.setItem('{{STORE}}_folders', JSON.stringify(folders));
+let blFolderFilter='';   // STATS history: current folder filter ('' = all)
 const fwdTee=()=> tee==='Red'||tee==='Green'; // forward sets score against women's par
 const holePar=h=> fwdTee() ? h.par_women : h.par;
 const holeHcp=h=> tee==='Green' ? (h.handicap_index_women_green ?? h.handicap_index_women)
@@ -1125,6 +1139,8 @@ function blBuild(){
     +`</svg><div class="bl-cap">${mcap}, on the ${blOrd(moment.h.hole_number)}</div></div>`;
   const nt=(notes[startDate]||'').trim();
   const noteHtml=`<div class="bl-note${nt?'':' empty'}" id="blNote">${nt?nt.replace(/</g,'&lt;'):'Tap to add a note about your round…'}</div>`;
+  const fld=(folders[startDate]||'').trim();
+  const folderHtml=`<button class="bl-folder${fld?'':' empty'}" id="blFolder" type="button">${fld?('&#128193; '+fld.replace(/</g,'&lt;')):'&#43; File this round in a folder'}</button>`;
   // Earned — what you did out there
   let earned='';
   const earnedHas=new Set();
@@ -1175,7 +1191,7 @@ function blBuild(){
     +`<div class="bl-chips"><span class="bl-chip">${t.p} putts</span><span class="bl-chip">${t.gir} greens</span></div></div>`
     +`<div class="bl-sec">The Card</div>${strip}`
     +`<div class="bl-sec">The Moments</div><div class="bl-cols"><div class="bl-moments">${moms}</div>${map}</div>`
-    +noteHtml+stickers
+    +noteHtml+folderHtml+stickers
     +`<div class="bl-bear">${line}<span class="bl-sig">— kept for ${nameU||'you'} by the {{BRAND}} {{PRODUCT}}</span></div>`
     +`<div class="bl-foot">{{CLUB_LINE}}${dateStr.toUpperCase()}</div></div>`;
   return {empty:false, html:page};
@@ -1198,6 +1214,15 @@ function openBearLog(round){
   const pr=$('blPrint'); if(pr) pr.onclick=()=>window.print();
   const sh=$('blShare'); if(sh) sh.onclick=()=>blShare(d);
   const nEl=$('blNote'); if(nEl) nEl.onclick=()=>{ const v=prompt('A line to remember this round by:', notes[d]||''); if(v!==null){ if(v.trim()) notes[d]=v.trim(); else delete notes[d]; saveNotes(); openBearLog(blCtx); } };
+  const fEl=$('blFolder'); if(fEl) fEl.onclick=()=>{
+    if(typeof prompt==='undefined') return;
+    const existing=[...new Set(Object.values(folders).filter(Boolean))];
+    const hint = existing.length ? '\n\nYour folders: '+existing.join(', ') : '';
+    const v=prompt('File this round in a folder (e.g. “2026 Season”, “Member-Guest”):'+hint, folders[d]||'');
+    if(v===null) return;
+    if(v.trim()) folders[d]=v.trim().slice(0,40); else delete folders[d];
+    saveFolders(); openBearLog(blCtx);
+  };
   $('bearlog').classList.add('open');
 }
 // Render the keepsake page to a PNG and hand it to the OS share sheet. html2canvas
@@ -1269,12 +1294,21 @@ function renderStats(){
       +`<polyline points="${xy.map(q=>q.join(',')).join(' ')}" fill="none" stroke="var(--accent2)" stroke-width="2" opacity=".9"/>`
       +xy.map(q=>`<circle cx="${q[0]}" cy="${q[1]}" r="2.5" fill="var(--accent2)"/>`).join('')+'</svg>';
   }
+  // in-app collections: folder filter chips + per-row folder tag
+  const allFolders=[...new Set(rounds.map(r=>folders[r.date]).filter(Boolean))].sort();
+  if(blFolderFilter && allFolders.indexOf(blFolderFilter)<0) blFolderFilter='';
+  const chips = allFolders.length ? '<div class="bl-folders">'
+      + `<button class="bl-fchip${blFolderFilter?'':' on'}" data-folder="">All</button>`
+      + allFolders.map(f=>`<button class="bl-fchip${blFolderFilter===f?' on':''}" data-folder="${f.replace(/"/g,'&quot;')}">&#128193; ${f.replace(/</g,'&lt;')}</button>`).join('')
+      + '</div>' : '';
+  const list = rounds.slice().reverse().filter(r=> !blFolderFilter || (folders[r.date]||'')===blFolderFilter).slice(0,20);
   // data-ri = index back into `rounds`; tapping a row reopens that round's keepsake
-  const row=(r,i)=>`<tr class="bl-open" data-ri="${rounds.length-1-i}" title="Open this round’s keepsake"><td>${r.date}</td><td>${r.tee}</td>`
-    +`<td>${r.s}${r.n===18?` <small>${fmtDiff(r.s-r.par)}</small>`:` <small>(${r.n}h)</small>`}</td>`
-    +`<td>${r.p||''}</td><td>${r.gir||''}</td></tr>`;
-  html+='<table><tr><th>DATE</th><th>TEE</th><th>SCORE</th><th>PUTTS</th><th>GIR</th></tr>'
-    +(rounds.length ? rounds.slice().reverse().slice(0,20).map(row).join('')
+  const row=(r)=>{ const f=folders[r.date]||'';
+    return `<tr class="bl-open" data-ri="${rounds.indexOf(r)}" title="Open this round’s keepsake"><td>${r.date}${f?`<div class="bl-ftag">&#128193; ${f.replace(/</g,'&lt;')}</div>`:''}</td><td>${r.tee}</td>`
+      +`<td>${r.s}${r.n===18?` <small>${fmtDiff(r.s-r.par)}</small>`:` <small>(${r.n}h)</small>`}</td>`
+      +`<td>${r.p||''}</td><td>${r.gir||''}</td></tr>`; };
+  html+=chips+'<table><tr><th>DATE</th><th>TEE</th><th>SCORE</th><th>PUTTS</th><th>GIR</th></tr>'
+    +(rounds.length ? (list.length?list.map(row).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--dim)">no rounds in this folder yet</td></tr>')
                     : '<tr><td colspan="5" style="text-align:center;color:var(--dim)">no rounds banked yet — finish a round, then tap NEW to save it here</td></tr>')
     +'</table>'
     +(rounds.length?'<div class="bl-openhint">Tap any round to open its keepsake</div>':'');
@@ -2577,7 +2611,7 @@ function init(data){
   ['pointerup','pointerleave','pointercancel'].forEach(ev=>sb.addEventListener(ev,()=>clearTimeout(slpTimer)));
   $('scClose').onclick=()=>$('scorecard').classList.remove('open');
   // Export / Import — back up or move your whole record between devices (rounds live per-device by design)
-  const BKEYS=['{{STORE}}_card','{{STORE}}_rounds','{{STORE}}_shots','{{STORE}}_club','{{STORE}}_name','{{STORE}}_tee','{{STORE}}_memories','{{STORE}}_notes'];
+  const BKEYS=['{{STORE}}_card','{{STORE}}_rounds','{{STORE}}_shots','{{STORE}}_club','{{STORE}}_name','{{STORE}}_tee','{{STORE}}_memories','{{STORE}}_notes','{{STORE}}_folders'];
   $('scExport').onclick=()=>{
     const data={app:'wbyc-rangefinder', v:1, exported:new Date().toISOString(), store:{}};
     for(const k of BKEYS){ const v=localStorage.getItem(k); if(v!==null) data.store[k]=v; }
@@ -2605,6 +2639,9 @@ function init(data){
   $('scNew').onclick=()=>{ if(confirm('Save this round to your history and start a fresh card?')){ archiveRound(); card=blankCard(); saveCard(); scShow(); renderScore(); } };
   $('sctab').onclick=ev=>{
     const cl=ev.target && ev.target.closest ? ev.target : null; if(!cl) return;
+    // tap a folder chip (STATS view) to filter the rounds list
+    const fc=ev.target.closest('.bl-fchip');
+    if(fc){ blFolderFilter=fc.dataset.folder||''; renderStats(); return; }
     // tap a banked-round row (STATS view) to reopen that round's keepsake
     const ro=ev.target.closest('tr[data-ri]');
     if(ro){ const r=rounds[+ro.dataset.ri]; if(r){ $('scorecard').classList.remove('open'); openBearLog(r); } return; }
