@@ -154,6 +154,9 @@
     margin-bottom:10px;overflow:hidden;position:relative;touch-action:pan-y}
   #mapbtns{position:absolute;top:8px;right:8px;display:flex;gap:6px}
   #shotbar{position:absolute;bottom:22px;left:8px;display:flex;flex-direction:column;gap:6px;align-items:stretch}
+  #shotbar .sb-cap{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-align:center;
+    color:#fff;background:rgba(10,16,12,.62);border-radius:6px;padding:3px 6px;margin-bottom:-1px}
+  body.sun #shotbar .sb-cap{background:rgba(255,255,255,.78);color:#111}
   #shotbar select{background:rgba(10,16,12,.62);color:#fff;border:2px solid #35c8ff;border-radius:7px;
     padding:6px 7px;font-size:13px;font-weight:900;letter-spacing:1.2px;backdrop-filter:blur(2px)}
   #shotbar button{background:rgba(10,16,12,.62);color:#fff;border:2px solid var(--accent2);border-radius:7px;
@@ -486,7 +489,7 @@
   <div id="mapwrap">
     <svg id="map" xmlns="http://www.w3.org/2000/svg"></svg>
     <div id="mapbtns"><button id="satBtn">SAT</button><button id="grnBtn" title="Zoom to the green">GRN</button><button id="pinBtn" title="Today's cup position. Distances normally measure to the middle of the green — tap PIN, then tap where the flag actually is, and FRONT/CENTER/BACK, plays-like, the carry arcs and the 3D flyover all re-measure to that exact spot. Long-press to clear; pins wipe themselves at midnight.">PIN</button><button id="memBtn" title="Leave a note on a spot. Tap the star, then tap anywhere on the hole — where the drive went, what the wind did, who was there. It stays pinned to that exact place and comes back every time you play the hole. Tap a star on the map to read it, or to remove it."><span class="star">★</span></button><button id="d3Btn">3D</button></div>
-    <div id="shotbar"><select id="clubSel"></select><button id="shotBtn" title="Mark a shot from your current position. Long-press to undo the last mark.">SHOT</button></div>
+    <div id="shotbar"><span class="sb-cap">MARK SHOT</span><select id="clubSel"></select><button id="shotBtn" title="Mark a shot from your current position. Long-press to undo the last mark.">SHOT</button></div>
     <div id="maphint"></div>
   </div>
 
@@ -2525,7 +2528,7 @@ function init(data){
   $('scTot').onclick=()=>{ scMode='card'; scShow(); $('scorecard').classList.add('open'); };
   $('scClubs').onclick=()=>{ scMode=scMode==='clubs'?'card':'clubs'; scShow(); };
   $('scStats').onclick=()=>{ scMode=scMode==='stats'?'card':'stats'; scShow(); };
-  $('bearBtn').onclick=openBearLog;
+  $('bearBtn').onclick=()=>openBearLog();   // no arg = live round (never pass the click event as `round`)
   // SHOT tracking: club picker + mark button (long-press = undo)
   $('clubSel').innerHTML=CLUBS.map(c=>`<option${c===curClub?' selected':''}>${c}</option>`).join('');
   $('clubSel').onchange=e=>{ curClub=e.target.value; localStorage.setItem('{{STORE}}_club',curClub); render(); };

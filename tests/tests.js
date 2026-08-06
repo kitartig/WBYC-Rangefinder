@@ -135,6 +135,13 @@ setTimeout(()=>{
       A('bearlog opens', elems['bearlog'].classList.contains('open'));
       A('bearlog has a memento note field', typeof elems['blNote'].onclick==='function');
       elems['blClose'].onclick(); A('bearlog closes', !elems['bearlog'].classList.contains('open'));
+      // the CARD's Bear's Log button must open the LIVE round — never pass the click
+      // event as `round` (that regression made the button silently dead)
+      A('card Bear\'s Log button is wired', typeof elems['bearBtn'].onclick==='function');
+      elems['bearBtn'].onclick({type:'click'});
+      A('card Bear\'s Log button opens the live log, ignoring the event arg',
+        elems['bearlog'].classList.contains('open') && elems['bearlog'].innerHTML.includes('The Score'));
+      elems['blClose'].onclick();
     })();
     // reopening a STORED round (tap a history row) renders its own keepsake, with the
     // snapshotted weather as Conditions, and points photos at that round's date
