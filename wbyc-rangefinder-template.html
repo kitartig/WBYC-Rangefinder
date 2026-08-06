@@ -1150,12 +1150,14 @@ function blBuild(){
   const setRow=(kinds,has)=>`<div class="bl-collect bl-set">`
     + kinds.map(k=>`<span class="bl-mini${has.has(k)?' bl-halo':''}">${rfSeal(k,SET_LABEL[k],44)}</span>`).join('')
     + `</div>`;
-  const box=(label,seals,strip)=>`<div class="bl-box"><div class="bl-secbar">${label}</div><div class="bl-stk">${seals}</div>${strip||''}</div>`;
-  const stickers=(earned||cond)
-    ? (earned?box('Earned',earned,setRow(['bird','drive','half','full'],earnedHas)):'')
-     +(cond  ?box('Conditions',cond,setRow(['sun','cloud','rain','wind'],condHas)):'')
-     +`<div class="bl-hint">A gold halo marks what you earned this round; the rest are yours to collect.</div>`
-    : '';
+  // The big shelf shows only the seals earned this round; the collection tray below
+  // ALWAYS shows the full set (halo = earned) so the collection is visible even on a
+  // quiet round — it should never vanish.
+  const box=(label,seals,strip)=>`<div class="bl-box"><div class="bl-secbar">${label}</div>${seals?`<div class="bl-stk">${seals}</div>`:''}${strip||''}</div>`;
+  const stickers=
+      box('Earned', earned, setRow(['bird','drive','half','full'],earnedHas))
+     +box('Conditions', cond, setRow(['sun','cloud','rain','wind'],condHas))
+     +`<div class="bl-hint">A gold halo marks what you earned this round; the rest are yours to collect.</div>`;
   const ne=played.filter(x=>x.d<=-2).length, nb=birdies.length;
   let line;
   if(ne>0) line=`An eagle on the card — a day the ${blOrd(moment.h.hole_number)} won't forget.`;

@@ -146,6 +146,14 @@ setTimeout(()=>{
         elems['bearlog'].classList.contains('open') && elems['bearlog'].innerHTML.includes('The Score'));
       elems['blClose'].onclick();
     })();
+    // the collection trays must ALWAYS render — even a quiet round (nothing "earned")
+    // still shows the full set to collect; the Earned shelf must never vanish
+    (()=>{ const save=card; card=blankCard(); card.holes[3]={s:5,p:2,f:null};
+      const q=blBuild();
+      A('both collection trays always render', (q.html.match(/bl-collect/g)||[]).length===2);
+      A('Earned shelf renders even with nothing earned', q.html.includes('>Earned<'));
+      card=save;
+    })();
     // reopening a STORED round (tap a history row) renders its own keepsake, with the
     // snapshotted weather as Conditions, and points photos at that round's date
     (()=>{ const p0=course.holes[0].par;
