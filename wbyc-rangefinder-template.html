@@ -91,6 +91,12 @@
   header h1 .h1b{display:block;font-size:16px;letter-spacing:1.4px;margin-top:3px}
   header .sub{font-size:11px;color:var(--dim)}
   #tagline{display:flex;justify-content:space-between;align-items:center;margin:2px 0 8px}
+  #tagline #who{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0}
+  #avatarBtn.avatar{width:46px;height:46px;border-radius:50%;border:2px solid var(--line);background:#fff no-repeat center/cover;
+    color:var(--dim);font-size:20px;font-weight:600;line-height:1;cursor:pointer;padding:0;flex:none;
+    display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+  #avatarBtn.avatar.set{border-color:var(--accent);color:transparent}
+  #tagline #who #pname{max-width:120px;padding:2px 4px}
   #pname{font-family:'EB Garamond',Garamond,Baskerville,'Times New Roman',serif;font-style:italic;
     font-weight:500;font-size:14px;color:var(--text);cursor:pointer;padding:4px 6px 4px 12px;
     letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%}
@@ -256,6 +262,8 @@
   #bearlog .bl-page:before{content:"";position:absolute;inset:9px;border:1px solid #ece2c9;border-radius:12px;pointer-events:none}
   #bearlog .bl-mast{display:flex;align-items:flex-start;gap:6px;border-bottom:1px solid #4d84c4;padding-bottom:4px}
   #bearlog .bl-mast img{width:238px;height:auto;flex:none;margin-top:-16px;margin-left:-26px}
+  #bearlog .bl-mast img.bl-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid #4d84c4;margin:0;flex:none}
+  #bearlog .bl-who{display:flex;align-items:center;gap:7px}
   #bearlog .bl-t{flex:1;min-width:0}
   #bearlog .bl-eyebrow{font-family:-apple-system,sans-serif;font-size:11px;letter-spacing:2.6px;text-transform:uppercase;color:#0e6b3a;font-weight:700;white-space:nowrap}
   #bearlog .bl-date{font-family:'EB Garamond',serif;font-weight:600;font-size:32px;margin:10px 0 0;line-height:1.05;color:#1a1712;white-space:nowrap}
@@ -465,7 +473,7 @@
       <button id="sunBtn" title="Toggle sunlight mode">☀</button>
     </span>
   </header>
-  <div id="tagline">{{CONTACT_HTML}}<span id="pname" title="Tap to put your name on the card"></span></div>
+  <div id="tagline">{{CONTACT_HTML}}<span id="who"><button id="avatarBtn" class="avatar" type="button" title="Add your photo" aria-label="Add your photo">+</button><span id="pname" title="Tap to put your name on the card"></span></span></div>
 
   <div class="holebar">
     <button id="prevBtn" aria-label="Previous hole">‹</button>
@@ -560,6 +568,7 @@
   </div>
 </div>
 <input type="file" id="rfPhotoInput" accept="image/*" style="display:none">
+<input type="file" id="avatarInput" accept="image/*" style="display:none">
 
 <script>
 "use strict";
@@ -784,6 +793,7 @@ let rfLogObs=null;   // Bear's Log photo-panel MutationObserver — declared up 
                      // beside rfRenderPhotos) so it exists before wireMemoryAndPhotos()
                      // runs at init; a `let` beside the function was in its dead zone.
 const saveShots=()=>localStorage.setItem('{{STORE}}_shots', JSON.stringify(shots));
+let avatar=''; try{ avatar=localStorage.getItem('{{STORE}}_avatar')||''; }catch(e){}   // player headshot (data URI)
 let curClub=localStorage.getItem('{{STORE}}_club'); if(!CLUBS.includes(curClub)) curClub='7i';
 // LOCAL date, not UTC. toISOString() is UTC, so in Minnesota (UTC-5/-6) every
 // round played after 7pm was stamped with TOMORROW's date — Kit's export at
@@ -1157,7 +1167,7 @@ function blBuild(){
   const who=`${nameU?nameU+' · ':''}${teeU} tees`;
   const page=`<div class="bl-page">`
     +`<div class="bl-mast"><img class="bl-burgee" alt=""><div class="bl-t">`
-    +`<div class="bl-eyebrow">{{DIARY}} · {{BRAND}}</div><div class="bl-date">${dateStr}</div><div class="bl-who">${who}</div></div>${condHtml}</div>`
+    +`<div class="bl-eyebrow">{{DIARY}} · {{BRAND}}</div><div class="bl-date">${dateStr}</div><div class="bl-who">${avatar?`<img class="bl-avatar" src="${avatar}" alt="">`:''}<span>${who}</span></div></div>${condHtml}</div>`
     +`<div class="bl-sec">The Score</div>`
     +`<div class="bl-band"><div class="bl-score">${t.s}</div><div class="bl-vs">${vsTxt}${thru}</div>`
     +`<div class="bl-chips"><span class="bl-chip">${t.p} putts</span><span class="bl-chip">${t.gir} greens</span></div></div>`
@@ -2418,6 +2428,31 @@ function init(data){
     };
     drawName();
   }
+  // Player headshot: a round avatar by the name; tap to set from a photo. Shows on the
+  // main page and in the keepsake masthead (and can flow into the shared round-film).
+  {
+    const av=$('avatarBtn'), inp=$('avatarInput');
+    if(av){
+      const drawAvatar=()=>{
+        if(avatar){ av.style.backgroundImage='url("'+avatar+'")'; av.textContent=''; av.classList.add('set'); }
+        else { av.style.backgroundImage='none'; av.textContent='+'; av.classList.remove('set'); }
+      };
+      if(inp && inp.addEventListener){
+        av.onclick=()=>inp.click();
+        inp.addEventListener('change', ()=>{
+          const f=inp.files&&inp.files[0]; inp.value='';
+          if(!f) return;
+          rfShrink(f, uri=>{
+            if(!uri){ alert('That photo could not be read.'); return; }
+            avatar=uri;
+            try{ localStorage.setItem('{{STORE}}_avatar', avatar); }catch(e){ alert('Storage is full — the photo was not saved.'); return; }
+            drawAvatar();
+          }, 256);   // small: a headshot only needs ~256px
+        });
+      }
+      drawAvatar();
+    }
+  }
   // PIN sheet: tap arms the next map tap; long-press clears today's pin on this hole
   {
     const pb=$('pinBtn');
@@ -2692,11 +2727,12 @@ const RF_PHOTO_KEY='{{STORE}}_photos', RF_MAXEDGE=900, RF_QUALITY=0.62, RF_CAP=4
 function rfLoadPhotos(){ try{ return JSON.parse(localStorage.getItem(RF_PHOTO_KEY))||{}; }catch(e){ return {}; } }
 function rfSavePhotos(o){ localStorage.setItem(RF_PHOTO_KEY, JSON.stringify(o)); }
 function rfStorageKB(){ let n=0; for(const k in localStorage) if(localStorage.hasOwnProperty(k)) n+=localStorage[k].length; return Math.round(n/1024); }
-function rfShrink(file, cb){
+function rfShrink(file, cb, maxEdge){
+  maxEdge = maxEdge || RF_MAXEDGE;
   if(typeof FileReader==='undefined'){ cb(null); return; }
   const fr=new FileReader();
   fr.onload=()=>{ const img=new Image();
-    img.onload=()=>{ const s=Math.min(1, RF_MAXEDGE/Math.max(img.width,img.height));
+    img.onload=()=>{ const s=Math.min(1, maxEdge/Math.max(img.width,img.height));
       const c=document.createElement('canvas'); c.width=Math.round(img.width*s); c.height=Math.round(img.height*s);
       c.getContext('2d').drawImage(img,0,0,c.width,c.height); cb(c.toDataURL('image/jpeg',RF_QUALITY)); };
     img.onerror=()=>cb(null); img.src=fr.result; };

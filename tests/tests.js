@@ -131,6 +131,9 @@ setTimeout(()=>{
       const r=blBuild();
       A('bearlog builds from a round', !r.empty && r.html.includes("The Bear's Log") && r.html.includes('The Score') && r.html.includes('bl-strip'));
       A('bearlog notes a birdie', r.html.includes('Birdie on the'));
+      // player headshot flows into the keepsake masthead when set
+      avatar='data:image/jpeg;base64,TEST'; A('keepsake shows the headshot when set', blBuild().html.includes('bl-avatar'));
+      avatar=''; A('keepsake omits the headshot when unset', !blBuild().html.includes('bl-avatar'));
       openBearLog();
       A('bearlog opens', elems['bearlog'].classList.contains('open'));
       A('bearlog has a memento note field', typeof elems['blNote'].onclick==='function');
