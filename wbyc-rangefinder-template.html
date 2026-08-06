@@ -268,14 +268,14 @@
     font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:12px;font-weight:800;letter-spacing:2.5px;padding:7px 0}
   #bearlog .bl-box .bl-stk{margin:13px 0}
   /* the full collection, lined up small under each shelf */
-  #bearlog .bl-collect{display:flex;justify-content:center;gap:11px;flex-wrap:wrap;padding:2px 8px 12px;border-top:1px solid #efe7d3;margin-top:2px}
+  #bearlog .bl-collect{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;padding:2px 6px 12px;border-top:1px solid #efe7d3;margin-top:2px}
   /* Collection minis are laid out with plain flex centering and NO auto margins or
      CSS filters on the SVG — html2canvas mis-measures `margin:0 auto` / filtered
      small inline SVGs and clips them to a sliver in the shared image. */
-  #bearlog .bl-collect .bl-mini{display:flex;flex-direction:column;align-items:center;width:58px}
-  #bearlog .bl-collect .bl-seal{width:58px;display:flex;flex-direction:column;align-items:center}
+  #bearlog .bl-collect .bl-mini{display:flex;flex-direction:column;align-items:center;width:64px}
+  #bearlog .bl-collect .bl-seal{width:64px;display:flex;flex-direction:column;align-items:center}
   #bearlog .bl-collect .bl-seal svg{display:block;margin:0;filter:none}
-  #bearlog .bl-collect .bl-scap{font-size:8px;letter-spacing:.3px;margin-top:4px;line-height:1.15;text-align:center}
+  #bearlog .bl-collect .bl-scap{font-size:9px;letter-spacing:.3px;margin-top:5px;line-height:1.15;text-align:center}
   /* all minis full strength (the art's too good to hide); earned ones get a gold halo */
   #bearlog .bl-collect .bl-halo svg{border-radius:50%;box-shadow:0 0 0 2.5px #f5b512,0 0 11px 3px rgba(245,181,18,.6)}
   #bearlog .bl-band{display:flex;align-items:baseline;gap:16px;margin:2px 0 4px}
@@ -928,7 +928,7 @@ const RF_GRAD={
   bird:[['0','#ff4fd0'],['.55','#d95fe4'],['1','#a56ae0']],
   rain:[['0','#c3ecff'],['.55','#7cc2ee'],['1','#4a8fd0']],
   sun :[['0','#f2ffa8'],['.55','#c2ee63'],['1','#5cb861']],
-  drive:[['0','#f26fae'],['.5','#ffb3d1'],['1','#ffe98a']],
+  drive:[['0','#f5008c'],['.5','#ff5a26'],['1','#ffa800']],
   full:[['0','#ff9fd8'],['.5','#e2429b'],['1','#96176a']],
   half:[['0','#ff9fd8'],['.5','#e2429b'],['1','#96176a']],
   cloud:[['0','#5aa6ea'],['.55','#2f6cc4'],['1','#123a8f']],
@@ -1138,7 +1138,7 @@ function blBuild(){
   const SET_LABEL={bird:'Birdie', drive:'Longest drive', half:'9 holes', full:'18 holes',
                   sun:'Sun', cloud:'Clouds', rain:'Rain', wind:'Wind'};
   const setRow=(kinds,has)=>`<div class="bl-collect bl-set">`
-    + kinds.map(k=>`<span class="bl-mini${has.has(k)?' bl-halo':''}">${rfSeal(k,SET_LABEL[k],34)}</span>`).join('')
+    + kinds.map(k=>`<span class="bl-mini${has.has(k)?' bl-halo':''}">${rfSeal(k,SET_LABEL[k],44)}</span>`).join('')
     + `</div>`;
   const box=(label,seals,strip)=>`<div class="bl-box"><div class="bl-secbar">${label}</div><div class="bl-stk">${seals}</div>${strip||''}</div>`;
   const stickers=(earned||cond)
