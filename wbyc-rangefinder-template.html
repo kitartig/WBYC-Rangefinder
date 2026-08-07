@@ -1211,7 +1211,13 @@ function openBearLog(round){
   $('bearlog').innerHTML=bar+r.html;
   const lg=$('logo'), bg=document.querySelector('#bearlog .bl-burgee'); if(bg&&lg) bg.src=lg.src;
   $('blClose').onclick=()=>{ $('bearlog').classList.remove('open'); blCtx=null; };
-  const pr=$('blPrint'); if(pr) pr.onclick=()=>window.print();
+  const pr=$('blPrint'); if(pr) pr.onclick=()=>{
+    // the print/PDF default filename follows document.title — swap it for the round's, then restore
+    const t=document.title; document.title=blFileName(d);
+    const restore=()=>{ document.title=t; window.removeEventListener('afterprint',restore); };
+    window.addEventListener('afterprint', restore); setTimeout(restore, 10000);
+    window.print();
+  };
   const sh=$('blShare'); if(sh) sh.onclick=()=>blShare(d);
   const nEl=$('blNote'); if(nEl) nEl.onclick=()=>{ const v=prompt('A line to remember this round by:', notes[d]||''); if(v!==null){ if(v.trim()) notes[d]=v.trim(); else delete notes[d]; saveNotes(); openBearLog(blCtx); } };
   const fEl=$('blFolder'); if(fEl) fEl.onclick=()=>{
@@ -1230,9 +1236,16 @@ function openBearLog(round){
 // foreignObject, so it works on iOS Safari and never taints the canvas. If it is
 // somehow unavailable or fails, we fall back to Save/Print, which on a phone still
 // yields a shareable PDF. So Share upgrades where it can and never breaks.
+// Friendly, sortable filename for saved/shared keepsakes, e.g. WBYC-Bears-Log-2026-07-29-Kit
+const blSlug=s=>(s||'').replace(/['’]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-+|-+$/g,'');
+const BL_FNAME_BASE=blSlug("{{BRAND}} {{DIARY_SHORT}}");
+function blFileName(d){
+  const nm=blSlug(((typeof blCtx!=='undefined'&&blCtx&&blCtx.pname)||pname)||'');
+  return `${BL_FNAME_BASE}-${d}${nm?'-'+nm:''}`;
+}
 function blShareDeliver(blob, d){
   if(!blob){ window.print(); return; }
-  const fname=`bears-log-${d}.png`, file=new File([blob], fname, {type:'image/png'});
+  const fname=blFileName(d)+'.png', file=new File([blob], fname, {type:'image/png'});
   if(navigator.canShare && navigator.canShare({files:[file]})){
     navigator.share({files:[file], title:"{{DIARY}}", text:"My round — kept by the {{BRAND}} {{PRODUCT}}"}).catch(()=>{});
   }else{

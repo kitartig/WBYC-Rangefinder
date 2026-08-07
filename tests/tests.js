@@ -137,6 +137,8 @@ setTimeout(()=>{
       // in-app collections: a round can be filed in a named folder
       folders[card.start]='Member-Guest'; A('keepsake shows the folder name when filed', blBuild().html.includes('Member-Guest'));
       delete folders[card.start]; A('keepsake offers to file when no folder set', blBuild().html.includes('File this round'));
+      // friendly, sortable saved-file names
+      (()=>{ const sp=pname; pname='Kit'; A('keepsake filename is friendly + sortable', blFileName('2026-07-29')==='WBYC-Bears-Log-2026-07-29-Kit'); pname=sp; })();
       openBearLog();
       A('bearlog opens', elems['bearlog'].classList.contains('open'));
       A('bearlog has a memento note field', typeof elems['blNote'].onclick==='function');
