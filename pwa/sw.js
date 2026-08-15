@@ -1,5 +1,5 @@
 /* WBYC Rangefinder service worker — offline-first app shell */
-const VERSION = 'wbyc-v248';
+const VERSION = 'wbyc-v249';
 const SHELL = ['./', './index.html', './manifest.webmanifest',
                './icon-192.png', './icon-512.png', './course_data_v2.json'];
 
