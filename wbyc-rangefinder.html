@@ -139,6 +139,11 @@
   .tees button.sel.Blue{background:var(--blue)} .tees button.sel.White{background:var(--white-tee)}
   .tees button.sel.Gold{background:var(--gold);color:#161616} .tees button.sel.Red{background:var(--red);color:#fff}
   .tees button.sel.Green{background:#7fe0a8;color:#0e1512}
+  /* Those five rules key off tee NAMES that happen to be colours, which is true
+     of some cards and not others. A club whose tees are Championship / Back /
+     Middle / Forward gets nothing from them, so a brand may supply a tee_colors
+     map and build.py writes the rules here, keyed on the data-tee attribute. */
+  
 
   #holeMemory{display:none;text-align:center;font-family:'EB Garamond',Garamond,Baskerville,serif;font-style:italic;
     font-size:14px;color:var(--dim);margin:1px 0 8px;letter-spacing:.2px;line-height:1.3}
@@ -152,7 +157,7 @@
   .dist .box.center{background:var(--centertint);border-color:var(--accent)}
   .dist .lbl{font-size:10px;color:var(--dim);letter-spacing:1px;font-weight:600}
   .dist .val{font-size:34px;font-weight:800;line-height:1.02;font-variant-numeric:tabular-nums}
-  .dist .box.center .val{font-size:44px;color:var(--accent)}
+  .dist .box.center .val{font-size:58px;color:var(--accent)}
   .dist .plays{font-size:11px;font-weight:700;color:var(--accent2);min-height:14px}
   body.sun .dist .plays{color:#1b3a66}   /* dark blue on the daytime center box (was brown) */
 
@@ -285,7 +290,7 @@
   #bearlog .bl-collect .bl-seal svg{display:block;margin:0;filter:none}
   #bearlog .bl-collect .bl-scap{font-size:9px;letter-spacing:.3px;margin-top:5px;line-height:1.15;text-align:center}
   /* all minis full strength (the art's too good to hide); earned ones get a gold halo */
-  #bearlog .bl-collect .bl-halo svg{border-radius:50%;box-shadow:0 0 0 2.5px #f5b512,0 0 11px 3px rgba(245,181,18,.6)}
+  #bearlog .bl-collect .bl-halo svg{border-radius:50%;box-shadow:0 0 0 3.5px #f5b512,0 0 16px 5px rgba(245,181,18,.65)}
   #bearlog .bl-band{display:flex;align-items:baseline;gap:16px;margin:2px 0 4px}
   #bearlog .bl-score{font-family:'EB Garamond',serif;font-weight:600;font-size:64px;line-height:.9;color:#1a1712}
   #bearlog .bl-vs{font-family:'EB Garamond',serif;font-size:23px;color:#2f6ec4;font-weight:600}
@@ -819,7 +824,7 @@ function detectHole(){
 /* ============ SHOT TRACKING ============ */
 const CLUBS=['D','3W','5W','3H','4i','5i','6i','7i','8i','9i','PW','GW','SW','LW'];
 let shots=[]; try{ shots=JSON.parse(localStorage.getItem('wbyc_shots'))||[]; }catch(e){}
-let rfLogObs=null;   // Bear's Log photo-panel MutationObserver — declared up here (not
+let rfLogObs=null;   // diary photo-panel MutationObserver — declared up here (not
                      // beside rfRenderPhotos) so it exists before wireMemoryAndPhotos()
                      // runs at init; a `let` beside the function was in its dead zone.
 const saveShots=()=>localStorage.setItem('wbyc_shots', JSON.stringify(shots));
@@ -849,13 +854,17 @@ function shotDists(day){ // each mark's distance: to the next mark on the same h
   // round's; clubStats() wants all of them, the keepsake wants only today's —
   // without the filter the keepsake called an all-time best "Longest shot".
   const src = day ? shots.filter(q=>q.d===day) : shots;
+  // earliest-marked shot per date+hole is the tee shot — flagged below so callers
+  // (the keepsake's "longest drive") can tell a drive from a mid-hole approach.
+  const firstT={};
+  src.forEach(s=>{ const k=s.d+'|'+s.h; if(firstT[k]==null||s.t<firstT[k]) firstT[k]=s.t; });
   const out=[];
   for(let i=0;i<src.length;i++){
     const s=src[i], nx=src[i+1];
     let end=null;
     if(nx && nx.d===s.d && nx.h===s.h) end={lat:nx.lat,lng:nx.lng};
     else{ const hh=course.holes.find(x=>x.hole_number===s.h); if(hh) end=hh.green.center; }
-    if(end){ const y=yds(s,end); if(y>15 && y<400) out.push({club:s.club, y}); }
+    if(end){ const y=yds(s,end); if(y>15 && y<400) out.push({club:s.club, y, h:s.h, tee:s.t===firstT[s.d+'|'+s.h]}); }
   }
   return out;
 }
@@ -1137,11 +1146,14 @@ function blBuild(){
       +`<tr><td class="bl-lab">${(nameU||'YOU').toUpperCase().slice(0,4)}</td>${yy}<td class="bl-tot">${any?sy:''}</td></tr></table>`; };
   const strip=`<div class="bl-strip">${nine(0,9,'OUT')}${nine(9,18,'IN')}</div>`;
   const birdies=played.filter(x=>x.d<=-1).sort((a,b)=>a.d-b.d);
-  const sd=shotDists(startDate); const longest=sd.length?sd.reduce((a,b)=>b.y>a.y?b:a):null;
+  // "Longest drive" means driver, off the tee — not just the longest marked shot
+  // of the round, which could be a long approach. Both flags come from shotDists.
+  const sd=shotDists(startDate).filter(x=>x.tee&&x.club==='D');
+  const longest=sd.length?sd.reduce((a,b)=>b.y>a.y?b:a):null;
   const moment=played.reduce((a,b)=>b.d<a.d?b:a);
   let moms='';
   birdies.forEach(x=>{ const lbl=x.d<=-2?'Eagle':'Birdie'; moms+=`<div class="bl-mom"><span class="bl-dot" style="background:#f000c2">&#8595;</span><div><b>${lbl} on the ${blOrd(x.h.hole_number)}</b> — ${x.e.s} on the par ${x.hp}.</div></div>`; });
-  if(longest) moms+=`<div class="bl-mom"><span class="bl-dot" style="background:#ffa300">D</span><div><b>Longest shot</b> — ${Math.round(longest.y)} yards${longest.club?' with the '+longest.club:''}.</div></div>`;
+  if(longest) moms+=`<div class="bl-mom"><span class="bl-dot" style="background:#ffa300">D</span><div><b>Longest drive</b> — ${Math.round(longest.y)} yards on the ${blOrd(longest.h)}.</div></div>`;
   const pars=played.filter(x=>x.d===0).length;
   if(pars) moms+=`<div class="bl-mom"><span class="bl-dot" style="background:#0e6b3a">P</span><div><b>${pars} par${pars>1?'s':''}</b> — steady stuff.</div></div>`;
   if(!moms) moms=`<div class="bl-mom"><div>A quiet, honest round — the kind the course remembers too.</div></div>`;
@@ -1255,7 +1267,7 @@ function openBearLog(round){
 // foreignObject, so it works on iOS Safari and never taints the canvas. If it is
 // somehow unavailable or fails, we fall back to Save/Print, which on a phone still
 // yields a shareable PDF. So Share upgrades where it can and never breaks.
-// Friendly, sortable filename for saved/shared keepsakes, e.g. WBYC-Bears-Log-2026-07-29-Kit
+// Friendly, sortable filename for saved/shared keepsakes: WBYC-Bear's Log-2026-07-29-Kit
 const blSlug=s=>(s||'').replace(/['’]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-+|-+$/g,'');
 const BL_FNAME_BASE=blSlug("WBYC Bear's Log");
 function blFileName(d){
@@ -2664,7 +2676,9 @@ function init(data){
         if(!confirm('Import will REPLACE the rounds, shots and settings on this device with the file’s. Continue?')) return;
         for(const k of BKEYS){ if(k in data.store) localStorage.setItem(k, data.store[k]); }
         location.reload();
-      }catch(_){ $('scstats').textContent='that file isn’t a WBYC Rangefinder export — nothing changed'; }
+      // double-quoted on purpose: WBYC lands inside this string literal and
+      // golf clubs are full of apostrophes (Madden's, Cragun's, Deacon's).
+      }catch(_){ $('scstats').textContent="that file isn’t a WBYC Rangefinder export — nothing changed"; }
     };
     r.readAsText(f); e.target.value='';
   };
@@ -2758,11 +2772,18 @@ function initPwa(){
   keepAwake();
 }
 
-/* prefer live JSON when served over http(s); embedded copy otherwise */
+/* Prefer live JSON when served over http(s); embedded copy otherwise.
+   The filename is swapped per brand by build.py (see LIVE_COURSE there) and can
+   be set to null to disable the fetch entirely. It used to be hardcoded to one
+   filename, which meant ANY host serving a file of that name replaced the
+   course: a demo for one club, opened from a folder belonging to another,
+   silently showed the wrong holes under the right branding — and looked
+   entirely plausible while doing it. */
+const LIVE_COURSE="course_data_v2.json";
 (async ()=>{
   let data=EMBEDDED_COURSE;
-  if(location.protocol.startsWith('http')){
-    try{ const r=await fetch('course_data_v2.json'); if(r.ok) data=await r.json(); }catch(e){}
+  if(LIVE_COURSE && location.protocol.startsWith('http')){
+    try{ const r=await fetch(LIVE_COURSE); if(r.ok) data=await r.json(); }catch(e){}
   }
   init(data);
   initTheme();
