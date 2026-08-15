@@ -1935,7 +1935,7 @@ function renderMap(h,p,tb){
         if(Math.round(adj)!==Math.round(dcY)) bits.push('plays '+Math.round(adj));
         if(sug) bits.push(sug.club);
         // the yardage number is the hero — big & glanceable; apex/plays stay small
-        const fsBase=Math.max(9,w*0.05), fs1=fsBase*1.9, fs2=fsBase*0.6;
+        const fsBase=Math.max(9,w*0.05), fs1=fsBase*2.5, fs2=fsBase*0.65;
         const halo=sunMode?'rgba(255,255,255,.85)':'rgba(8,14,10,.75)';
         const pcol=sunMode?'#be0096':TRACER.bright;
         const scol=sunMode?'#2d2d37':'#e8eef6';
