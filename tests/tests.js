@@ -142,6 +142,36 @@ setTimeout(()=>{
       openBearLog();
       A('bearlog opens', elems['bearlog'].classList.contains('open'));
       A('bearlog has a memento note field', typeof elems['blNote'].onclick==='function');
+      // Played With: empty state, then a round-trip through the sheet
+      A('played-with offers to add when empty', blBuild().html.includes('Add who you played with'));
+      A('played-with pill hidden when empty', !blBuild().html.includes('bl-ptag">'));
+      elems['blPlayers'].onclick();
+      A('tap opens the players sheet', elems['blPlayersSheet'].classList.contains('open'));
+      A('players sheet targets the live round date', blPlayersPend===card.start);
+      blAddPlayer('Sal Marchetti'); blAddPlayer('  Dee  ');
+      A('players saved to the round', (players[card.start]||[]).join('|')==='Sal Marchetti|Dee');
+      A('played-with pills render after adding', blBuild().html.includes('bl-ptag">Sal Marchetti</span>') && blBuild().html.includes('bl-ptag">Dee</span>'));
+      blClosePlayersSheet();
+      A('players sheet closes', !elems['blPlayersSheet'].classList.contains('open'));
+      delete players[card.start]; savePlayers();
+      // The note: now a multi-line sheet instead of prompt() — same underlying `notes` store
+      elems['blNote'].onclick();
+      A('tap opens the note sheet', elems['blNoteSheet'].classList.contains('open'));
+      A('note sheet targets the live round date', blNotePend===card.start);
+      elems['blNoteText'].value='Three-putted 14 into the wind.\nBirdie on 17 made up for it.';
+      blCommitNote();
+      A('note sheet closes on save', !elems['blNoteSheet'].classList.contains('open'));
+      A('multi-line note saved verbatim', notes[card.start]==='Three-putted 14 into the wind.\nBirdie on 17 made up for it.');
+      A('saved note renders on the keepsake', blBuild().html.includes('Birdie on 17 made up for it.'));
+      elems['blNote'].onclick(); elems['blNoteText'].value=''; blCommitNote();
+      A('clearing the note removes it from the store', !(card.start in notes));
+      // Script picker: a saved global preference, applied as a class on .bl-page
+      A('classic script has no extra class', !blBuild().html.includes('bl-script-'));
+      const sp0=scriptPref;
+      scriptPref='quick'; A('quick-hand script class applied', blBuild().html.includes('bl-page bl-script-quick'));
+      scriptPref='fountain'; A('fountain-pen script class applied', blBuild().html.includes('bl-page bl-script-fountain'));
+      scriptPref='formal'; A('formal script class applied', blBuild().html.includes('bl-page bl-script-formal'));
+      scriptPref=sp0;
       elems['blClose'].onclick(); A('bearlog closes', !elems['bearlog'].classList.contains('open'));
       // the CARD's Bear's Log button must open the LIVE round — never pass the click
       // event as `round` (that regression made the button silently dead)
