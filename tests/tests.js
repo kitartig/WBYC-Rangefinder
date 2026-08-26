@@ -207,6 +207,22 @@ setTimeout(()=>{
       A('legacy round without weather still builds', elems['bearlog'].classList.contains('open') && elems['bearlog'].innerHTML.includes('The Card'));
       elems['blClose'].onclick();
     })();
+    // STATS history list: every banked round gets a paw-print affordance that
+    // opens its keepsake (the tap-to-open wiring itself is exercised above via
+    // openBearLog(stored) directly — the DOM stub has no closest(), so the
+    // sctab click handler's event delegation isn't reachable from here)
+    (()=>{ const save=rounds.slice(), sf=blFolderFilter; rounds.length=0; blFolderFilter='';
+      rounds.push({date:'2026-05-01', tee:'White', pname:'Kit', n:18, s:82, par:72, p:31, gir:9, fwH:7, fwT:10});
+      rounds.push({date:'2026-05-08', tee:'White', pname:'Kit', n:18, s:79, par:72, p:29, gir:11, fwH:8, fwT:10});
+      renderStats();
+      const tab=elems['sctab'].innerHTML;
+      A('a paw icon opens each history row', (tab.match(/bl-opencell/g)||[]).length===2);
+      A('the hint explains what the paw does', /opens that round.?s Bear.?s Log/.test(tab));
+      A('history table gained a 6th (icon) column', /<th><\/th>/.test(tab));
+      rounds.length=0; renderStats();
+      A('empty history still shows the full-width message', /colspan="6"/.test(elems['sctab'].innerHTML));
+      rounds.length=0; save.forEach(r=>rounds.push(r)); blFolderFilter=sf; renderStats();
+    })();
     // self-writing memory line from past rounds
     (()=>{ const save=rounds.slice(); rounds.length=0;
       const p0=course.holes[0].par, p1=course.holes[1].par;

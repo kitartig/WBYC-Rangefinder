@@ -437,6 +437,8 @@
   #sctab tr.bl-open{cursor:pointer}
   #sctab tr.bl-open:hover td{background:#f4f8ff}
   #sctab tr.bl-open:active td{background:#e9f0fb}
+  #sctab td.bl-opencell{padding:8px 8px 8px 2px;font-size:15px;opacity:.5}
+  #sctab tr.bl-open:hover td.bl-opencell,#sctab tr.bl-open:active td.bl-opencell{opacity:.95}
   .bl-openhint{text-align:center;font-size:11px;color:#7b8aa3;margin:8px 0 2px;font-family:-apple-system,sans-serif;letter-spacing:.3px}
   #sctab tr.cur td{color:#1f5fd0;font-weight:700}
   #sctab tr.tot td{font-weight:700;border-top:2px solid #9fc2ea}
@@ -1435,12 +1437,12 @@ function renderStats(){
   const row=(r)=>{ const f=folders[r.date]||'';
     return `<tr class="bl-open" data-ri="${rounds.indexOf(r)}" title="Open this round’s keepsake"><td>${r.date}${f?`<div class="bl-ftag">&#128193; ${f.replace(/</g,'&lt;')}</div>`:''}</td><td>${r.tee}</td>`
       +`<td>${r.s}${r.n===18?` <small>${fmtDiff(r.s-r.par)}</small>`:` <small>(${r.n}h)</small>`}</td>`
-      +`<td>${r.p||''}</td><td>${r.gir||''}</td></tr>`; };
-  html+=chips+'<table><tr><th>DATE</th><th>TEE</th><th>SCORE</th><th>PUTTS</th><th>GIR</th></tr>'
-    +(rounds.length ? (list.length?list.map(row).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--dim)">no rounds in this folder yet</td></tr>')
-                    : '<tr><td colspan="5" style="text-align:center;color:var(--dim)">no rounds banked yet — finish a round, then tap NEW to save it here</td></tr>')
+      +`<td>${r.p||''}</td><td>${r.gir||''}</td><td class="bl-opencell" aria-label="Open this round's keepsake">&#128062;</td></tr>`; };
+  html+=chips+'<table><tr><th>DATE</th><th>TEE</th><th>SCORE</th><th>PUTTS</th><th>GIR</th><th></th></tr>'
+    +(rounds.length ? (list.length?list.map(row).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--dim)">no rounds in this folder yet</td></tr>')
+                    : '<tr><td colspan="6" style="text-align:center;color:var(--dim)">no rounds banked yet — finish a round, then tap NEW to save it here</td></tr>')
     +'</table>'
-    +(rounds.length?'<div class="bl-openhint">Tap any round to open its keepsake</div>':'');
+    +(rounds.length?`<div class="bl-openhint">&#128062; opens that round’s Bear's Log</div>`:'');
   $('sctab').innerHTML=html;
   if(full.length){
     const best=full.reduce((a,r)=>(r.s-r.par)<(a.s-a.par)?r:a);
@@ -1510,8 +1512,12 @@ function render(){
     if(gravIdx>0) plays=`plays ${Math.round(adj/grav.f)} on ${grav.name}`;
     else{
       const bits=[];
-      if(Math.abs(dFt)>=3) bits.push(`${dFt>0?'+':''}${dFt} ft`);
-      if(Math.abs(wYd)>=1) bits.push(`wind ${wYd>0?'+':''}${wYd}`);
+      // Say it in golf, not in arithmetic. This used to render the raw signed
+      // difference — "(-34 ft)" — which reads as a deficit or an error rather
+      // than as the green sitting 34 feet below the tee. Same for wind: "-9"
+      // meant helping, which nobody would guess.
+      if(Math.abs(dFt)>=3) bits.push(`${Math.abs(dFt)} ft ${dFt>0?'uphill':'downhill'}`);
+      if(Math.abs(wYd)>=1) bits.push(`wind ${Math.abs(wYd)} ${wYd>0?'into':'helping'}`);
       if(bits.length) plays=`plays ${Math.round(adj)} (${bits.join(', ')})`;
       const sug=suggestClub(Math.round(adj)); // learned club, once SHOT marks teach it
       if(sug) plays=(plays||`plays ${Math.round(adj)}`)+` · ${sug.club}`;
