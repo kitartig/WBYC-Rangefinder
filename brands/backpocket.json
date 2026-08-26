@@ -6,6 +6,7 @@
   "DIARY": "The Round Log",
   "DIARY_SHORT": "Round Log",
   "DIARY_BUTTON": "My Round Log",
+  "TRACKS_HINT": "Tap the tracks to see the round.",
   "CREST_FILE": "assets/backpocket-mark.svg",
   "CREST_STYLE": "width:52px;height:52px;flex-shrink:0",
   "CREST_CARD_W": "118px",
