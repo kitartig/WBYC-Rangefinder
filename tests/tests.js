@@ -240,9 +240,13 @@ setTimeout(()=>{
       const empty=blBuild();
       A('empty keepsake is no longer a dead end when rounds are saved', empty.empty && empty.html.includes('Your Rounds'));
       A('empty-state rounds list still offers both saved rounds', (empty.html.match(/bl-opencell/g)||[]).length===2);
-      // no saved rounds at all: the section quietly doesn't appear
+      A('"No round yet" is dropped once there\'s history to show instead', !empty.html.includes('No round yet'));
+      // no saved rounds at all: the section quietly doesn't appear, and the
+      // original message earns its place back
       rounds.length=0; card=blankCard();
-      A('rounds list is absent with no history', !blBuild().html.includes('Your Rounds'));
+      const trulyEmpty=blBuild();
+      A('rounds list is absent with no history', !trulyEmpty.html.includes('Your Rounds'));
+      A('"No round yet" still shows with no history at all', trulyEmpty.html.includes('No round yet'));
       rounds.length=0; save.forEach(r=>rounds.push(r)); card=sc;
       // opening a round from the list is wired, same as the STATS row
       openBearLog();

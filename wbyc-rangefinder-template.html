@@ -1214,10 +1214,18 @@ function blBuild(){
   const t=cardTotals(holes), H=course.holes;
   const dd=new Date((startDate||new Date().toISOString().slice(0,10))+'T12:00');
   const dateStr=dd.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-  if(!t.n) return {empty:true, html:`<div class="bl-page" style="text-align:center;padding-top:40px">
-    <div class="bl-sec" style="text-align:center">No round yet</div>
-    <p style="font-family:'EB Garamond',serif;font-style:italic;color:#6b6350">Score a hole and your {{DIARY_SHORT}} will start writing itself.</p>
-    <div style="text-align:left">${blRoundsListHtml()}</div></div>`};
+  if(!t.n){
+    // "No round yet" only earns its place when there's truly nothing to show —
+    // once rounds exist, the list below speaks for itself and the old message
+    // just sat above it as clutter.
+    const lede = rounds.length
+      ? `<div class="bl-sec" style="text-align:center">{{DIARY}}</div>
+         <p style="font-family:'EB Garamond',serif;font-style:italic;color:#6b6350">Score a hole to start today's page — or pick up where you left off:</p>`
+      : `<div class="bl-sec" style="text-align:center">No round yet</div>
+         <p style="font-family:'EB Garamond',serif;font-style:italic;color:#6b6350">Score a hole and your {{DIARY_SHORT}} will start writing itself.</p>`;
+    return {empty:true, html:`<div class="bl-page" style="text-align:center;padding-top:40px">${lede}`
+      + `<div style="text-align:left">${blRoundsListHtml()}</div></div>`};
+  }
   const played=H.map((h,i)=>({h,i,e:holes[i],hp:holePar(h),d:holes[i].s?holes[i].s-holePar(h):0})).filter(x=>x.e.s>0);
   const wx=blWx(wxObj);
   const l1=[]; if(wx) l1.push('<b>'+wx+'</b>'); if(wxObj.temp!=null) l1.push(wxObj.temp+'°F');
