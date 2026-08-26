@@ -1245,7 +1245,8 @@ function blBuild(){
          <p style="font-family:'EB Garamond',serif;font-style:italic;color:#6b6350">Tap the bear tracks to see the round.</p>`
       : `<div class="bl-sec" style="text-align:center">No round yet</div>
          <p style="font-family:'EB Garamond',serif;font-style:italic;color:#6b6350">Score a hole and your Bear's Log will start writing itself.</p>`;
-    return {empty:true, html:`<div class="bl-page" style="text-align:center;padding-top:40px">${lede}`
+    return {empty:true, html:`<div class="bl-page" style="text-align:center;padding-top:40px">`
+      + `<img class="bl-burgee" alt="" style="width:110px;height:auto;display:block;margin:0 auto 12px">${lede}`
       + `<div style="text-align:left">${blRoundsListHtml()}</div></div>`};
   }
   const played=H.map((h,i)=>({h,i,e:holes[i],hp:holePar(h),d:holes[i].s?holes[i].s-holePar(h):0})).filter(x=>x.e.s>0);
