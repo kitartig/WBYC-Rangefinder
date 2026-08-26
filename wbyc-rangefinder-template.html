@@ -1187,6 +1187,10 @@ const blOrd=n=>{const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[
 // lighter table, capped so a long history doesn't turn the keepsake into a
 // second scrollable scorecard. Pure in-app chrome: excluded from Share/Print
 // via .bl-nochrome (see blShare's ignoreElements + the @media print rule).
+// Fuchsia paw-print glyph used everywhere a round is tap-to-open (STATS rows,
+// the in-keepsake Your Rounds list, the openhint caption). Drawn as inline
+// SVG rather than the 🐾 emoji so the color is ours to set, not the platform's.
+const PAW='<svg viewBox="0 0 24 24" width="14" height="14" fill="fuchsia" style="vertical-align:-2px" aria-hidden="true"><ellipse cx="12" cy="16.2" rx="6.1" ry="5.1"/><ellipse cx="4.3" cy="8.3" rx="2.5" ry="3.3" transform="rotate(-18 4.3 8.3)"/><ellipse cx="9.6" cy="4.2" rx="2.4" ry="3.2" transform="rotate(-6 9.6 4.2)"/><ellipse cx="14.6" cy="4.2" rx="2.4" ry="3.2" transform="rotate(6 14.6 4.2)"/><ellipse cx="19.9" cy="8.3" rx="2.5" ry="3.3" transform="rotate(18 19.9 8.3)"/></svg>';
 function blRoundsListHtml(currentDate){
   if(!rounds.length) return '';
   const list=rounds.slice().reverse().slice(0,12);
@@ -1194,7 +1198,7 @@ function blRoundsListHtml(currentDate){
     return `<tr class="bl-open${cur?' cur':''}" data-ri="${rounds.indexOf(r)}">`
       +`<td>${r.date}</td><td>${r.tee}</td>`
       +`<td>${r.s}${r.n===18?` <small>${fmtDiff(r.s-r.par)}</small>`:` <small>(${r.n}h)</small>`}</td>`
-      +`<td class="bl-opencell">${cur?'':'&#128062;'}</td></tr>`; };
+      +`<td class="bl-opencell">${cur?'':PAW}</td></tr>`; };
   const more=rounds.length>list.length?`<div class="bl-rmore">+ ${rounds.length-list.length} more in STATS</div>`:'';
   return `<div class="bl-sec bl-nochrome">Your Rounds</div>`
     + `<div class="bl-rlist bl-nochrome" id="blRounds"><table><tr><th>DATE</th><th>TEE</th><th>SCORE</th><th></th></tr>`
@@ -1472,12 +1476,12 @@ function renderStats(){
   const row=(r)=>{ const f=folders[r.date]||'';
     return `<tr class="bl-open" data-ri="${rounds.indexOf(r)}" title="Open this round’s keepsake"><td>${r.date}${f?`<div class="bl-ftag">&#128193; ${f.replace(/</g,'&lt;')}</div>`:''}</td><td>${r.tee}</td>`
       +`<td>${r.s}${r.n===18?` <small>${fmtDiff(r.s-r.par)}</small>`:` <small>(${r.n}h)</small>`}</td>`
-      +`<td>${r.p||''}</td><td>${r.gir||''}</td><td class="bl-opencell" aria-label="Open this round's keepsake">&#128062;</td></tr>`; };
+      +`<td>${r.p||''}</td><td>${r.gir||''}</td><td class="bl-opencell" aria-label="Open this round's keepsake">${PAW}</td></tr>`; };
   html+=chips+'<table><tr><th>DATE</th><th>TEE</th><th>SCORE</th><th>PUTTS</th><th>GIR</th><th></th></tr>'
     +(rounds.length ? (list.length?list.map(row).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--dim)">no rounds in this folder yet</td></tr>')
                     : '<tr><td colspan="6" style="text-align:center;color:var(--dim)">no rounds banked yet — finish a round, then tap NEW to save it here</td></tr>')
     +'</table>'
-    +(rounds.length?`<div class="bl-openhint">&#128062; opens that round’s {{DIARY_SHORT}}</div>`:'');
+    +(rounds.length?`<div class="bl-openhint">${PAW} opens that round’s {{DIARY_SHORT}}</div>`:'');
   $('sctab').innerHTML=html;
   if(full.length){
     const best=full.reduce((a,r)=>(r.s-r.par)<(a.s-a.par)?r:a);
