@@ -36,11 +36,33 @@ raw = open(crest_file, 'rb').read()
 if mime == 'image/svg+xml':
     import urllib.parse
     crest_uri = 'data:image/svg+xml;utf8,' + urllib.parse.quote(raw.decode('utf-8'))
+    # SVGs here are already cropped to their own viewBox — nothing to trim.
+    crest_trim_uri = crest_uri
 else:
     crest_uri = f'data:{mime};base64,' + base64.b64encode(raw).decode()
+    # wbyc-burgee.webp in particular carries a huge transparent margin — it's
+    # sized and positioned for the masthead's negative-margin overlap trick
+    # (.bl-mast img{margin-top:-16px;margin-left:-26px}). Used standalone (e.g.
+    # the Bear's Log empty-state letterhead) that padding reads as a washed-out
+    # logo floating in empty space. Trim to the opaque bounding box, with a
+    # small margin kept, for any use that isn't the masthead.
+    from PIL import Image
+    import io
+    im = Image.open(io.BytesIO(raw)).convert('RGBA')
+    bbox = im.getbbox()
+    if bbox:
+        pad = 6
+        l, t, r, b = bbox
+        l, t = max(0, l - pad), max(0, t - pad)
+        r, b = min(im.width, r + pad), min(im.height, b + pad)
+        im = im.crop((l, t, r, b))
+    buf = io.BytesIO()
+    im.save(buf, format='PNG')
+    crest_trim_uri = 'data:image/png;base64,' + base64.b64encode(buf.getvalue()).decode()
 
 values = dict(brand)
 values['CREST_SRC'] = crest_uri
+values['CREST_TRIM_SRC'] = crest_trim_uri
 
 # ---------------- substitute, and refuse to ship a half-built app ----------------
 needed = set(re.findall(r'\{\{(\w+)\}\}', tpl))
