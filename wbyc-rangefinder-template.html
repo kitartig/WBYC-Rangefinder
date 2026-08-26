@@ -493,9 +493,12 @@
     border-radius:999px;padding:5px 8px 5px 12px;font-size:14px;color:var(--text)}
   .bl-ptagx button{border:none;background:rgba(255,255,255,.14);color:var(--text);width:18px;height:18px;
     border-radius:50%;font-size:11px;line-height:1;cursor:pointer}
-  .bl-padd{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:15px;
+  .bl-paddrow{display:flex;gap:8px}
+  .bl-padd{flex:1;width:auto;min-width:0;border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:15px;
     background:var(--card2);color:var(--text);font-family:inherit;outline:none}
   .bl-padd:focus{border-color:var(--accent)}
+  .bl-padbtn{flex:none;width:44px;border:none;border-radius:12px;background:var(--accent);color:#fff;
+    font-size:22px;line-height:1;font-weight:700;cursor:pointer}
   /* ---- photographs on the keepsake ---- */
   #rfPhotos{margin:22px 0 4px}
   #rfPhotos h4{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:#1b3a66;margin:0 0 9px;
@@ -639,7 +642,10 @@
     <h3>Played with</h3>
     <p class="rf-sub">A running list for the record — not a separate scorecard.</p>
     <div class="bl-ptags" id="blPtags"></div>
-    <input class="bl-padd" id="blPtagInput" type="text" maxlength="24" placeholder="Type a name and hit enter&#8230;">
+    <div class="bl-paddrow">
+      <input class="bl-padd" id="blPtagInput" type="text" maxlength="24" placeholder="Type a name&#8230;">
+      <button class="bl-padbtn" id="blPtagAdd" type="button" aria-label="Add">+</button>
+    </div>
     <div class="rf-row" style="margin-top:14px">
       <button class="rf-btn primary" id="blPlayersDone" style="flex:1">Done</button>
     </div>
@@ -3022,7 +3028,11 @@ function wireBlExtras(){
   $('blNoteSave').onclick=blCommitNote;
   $('blNoteSheet').addEventListener('click', e=>{ if(e.target===$('blNoteSheet')) blCloseNoteSheet(); });
   const pi=$('blPtagInput'); if(!pi) return;
+  // Enter works on most keyboards, but mobile IMEs (Android Gboard in particular)
+  // often don't fire a real keydown for the return/go key — so the + button next
+  // to the field is the reliable path, not a decoration.
   pi.addEventListener('keydown', e=>{ if(e.key==='Enter' && pi.value.trim()){ blAddPlayer(pi.value); pi.value=''; } });
+  const pa=$('blPtagAdd'); if(pa) pa.onclick=()=>{ if(pi.value.trim()){ blAddPlayer(pi.value); pi.value=''; pi.focus(); } };
   $('blPlayersDone').onclick=blClosePlayersSheet;
   $('blPlayersSheet').addEventListener('click', e=>{ if(e.target===$('blPlayersSheet')) blClosePlayersSheet(); });
 }
