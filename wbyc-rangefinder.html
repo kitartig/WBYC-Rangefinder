@@ -1305,7 +1305,7 @@ function blBuild(){
     +`<div class="bl-sec">The Moments</div><div class="bl-cols"><div class="bl-moments">${moms}</div>${map}</div>`
     +playersHtml+noteHtml+scriptRow+folderHtml+stickers
     +`<div class="bl-bear">${line}<span class="bl-sig">— kept for ${nameU||'you'} by the WBYC Rangefinder</span></div>`
-    +`<div class="bl-foot">WHITE BEAR YACHT CLUB · EST. 1889 · ${dateStr.toUpperCase()}</div></div>`;
+    +`<div class="bl-foot">WHITE BEAR YACHT CLUB · ${dateStr.toUpperCase()}</div></div>`;
   return {empty:false, html:page};
 }
 let blCtx=null;   // the stored round being viewed, or null for the live round

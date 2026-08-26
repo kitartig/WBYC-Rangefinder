@@ -2,7 +2,7 @@
   "_note": "WBYC is a brand config like any other. STORE must stay 'wbyc' — changing it orphans every existing member's saved rounds, pins and clubs.",
   "BRAND": "WBYC",
   "PRODUCT": "Rangefinder",
-  "CLUB_LINE": "WHITE BEAR YACHT CLUB · EST. 1889 · ",
+  "CLUB_LINE": "WHITE BEAR YACHT CLUB · ",
   "DIARY": "The Bear's Log",
   "DIARY_SHORT": "Bear's Log",
   "DIARY_BUTTON": "My Bear's Log",
