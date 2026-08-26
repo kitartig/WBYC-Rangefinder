@@ -223,6 +223,32 @@ setTimeout(()=>{
       A('empty history still shows the full-width message', /colspan="6"/.test(elems['sctab'].innerHTML));
       rounds.length=0; save.forEach(r=>rounds.push(r)); blFolderFilter=sf; renderStats();
     })();
+    // Your Rounds: the keepsake itself now embeds the same rounds list STATS has,
+    // so the {{DIARY_SHORT}} is never a dead end even with nothing scored today —
+    // Kit's complaint was that saved rounds were reachable only from STATS.
+    (()=>{ const save=rounds.slice(), sc=card;
+      rounds.length=0;
+      rounds.push({date:'2026-05-01', tee:'White', pname:'Kit', n:18, s:82, par:72, p:31, gir:9, fwH:7, fwT:10});
+      rounds.push({date:'2026-05-08', tee:'White', pname:'Kit', n:18, s:79, par:72, p:29, gir:11, fwH:8, fwT:10});
+      // full page: the list appears, and the round being viewed is marked, not linked
+      card=blankCard(); card.holes[0]={s:4,p:2,f:true};
+      const full=blBuild();
+      A('a full keepsake still lists other saved rounds', full.html.includes('Your Rounds') && (full.html.match(/bl-opencell/g)||[]).length===2);
+      A('the rounds-list rows point back into `rounds`', /data-ri="0"/.test(full.html) && /data-ri="1"/.test(full.html));
+      // empty state: no holes scored today — this used to be a dead end
+      card=blankCard();
+      const empty=blBuild();
+      A('empty keepsake is no longer a dead end when rounds are saved', empty.empty && empty.html.includes('Your Rounds'));
+      A('empty-state rounds list still offers both saved rounds', (empty.html.match(/bl-opencell/g)||[]).length===2);
+      // no saved rounds at all: the section quietly doesn't appear
+      rounds.length=0; card=blankCard();
+      A('rounds list is absent with no history', !blBuild().html.includes('Your Rounds'));
+      rounds.length=0; save.forEach(r=>rounds.push(r)); card=sc;
+      // opening a round from the list is wired, same as the STATS row
+      openBearLog();
+      A('the in-keepsake rounds list is clickable', typeof elems['blRounds'].onclick==='function');
+      elems['blClose'].onclick();
+    })();
     // self-writing memory line from past rounds
     (()=>{ const save=rounds.slice(); rounds.length=0;
       const p0=course.holes[0].par, p1=course.holes[1].par;

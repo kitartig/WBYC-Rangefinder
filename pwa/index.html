@@ -336,6 +336,20 @@
     font-size:15px;line-height:1;cursor:pointer;color:#1a1712;padding:0}
   #bearlog .bl-swb.on{border-color:#f000c2;background:#fff0fa}
   @media print{ #bearlog .bl-scriptrow{display:none} }
+  @media print{ #bearlog .bl-nochrome{display:none} }
+  /* Your Rounds: a lighter echo of the STATS table, embedded in the keepsake
+     itself so past rounds are reachable without leaving to a different screen */
+  #bearlog .bl-rlist{border:1.4px solid #9fc2ea;border-radius:12px;overflow:hidden;background:#fff;margin-top:2px}
+  #bearlog .bl-rlist table{width:100%;border-collapse:collapse;font-size:13px;font-family:-apple-system,sans-serif}
+  #bearlog .bl-rlist th{background:#f4f9ff;color:#4a6ea8;font-weight:700;font-size:10px;letter-spacing:.5px;padding:7px 8px;text-align:left}
+  #bearlog .bl-rlist td{padding:8px;border-top:1px solid #dceaf6;color:#1a1712}
+  #bearlog .bl-rlist td small{color:#7b93b8;font-size:11px}
+  #bearlog .bl-rlist tr.bl-open{cursor:pointer}
+  #bearlog .bl-rlist tr.bl-open:active td{background:#f4f9ff}
+  #bearlog .bl-rlist tr.cur td{color:#8a8270;font-style:italic}
+  #bearlog .bl-rlist td.bl-opencell{text-align:center;opacity:.55;width:28px}
+  #bearlog .bl-rlist tr.bl-open:active td.bl-opencell{opacity:.95}
+  #bearlog .bl-rmore{text-align:center;font-family:-apple-system,sans-serif;font-size:11px;color:#9a9282;margin-top:6px}
   /* the four note styles — Classic is the base .bl-note rule above (EB Garamond italic) */
   #bearlog .bl-page.bl-script-quick .bl-note{font-family:'Caveat',cursive;font-style:normal;font-size:23px}
   #bearlog .bl-page.bl-script-fountain .bl-note{font-family:'Kalam',cursive;font-style:normal;font-weight:700;font-size:19px}
@@ -1186,6 +1200,24 @@ function blWx(w){
   const c=w.code; if(c==null) return ''; if(c===0) return w.day?'Sunny':'Clear'; return W[c]||'';
 }
 const blOrd=n=>{const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);};
+// Every saved round, right inside the Bear's Log page itself — the STATS
+// history table isn't the only door in. Same data as renderStats()'s rows, a
+// lighter table, capped so a long history doesn't turn the keepsake into a
+// second scrollable scorecard. Pure in-app chrome: excluded from Share/Print
+// via .bl-nochrome (see blShare's ignoreElements + the @media print rule).
+function blRoundsListHtml(currentDate){
+  if(!rounds.length) return '';
+  const list=rounds.slice().reverse().slice(0,12);
+  const row=r=>{ const cur=r.date===currentDate;
+    return `<tr class="bl-open${cur?' cur':''}" data-ri="${rounds.indexOf(r)}">`
+      +`<td>${r.date}</td><td>${r.tee}</td>`
+      +`<td>${r.s}${r.n===18?` <small>${fmtDiff(r.s-r.par)}</small>`:` <small>(${r.n}h)</small>`}</td>`
+      +`<td class="bl-opencell">${cur?'':'&#128062;'}</td></tr>`; };
+  const more=rounds.length>list.length?`<div class="bl-rmore">+ ${rounds.length-list.length} more in STATS</div>`:'';
+  return `<div class="bl-sec bl-nochrome">Your Rounds</div>`
+    + `<div class="bl-rlist bl-nochrome" id="blRounds"><table><tr><th>DATE</th><th>TEE</th><th>SCORE</th><th></th></tr>`
+    + list.map(row).join('') + `</table></div>` + more;
+}
 function blBuild(){
   // A keepsake can be built for the LIVE round (blCtx null) or a STORED round
   // reopened from history (blCtx = that round). Everything downstream reads these
@@ -1202,7 +1234,8 @@ function blBuild(){
   const dateStr=dd.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   if(!t.n) return {empty:true, html:`<div class="bl-page" style="text-align:center;padding-top:40px">
     <div class="bl-sec" style="text-align:center">No round yet</div>
-    <p style="font-family:'EB Garamond',serif;font-style:italic;color:#6b6350">Score a hole and your Bear's Log will start writing itself.</p></div>`};
+    <p style="font-family:'EB Garamond',serif;font-style:italic;color:#6b6350">Score a hole and your Bear's Log will start writing itself.</p>
+    <div style="text-align:left">${blRoundsListHtml()}</div></div>`};
   const played=H.map((h,i)=>({h,i,e:holes[i],hp:holePar(h),d:holes[i].s?holes[i].s-holePar(h):0})).filter(x=>x.e.s>0);
   const wx=blWx(wxObj);
   const l1=[]; if(wx) l1.push('<b>'+wx+'</b>'); if(wxObj.temp!=null) l1.push(wxObj.temp+'°F');
@@ -1311,6 +1344,7 @@ function blBuild(){
     +`<div class="bl-sec">The Moments</div><div class="bl-cols"><div class="bl-moments">${moms}</div>${map}</div>`
     +playersHtml+noteHtml+scriptRow+folderHtml+stickers
     +`<div class="bl-bear">${line}<span class="bl-sig">— kept for ${nameU||'you'} by the WBYC Rangefinder</span></div>`
+    +blRoundsListHtml(startDate)
     +`<div class="bl-foot">WHITE BEAR YACHT CLUB · ${dateStr.toUpperCase()}</div></div>`;
   return {empty:false, html:page};
 }
@@ -1339,6 +1373,11 @@ function openBearLog(round){
   const sh=$('blShare'); if(sh) sh.onclick=()=>blShare(d);
   const nEl=$('blNote'); if(nEl) nEl.onclick=()=>blOpenNoteSheet(d);
   const pEl=$('blPlayers'); if(pEl) pEl.onclick=()=>blOpenPlayersSheet(d);
+  const rlEl=$('blRounds'); if(rlEl) rlEl.onclick=ev=>{
+    const tr=ev.target && ev.target.closest ? ev.target.closest('tr[data-ri]') : null;
+    if(!tr) return;
+    const rr=rounds[+tr.dataset.ri]; if(rr) openBearLog(rr);
+  };
   document.querySelectorAll('#bearlog .bl-swb').forEach(b=>{
     b.onclick=()=>{ scriptPref=b.dataset.script; localStorage.setItem('wbyc_script', scriptPref); openBearLog(blCtx); };
   });
