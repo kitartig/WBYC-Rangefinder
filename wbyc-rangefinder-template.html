@@ -592,7 +592,7 @@
      every screen height without a media query. */
   #entry .cardwrap{position:relative;width:100%;max-width:322px;box-sizing:border-box}
   #entry .ball{position:absolute;left:36%;transform:translateX(-50%);
-    bottom:-13.5vw;width:33vw;max-width:158px;aspect-ratio:480/304;
+    bottom:-7.3vw;width:20vw;max-width:95px;aspect-ratio:480/304;
     background-repeat:no-repeat;background-size:100% 100%;pointer-events:none}
   #entry .mortise{position:relative;width:100%;max-width:322px;box-sizing:border-box;border-radius:17px;
     background:rgba(252,241,196,.78);
@@ -629,13 +629,14 @@
     -webkit-tap-highlight-color:transparent;touch-action:manipulation}
   #entry .glass:active{background:#00317f}
   /* secondary action — the same shape, drawn as an outline */
-  #entry .ghost{display:none;width:72%;margin:9px auto 2px;cursor:pointer;
+  #entry .ghost{display:block;opacity:.40;pointer-events:none;
+    width:72%;margin:9px auto 2px;cursor:pointer;
     padding:13px 14px 14px;border-radius:10px;
     background:transparent;border:1px solid rgba(0,60,165,.55);color:#003ca5;
     font-family:inherit;font-size:13.5px;font-weight:400;
     letter-spacing:.17em;text-indent:.17em;text-transform:uppercase;
     -webkit-tap-highlight-color:transparent;touch-action:manipulation}
-  #entry .ghost.on{display:block}
+  #entry .ghost.on{opacity:1;pointer-events:auto}
   #entry .ghost:active{background:rgba(0,60,165,.10)}
   @media (max-height:720px){
     #entry .hero{height:43vh;min-height:210px}
