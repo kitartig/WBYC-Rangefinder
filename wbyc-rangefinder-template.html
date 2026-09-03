@@ -296,6 +296,8 @@
   #bearlog .bl-collect .bl-scap{font-size:9px;letter-spacing:.3px;margin-top:5px;line-height:1.15;text-align:center}
   /* all minis full strength (the art's too good to hide); earned ones get a gold halo */
   #bearlog .bl-collect .bl-halo svg{border-radius:50%;box-shadow:0 0 0 3.5px #f5b512,0 0 16px 5px rgba(245,181,18,.65)}
+  /* first-run tray: no divider above the first row, since nothing precedes it */
+  #bearlog .bl-tray .bl-collect:first-child{border-top:0;padding-top:12px}
   #bearlog .bl-band{display:flex;align-items:baseline;gap:16px;margin:2px 0 4px}
   #bearlog .bl-score{font-family:'EB Garamond',serif;font-weight:600;font-size:64px;line-height:.9;color:#1a1712}
   #bearlog .bl-vs{font-family:'EB Garamond',serif;font-size:23px;color:#2f6ec4;font-weight:600}
@@ -1423,6 +1425,11 @@ function blBuild(){
   const t=cardTotals(holes), H=course.holes;
   const dd=new Date((startDate||new Date().toISOString().slice(0,10))+'T12:00');
   const dateStr=dd.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  const SET_LABEL={bird:'Birdie', drive:'Longest drive', half:'9 holes', full:'18 holes',
+                  sun:'Sun', cloud:'Clouds', rain:'Rain', wind:'Wind'};
+  const setRow=(kinds,has)=>`<div class="bl-collect bl-set">`
+    + kinds.map(k=>`<span class="bl-mini${has.has(k)?' bl-halo':''}">${rfSeal(k,SET_LABEL[k],44)}</span>`).join('')
+    + `</div>`;
   if(!t.n){
     // "No round yet" only earns its place when there's truly nothing to show —
     // once rounds exist, the list below speaks for itself and the old message
@@ -1432,8 +1439,17 @@ function blBuild(){
          <p style="font-family:'EB Garamond',serif;font-style:italic;color:#6b6350">{{TRACKS_HINT}}</p>`
       : `<div class="bl-sec" style="text-align:center;margin-top:2px">No round yet</div>
          <p style="font-family:'EB Garamond',serif;font-style:italic;color:#6b6350">Score a hole and your {{DIARY_SHORT}} will start writing itself.</p>`;
+    // On a first run the page was the burgee and one line. The whole set, shown
+    // at full strength, turns it from a blank page into a reason to play. Once
+    // rounds exist the list speaks for itself and the tray would only repeat it.
+    const tray = rounds.length ? '' :
+        `<div class="bl-sec" style="text-align:center;margin-top:26px">Waiting to be earned</div>`
+      + `<div class="bl-box bl-tray">`
+      +   setRow(['bird','drive','half','full'], new Set())
+      +   setRow(['sun','cloud','rain','wind'], new Set())
+      + `</div>`;
     return {empty:true, html:`<div class="bl-page" style="text-align:center;padding-top:16px">`
-      + `<img class="bl-burgee" alt="" src="{{CREST_TRIM_SRC}}" style="width:220px;height:auto;display:block;margin:0 auto">${lede}`
+      + `<img class="bl-burgee" alt="" src="{{CREST_TRIM_SRC}}" style="width:220px;height:auto;display:block;margin:0 auto">${lede}${tray}`
       + `<div style="text-align:left">${blRoundsListHtml()}</div></div>`};
   }
   const played=H.map((h,i)=>({h,i,e:holes[i],hp:holePar(h),d:holes[i].s?holes[i].s-holePar(h):0})).filter(x=>x.e.s>0);
@@ -1511,11 +1527,6 @@ function blBuild(){
   if(wndObj.src && wndObj.spd>=12 && wndObj.dir!=null){ cond+=rfSeal('wind', `${dirName(wndObj.dir)} ${wndObj.spd} mph`); condHas.add('wind'); }
   // the full set lined up small under each shelf — vivid where earned, ghosted where not,
   // so the page reads as a collection you're building over time
-  const SET_LABEL={bird:'Birdie', drive:'Longest drive', half:'9 holes', full:'18 holes',
-                  sun:'Sun', cloud:'Clouds', rain:'Rain', wind:'Wind'};
-  const setRow=(kinds,has)=>`<div class="bl-collect bl-set">`
-    + kinds.map(k=>`<span class="bl-mini${has.has(k)?' bl-halo':''}">${rfSeal(k,SET_LABEL[k],44)}</span>`).join('')
-    + `</div>`;
   // The big shelf shows only the seals earned this round; the collection tray below
   // ALWAYS shows the full set (halo = earned) so the collection is visible even on a
   // quiet round — it should never vanish.
