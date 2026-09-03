@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 132" role="img" aria-label="Madden's on Gull Lake">
+  <!-- PLACEHOLDER MARK. A neutral typographic wordmark, not Madden's actual
+       logo. Replace with the resort's own artwork before this is shown as
+       anything other than a demonstration. -->
+  <g fill="none" stroke="#1f5c3d" stroke-width="2.4" stroke-linecap="round">
+    <path d="M96 34 h228"/>
+    <path d="M96 98 h228"/>
+  </g>
+  <g fill="#1f5c3d">
+    <circle cx="210" cy="34" r="4.4"/>
+    <circle cx="210" cy="98" r="4.4"/>
+  </g>
+  <!-- small pine, a nod to the property without borrowing their mark -->
+  <g fill="#1f5c3d" opacity="0.92">
+    <path d="M52 26 L64 50 L57 50 L68 72 L60 72 L72 94 L32 94 L44 72 L36 72 L47 50 L40 50 Z"/>
+    <rect x="49" y="94" width="6" height="12" rx="1.4"/>
+  </g>
+  <text x="210" y="76" text-anchor="middle" font-family="Garamond, Baskerville, 'Times New Roman', serif"
+        font-size="46" font-weight="600" letter-spacing="3" fill="#14402b">MADDEN&#8217;S</text>
+  <text x="210" y="120" text-anchor="middle" font-family="Garamond, Baskerville, 'Times New Roman', serif"
+        font-size="15" letter-spacing="6.5" fill="#3f6b55">ON GULL LAKE</text>
+</svg>
