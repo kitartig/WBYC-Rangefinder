@@ -679,7 +679,7 @@
       <div class="rule"><i></i><b>.</b><i></i></div>
       <div class="when" id="entryWhen"></div>
       <button class="glass" id="entryGo" type="button"><span id="entryGoLbl">Start Round</span></button>
-      <button class="ghost" id="entryCont" type="button">Continue Round</button>
+      <button class="ghost" id="entryLog" type="button">Bear's Log</button>
     </div></div>
     </div>
   </div>
@@ -709,15 +709,32 @@
     var c = JSON.parse(localStorage.getItem(P+'card') || 'null');
     if(c && c.holes) for(var i=0;i<c.holes.length;i++){ if(c.holes[i] && c.holes[i].s) thru++; }
   }catch(_){}
-  var cont = document.getElementById('entryCont');
-  if(thru) cont.classList.add('on');
+  var logBtn = document.getElementById('entryLog');
+  if(thru) logBtn.classList.add('on');
 
   function enter(){
     e.classList.add('out');
     setTimeout(function(){ if(e.parentNode) e.parentNode.removeChild(e); }, 460);
   }
   document.getElementById('entryGo').addEventListener('click', enter);
-  cont.addEventListener('click', enter);
+
+  /* The second action opens the keepsake rather than repeating the first.
+     The entry screen sits above it and fades out, so opening straight away
+     reads as a cross-fade. This is the one place the entry screen calls into
+     the engine; it checks for the function rather than assuming it, so the
+     screen still dismisses cleanly if the engine ever moves.
+     Live card with strokes wins; then the most recent stored round; then the
+     Log's own empty page. */
+  logBtn.addEventListener('click', function(){
+    enter();
+    try{
+      if(typeof openBearLog !== 'function') return;
+      if(thru) openBearLog();
+      else if(typeof rounds !== 'undefined' && rounds && rounds.length)
+        openBearLog(rounds[rounds.length-1]);
+      else openBearLog();
+    }catch(_){}
+  });
 })();
 </script>
 <!-- /ENTRY SCREEN -->
