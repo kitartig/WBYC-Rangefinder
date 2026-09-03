@@ -8,6 +8,10 @@
   "DIARY_BUTTON": "My Bear's Log",
   "TRACKS_HINT": "Tap the bear tracks to see the round.",
   "CREST_FILE": "assets/wbyc-burgee.webp",
+  "WELCOME_FILE": "assets/wbyc-welcome.jpg",
+  "MID_FILE": "assets/wbyc-mid.webp",
+  "GROUND_FILE": "assets/wbyc-ground.webp",
+  "BALL_FILE": "assets/wbyc-ball.webp",
   "CREST_STYLE": "width:200px;max-width:44vw;height:auto;flex-shrink:1;min-width:0",
   "CREST_CARD_W": "min(340px,82%)",
   "CREST_CARD_M": "-36px 0 -42px",
@@ -18,5 +22,7 @@
     "app": "wbyc-rangefinder.html",
     "pwa": "pwa/index.html",
     "bump_sw": true
-  }
+  },
+  "club_full": "White Bear Yacht Club",
+  "site_url": "wbyc-rangefinder.netlify.app"
 }
