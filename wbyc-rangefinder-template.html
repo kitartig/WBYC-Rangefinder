@@ -214,6 +214,20 @@
   #d3hint{text-align:center;font-size:10px;color:var(--dim);padding:8px}
   #map{display:block;width:100%;height:auto;max-height:66vh;margin:0 auto;touch-action:manipulation}
   #maphint{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:10px;color:var(--dim);pointer-events:none}
+  /* AIM's sentence is the whole point of the view, so it gets a bar of its own
+     rather than 10px of grey lying on the photograph with its descenders cut off. */
+  /* the bar is chrome, so it follows the theme rather than the map underneath */
+  body.sun #maphint.aim{color:#123a5e;
+    background:linear-gradient(180deg,rgba(255,253,247,0),rgba(255,253,247,.92) 38%,rgba(255,253,247,.97))}
+  /* A two-line sentence makes the bar tall enough to sit on top of SHOT — it
+     happens whenever the advice names a bail-out club as well as the trouble.
+     Lift the shot controls whenever the bar is showing. (The club name in a
+     comment here would be another club's identity in every other build, which
+     is what the guard in build_guide.py caught when this comment first went in.) */
+  #mapwrap:has(#maphint.aim) #shotbar{bottom:62px}
+  #maphint.aim{bottom:0;left:0;right:0;font-size:13px;line-height:1.35;font-weight:700;
+    color:#ffe3a8;background:linear-gradient(180deg,rgba(6,14,10,0),rgba(6,14,10,.86) 38%,rgba(6,14,10,.94));
+    padding:16px 10px 8px;text-align:center;white-space:normal}
   .dist .box.center{cursor:pointer}
 
   .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}
@@ -571,6 +585,29 @@
   #entry .vig{position:absolute;inset:0;pointer-events:none;
     background:radial-gradient(112% 74% at 50% 62%, rgba(0,0,0,0) 40%, rgba(0,0,0,.34) 100%)}
   /* hero photograph */
+  /* Drifting sky. The hero photograph has its sky punched out to transparency,
+     so these clouds show through that gap and nothing else on the screen moves.
+     The tile is seamless end to end. The strip is four hero-widths wide and the
+     tile is drawn at 55% of the strip — so one tile is 2.2 hero-widths — and the
+     strip translates by exactly 55% of itself, which advances the sky by exactly
+     one tile and leaves no jump at the loop. Both numbers are percentages of the
+     same box, so it holds at every screen size without a media query, and 4 - 2.2
+     still covers the hero at the end of the travel.
+     Height comes from the tile's own aspect against the hero's WIDTH, so the box
+     just has to be tall enough not to clip it; below the tile it stays
+     transparent, and the screen's own gradient shows through as before. */
+  #entry .sky{position:absolute;left:0;right:0;top:0;height:60vh;overflow:hidden;
+    pointer-events:none;filter:saturate(1.10) contrast(1.00) brightness(1.10)}
+  #entry .sky i{position:absolute;top:0;left:0;width:400%;height:100%;
+    background-repeat:repeat-x;background-position:0 0;background-size:55% auto}
+  /* A brand with no sky of its own renders url() with nothing in it. Match on
+     that and the strip simply never animates, rather than spending a
+     compositor layer forever on an empty box. */
+  #entry .sky i:not([style*="url()"]){animation:entrysky 120s linear infinite;
+    will-change:transform}
+  @keyframes entrysky{from{transform:translate3d(0,0,0)}
+                      to{transform:translate3d(-55%,0,0)}}
+  @media (prefers-reduced-motion:reduce){#entry .sky i{animation:none}}
   #entry .hero{position:relative;height:47vh;min-height:250px;flex:none;overflow:hidden;
     background-position:64% 66%;background-size:cover;background-repeat:no-repeat;
     filter:saturate(1.10) contrast(1.00) brightness(1.10);
@@ -668,6 +705,7 @@
 <!--__DEMO_BANNER__-->
 <!-- ENTRY SCREEN -->
 <div id="entry" role="dialog" aria-label="Welcome">
+  <div class="sky"><i style="background-image:url({{SKY_SRC}})"></i></div>
   <div class="hero" style="background-image:url({{WELCOME_SRC}})"><div class="grain"></div><div class="veil"></div></div>
   <div class="turf"></div><div class="turf2"></div><div class="turf3"></div>
   <div class="mid" style="background-image:url({{MID_SRC}})"></div>
@@ -776,7 +814,7 @@
 
   <div id="mapwrap">
     <svg id="map" xmlns="http://www.w3.org/2000/svg"></svg>
-    <div id="mapbtns"><button id="satBtn">SAT</button><button id="grnBtn" title="Zoom to the green">GRN</button><button id="pinBtn" title="Today's cup position. Distances normally measure to the middle of the green — tap PIN, then tap where the flag actually is, and FRONT/CENTER/BACK, plays-like, the carry arcs and the 3D flyover all re-measure to that exact spot. Long-press to clear; pins wipe themselves at midnight.">PIN</button><button id="memBtn" title="Leave a note on a spot. Tap the star, then tap anywhere on the hole — where the drive went, what the wind did, who was there. It stays pinned to that exact place and comes back every time you play the hole. Tap a star on the map to read it, or to remove it."><span class="star">★</span></button><button id="d3Btn">3D</button></div>
+    <div id="mapbtns"><button id="satBtn">SAT</button><button id="aimBtn" title="Where to aim, and what it costs. Draws the line of play, marks the target, rings the distance each of your clubs reaches from where you are standing, and prints what every bunker takes to carry. Distances are yours once the app has watched you hit a few; until then they come from the tee you chose.">AIM</button><button id="grnBtn" title="Zoom to the green">GRN</button><button id="pinBtn" title="Today's cup position. Distances normally measure to the middle of the green — tap PIN, then tap where the flag actually is, and FRONT/CENTER/BACK, plays-like, the carry arcs and the 3D flyover all re-measure to that exact spot. Long-press to clear; pins wipe themselves at midnight.">PIN</button><button id="memBtn" title="Leave a note on a spot. Tap the star, then tap anywhere on the hole — where the drive went, what the wind did, who was there. It stays pinned to that exact place and comes back every time you play the hole. Tap a star on the map to read it, or to remove it."><span class="star">★</span></button><button id="d3Btn">3D</button></div>
     <div id="shotbar"><span class="sb-cap">MARK SHOT</span><select id="clubSel"></select><button id="shotBtn" title="Mark a shot from your current position. Long-press to undo the last mark.">SHOT</button></div>
     <div id="maphint"></div>
   </div>
@@ -1020,7 +1058,11 @@ function windUI(){
   b.textContent = wind.src ? `WIND ${wind.spd} ${dirName(wind.dir)}${wind.src==='manual'?'*':''}` : 'WIND';
   b.classList.toggle('on', windAdjust && !!wind.src);
 }
-let satMode = localStorage.getItem('{{STORE}}_base')==='sat';
+// A brand can open on its photography rather than the rendering. For a pitch
+// build that matters: the aerial is what makes it read as a yardage book instead
+// of a diagram. Still a toggle — this only decides what the first launch shows.
+const SAT_DEFAULT = /*__SAT_DEFAULT__*/false;
+let satMode = (localStorage.getItem('{{STORE}}_base') || (SAT_DEFAULT?'sat':'map'))==='sat';
 let greenView=false; // zoom to green complex; session-only, resets on hole change
 const GRAVS=[{name:'Earth',f:1,icon:'± ELEV'},{name:'the Moon',f:6.05,icon:'☾ MOON'},{name:'Mars',f:2.64,icon:'♂ MARS'}];
 let gravIdx=0; // session-only whimsy; never persisted
@@ -1040,12 +1082,102 @@ function playerPos(){
   if(demo) return demoPos;
   return pos;
 }
+/* ── GPS smoothing ────────────────────────────────────────────────────────────
+   Off unless a brand opts in, so an existing app's behaviour cannot change
+   underneath it. Build with "gps_smoothing": true in the brand config.
+
+   Why it exists. A Class A head professional played eighteen holes off this and
+   reported the yardages "a bit glitchy, not settling on numbers". He was right,
+   and the old four lines below explain it exactly:
+
+     * they took the MEAN of the last five fixes. A mean is the most
+       outlier-sensitive average there is — one wild fix drags the result by a
+       fifth of its own error.
+     * `accuracy` was read off the fix and then never used. A ±40 m reading
+       under tree cover counted for exactly as much as a ±4 m reading in the
+       open, which on a wooded course is most of them.
+     * every fix called render(), about once a second. Even with a perfectly
+       still player the underlying distance is a wobbling float, so the display
+       walked 158, 157, 158, 159 — which is precisely "won't settle".
+
+   The fix is three matching changes: a median instead of a mean, rejection of
+   fixes much worse than the best currently available, and a deadband so the
+   committed position only moves when the move is real. The deadband is applied
+   to the POSITION, not to each readout, so front, centre and back all settle
+   together rather than one at a time.                                        */
+const SMOOTH_GPS = /*__GPS_SMOOTH__*/false;
+const SM = { committed:null, still:false, moving:false, votes:0 };
+function _median(a){
+  const b = a.slice().sort((x,y)=>x-y), m = b.length>>1;
+  return b.length%2 ? b[m] : (b[m-1]+b[m])/2;
+}
+function _mid(fs){                           // component-wise median position
+  return { lat:_median(fs.map(f=>f.lat)), lng:_median(fs.map(f=>f.lng)) };
+}
+function _meters(a,b){                       // small-angle, ample at hole scale
+  const mlat = 111320, mlon = 111320*Math.cos(a.lat*Math.PI/180);
+  return Math.hypot((b.lng-a.lng)*mlon, (b.lat-a.lat)*mlat);
+}
 function pushFix(lat,lng,accuracy){
-  fixes.push({lat,lng}); if(fixes.length>5) fixes.shift();
-  pos = { lat: fixes.reduce((s,f)=>s+f.lat,0)/fixes.length,
-          lng: fixes.reduce((s,f)=>s+f.lng,0)/fixes.length };
-  acc = accuracy;
-  if(autoHole && !demo && Date.now()>manualUntil) detectHole();   // hole follows you unless you've just stepped through manually
+  const now = Date.now();
+  fixes.push({lat, lng, acc: accuracy||99, t: now});
+
+  if(!SMOOTH_GPS){
+    if(fixes.length>5) fixes.shift();
+    pos = { lat: fixes.reduce((s,f)=>s+f.lat,0)/fixes.length,
+            lng: fixes.reduce((s,f)=>s+f.lng,0)/fixes.length };
+    acc = accuracy;
+    if(autoHole && !demo && Date.now()>manualUntil) detectHole();
+    render();
+    return;
+  }
+
+  // a rolling twelve seconds, capped
+  while(fixes.length && now-fixes[0].t > 12000) fixes.shift();
+  if(fixes.length > 12) fixes.shift();
+
+  // throw away fixes markedly worse than the best we are currently getting,
+  // but never leave ourselves fewer than three to work with
+  const best = Math.min.apply(null, fixes.map(f=>f.acc));
+  const good = fixes.filter(f => f.acc <= Math.max(best*2.5, best+10));
+  const use  = good.length >= 3 ? good : fixes;
+
+  // Are we walking or standing? This matters more than it sounds. A twelve
+  // second median is what kills the jitter, but if you are walking to your ball
+  // it also reports where you were six seconds ago — about eight yards behind
+  // yourself. So the window has to collapse the moment you start moving.
+  //
+  // Speed is measured between the median of the oldest third and the median of
+  // the newest third. That estimate is itself noisy, so the state is sticky:
+  // two votes to change, with a gap between the thresholds. Without the gap,
+  // GPS noise alone reads as ~0.7 m/s and the window flaps.
+  let speed = 0;
+  if(use.length >= 6){
+    const k = Math.max(2, Math.floor(use.length/3));
+    const a = use.slice(0,k), b = use.slice(-k);
+    const dt = (b[b.length-1].t - a[0].t)/1000;
+    if(dt > 0) speed = _meters(_mid(a), _mid(b))/dt;
+  }
+  const vote = speed > 0.9 ? 1 : (speed < 0.5 ? -1 : 0);
+  if(vote){
+    SM.votes = (vote > 0) === (SM.votes > 0) ? SM.votes+vote : vote;
+    if(SM.votes >=  2) SM.moving = true;
+    if(SM.votes <= -2) SM.moving = false;
+  }
+
+  const set  = SM.moving ? use.slice(-3) : use;
+  const cand = _mid(set);
+  SM.still   = !SM.moving;
+
+  // deadband: hold the committed position until the candidate has genuinely
+  // moved. Tight while walking so the number keeps up; wider standing still,
+  // where a yard of jitter is the whole complaint.
+  const band = SM.moving ? 0.7 : 2.0;
+  if(!SM.committed || _meters(SM.committed, cand) > band) SM.committed = cand;
+
+  pos = SM.committed;
+  acc = Math.round(_median(use.map(f=>f.acc)));
+  if(autoHole && !demo && now>manualUntil) detectHole();
   render();
 }
 function startGeo(){
@@ -1060,7 +1192,11 @@ function startGeo(){
   watchId = navigator.geolocation.watchPosition(
     p => { if(demo) return;
       pushFix(p.coords.latitude, p.coords.longitude, p.coords.accuracy);
-      gpsStatus('ok', `GPS ±${Math.round(p.coords.accuracy)}m · ${fixes.length}/5 fixes`); },
+      // "steady" is worth saying out loud: it tells a player the number they
+      // are looking at has stopped moving on purpose, not by luck.
+      gpsStatus('ok', SMOOTH_GPS
+        ? `GPS ±${acc}m · ${SM.still ? 'steady' : 'settling'}`
+        : `GPS ±${Math.round(p.coords.accuracy)}m · ${fixes.length}/5 fixes`); },
     e => { gpsStatus('bad', 'GPS unavailable — tap DEMO MODE');
            if(!pos && !demo) setDemo(true,'auto (no GPS)'); },
     { enableHighAccuracy:true, maximumAge:2000, timeout:15000 });
@@ -1156,6 +1292,136 @@ function suggestClub(distYds){ // closest learned median within 25 yds, needs >=
   for(const s of clubStats()){ if(s.n<2) continue;
     const d=Math.abs(s.med-distYds); if(d<bd){ bd=d; best=s; } }
   return bd<=25 ? best : null;
+}
+
+/* ============ AIM ============================================================
+   A Class A head professional played eighteen holes off this app and said that
+   for a player unfamiliar with the course it was "tough to figure out where to
+   aim and determine where to hit". He was right, and it was not a bug: the app
+   gave distances to things and left the golfer to work out the plan. A yardage
+   book does the opposite — it draws a line, marks the target, and prints what
+   each hazard costs to carry.
+
+   This is that, computed rather than drawn, and measured from where the player
+   is standing rather than from the tee. Off unless the brand opts in.
+   ========================================================================== */
+const AIM_VIEW = /*__AIM_VIEW__*/false;
+let aimMode = AIM_VIEW && localStorage.getItem('{{STORE}}_aim')!=='off';
+
+function ptToward(a,b,d){                 // linear is ample over one golf hole
+  const t=d/Math.max(1,yds(a,b));
+  return {lat:a.lat+(b.lat-a.lat)*t, lng:a.lng+(b.lng-a.lng)*t};
+}
+
+function aimBag(){
+  // Learned distances the moment there are any. Before that — which is exactly
+  // the first-time guest this view exists for — fall back to the stock ladder
+  // SCALED BY THE TEE THEY CHOSE. Choosing a tee is a distance self-assessment
+  // a golfer has already made, and made more honestly than they would answer
+  // "how far do you hit it". Handing a forward-tee guest the stock 220-yard
+  // driver would have him taking on carries he has never made in his life.
+  const learned = clubStats().some(s=>s.n>=2);
+  if(learned) return CLUBS.map(c=>({club:c,y:clubDist(c)})).filter(x=>x.y).sort((a,b)=>b.y-a.y);
+  const t=((course&&course.tees)||[]).find(x=>x.name===tee);
+  const f=(t&&t.total_yardage) ? Math.max(0.70, Math.min(1.16, t.total_yardage/6500)) : 1;
+  return CLUBS.map(c=>({club:c,y:Math.round(DEFDIST[c]*f/5)*5})).filter(x=>x.y).sort((a,b)=>b.y-a.y);
+}
+
+function aimPlan(h, from){
+  const tgt=target(h), par=holePar(h), rem=yds(from,tgt);
+  const bag=aimBag(), longest=bag[0];
+  if(!longest) return null;
+
+  // remaining corners of the hole, in order — the ones still ahead of us
+  // Ordered by PROGRESS TOWARD THE GREEN, not by distance from the player. On
+  // the 13th, sorting by distance-from-here put a node that sits off to the side
+  // first, and the walk set off away from the hole: a 571-yard par 5 reported
+  // "205 hit, 461 left", which is more than it started with.
+  const corners=h.centerline
+    .filter(v => yds(from,v)>40 && yds(v,tgt)>40 && yds(v,tgt) < rem-20)
+    .sort((a,b)=>yds(b,tgt)-yds(a,tgt));
+
+  // Walk the line of play rather than flying straight at the next vertex. The
+  // first version aimed at whichever centreline node was nearest and called it
+  // "the corner", which on a hole whose centreline starts near the tee produced
+  // "driver to the corner, 52" — an instruction to hit a driver fifty yards.
+  const line=[from, ...corners, tgt];
+  const along=(d)=>{
+    let run=0;
+    for(let i=0;i<line.length-1;i++){
+      const seg=yds(line[i],line[i+1]);
+      if(run+seg>=d) return ptToward(line[i], line[i+1], d-run);
+      run+=seg;
+    }
+    return tgt;
+  };
+
+  // A par 3, or anything inside a full swing, is a shot AT something. Everything
+  // else is a shot to a PLACE, and the place is as far down the line as the
+  // longest club goes — snapped to a dogleg corner if one sits about there,
+  // because that is what the corner is for.
+  const forGreen = par===3 || rem<=longest.y+8;
+  let aim, club, reach;
+  if(forGreen){
+    aim=tgt; reach=rem;
+    club=bag.slice().sort((a,b)=>Math.abs(a.y-rem)-Math.abs(b.y-rem))[0];
+  } else {
+    club=longest;
+    reach=Math.min(longest.y, Math.max(70, rem-30));
+    aim=along(reach);
+    // snap back to a corner, never forward past it: snapping onto a dogleg 23
+    // yards beyond the driver told a 205-yard player to hit it 228
+    const snap=corners.find(v => { const dv=yds(from,v); return dv<=reach+10 && dv>=reach-28; });
+    if(snap){ aim=snap; reach=yds(from,snap); }
+  }
+  const leaves = Math.round(yds(aim, tgt));
+
+  // What is in the way, measured from here. "In play" means the shot we are
+  // actually proposing can reach it — not merely that it exists down there.
+  const hz=h.hazards.map(z=>{
+    const ds=z.points.map(q=>yds(from,q));
+    return {z, type:z.type, near:Math.min.apply(null,ds), far:Math.max.apply(null,ds)};
+  }).filter(x => x.far>30 && x.near < rem+25);
+  const inPlay = hz.filter(x => x.near <= reach+20 && x.far >= reach-45);
+
+  // The trouble that matters is the trouble this shot finishes IN. A bunker the
+  // ball stops short of is information, not a problem, and does not need a bail
+  // club — the first version offered "D lays back" on a shot already laying back,
+  // which is both wrong and faintly ridiculous.
+  const worst = inPlay.length ? inPlay.reduce((a,b)=>b.far>a.far?b:a) : null;
+  const caught = !!(worst && reach>=worst.near-5 && reach<=worst.far+5);
+  const bail = caught ? (bag.find(c => c.y < worst.near-10 && c.club!==club.club) || null) : null;
+  const noun = w2 => w2==='water' ? 'water' : 'bunker';
+
+  let say;
+  if(forGreen){
+    const over = hz.filter(x => x.far < rem-4 && x.far > rem-70 && x.near > 25)
+                   .reduce((a,b)=>(!a||b.far>a.far)?b:a, null);
+    say = `${Math.round(rem)} to the ${pinFor(h)?'pin':'middle'} — ${club.club}.`
+        + (over ? ` ${Math.round(over.far)} to carry the ${over.type==='water'?'water':'sand'}.` : '');
+  } else if(caught){
+    say = `${club.club} finishes in the ${noun(worst.type)} — it runs ${Math.round(worst.near)} to ${Math.round(worst.far)}.`
+        + (bail ? ` ${bail.club} stops short, leaving ${Math.round(yds(along(bail.y), tgt))} in.`
+                : ` Aim away from it.`);
+  } else if(worst && reach>worst.far){
+    say = `${club.club} carries the ${noun(worst.type)} — it ends at ${Math.round(worst.far)}. Leaves ${leaves} in.`;
+  } else if(worst){
+    say = `${club.club} to ${Math.round(reach)}, short of the ${noun(worst.type)} at ${Math.round(worst.near)}. Leaves ${leaves} in.`;
+  } else {
+    // "Nothing to carry" states a null result and stops. On a course with sparse
+    // bunkering that is most of the round, and it reads as the feature having
+    // nothing to say. What a player actually wants on a clear hole is what's
+    // left and what club that is — so answer that instead, and mention the
+    // absence of trouble second, where it belongs.
+    const into = bag.slice().sort((a,b)=>Math.abs(a.y-leaves)-Math.abs(b.y-leaves))[0];
+    say = `${club.club} to ${Math.round(reach)}, nothing in play. Leaves ${leaves}`
+        + (into && Math.abs(into.y-leaves) <= 18 ? ` — about a ${into.club}.` : ' in.');
+  }
+
+  // rings worth drawing: clubs that land between here and a little past the target
+  const rings=bag.filter(c => c.y>=Math.min(60,rem*0.35) && c.y<=rem+15).slice(0,3);
+  return {aim, club, reach, rem, rings, hz, inPlay, worst, bail, say, forGreen,
+          shown: bail || club};
 }
 
 /* ============ SCORECARD ============ */
@@ -2271,8 +2537,8 @@ function renderMap(h,p,tb){
         const off=sgn*Math.min(fdl*0.16, w*0.22);
         const qx=fmx+fpx*off, qy=fmy+fpy*off, apx2=fmx+fpx*off/2, apy2=fmy+fpy*off/2;
         const fd=`M${pPt[0].toFixed(1)} ${pPt[1].toFixed(1)}Q${qx.toFixed(1)} ${qy.toFixed(1)} ${cc[0].toFixed(1)} ${cc[1].toFixed(1)}`;
-        s+=`<linearGradient id="arcgrad" gradientUnits="userSpaceOnUse" x1="${pPt[0].toFixed(1)}" y1="${pPt[1].toFixed(1)}" x2="${cc[0].toFixed(1)}" y2="${cc[1].toFixed(1)}"><stop offset="0%" stop-color="${TRACER.main}" stop-opacity=".2"/><stop offset="50%" stop-color="${TRACER.bright}" stop-opacity=".95"/><stop offset="100%" stop-color="${TRACER.main}" stop-opacity=".3"/></linearGradient>`
-          +`<path class="flight" d="${fd}" fill="none" stroke="${TRACER.main}" stroke-width="2.6" opacity=".26"/>`
+        s+=`<linearGradient id="arcgrad" gradientUnits="userSpaceOnUse" x1="${pPt[0].toFixed(1)}" y1="${pPt[1].toFixed(1)}" x2="${cc[0].toFixed(1)}" y2="${cc[1].toFixed(1)}"><stop offset="0%" stop-color="#ffe14d" stop-opacity=".95"/><stop offset="45%" stop-color="#ff9a5c" stop-opacity="1"/><stop offset="100%" stop-color="${TRACER.main}" stop-opacity=".9"/></linearGradient>`
+          +`<path class="flight" d="${fd}" fill="none" stroke="#ffb03a" stroke-width="2.6" opacity=".20"/>`
           +`<path class="flight" d="${fd}" fill="none" stroke="url(#arcgrad)" stroke-width="1.2"/>`
           +`<line x1="${apx2.toFixed(1)}" y1="${apy2.toFixed(1)}" x2="${fmx.toFixed(1)}" y2="${fmy.toFixed(1)}" stroke="${TRACER.main}" stroke-width=".5" stroke-dasharray="1.5 2" opacity=".55"/>`
           +`<circle class="flight-apex" cx="${apx2.toFixed(1)}" cy="${apy2.toFixed(1)}" r="1.7" fill="${TRACER.bright}"/>`;
@@ -2288,13 +2554,24 @@ function renderMap(h,p,tb){
         if(Math.round(adj)!==Math.round(dcY)) bits.push('plays '+Math.round(adj));
         if(sug) bits.push(sug.club);
         // the yardage number is the hero — big & glanceable; apex/plays stay small
-        const fsBase=Math.max(9,w*0.05), fs1=fsBase*2.5, fs2=fsBase*0.65;
+        // The flight readout is the hero when you are tracking a shot. With AIM on
+        // it is the second big number on the screen and it lands across the line of
+        // play, so it steps down rather than disappearing — the information is still
+        // wanted, the shouting isn't.
+        const fsBase=Math.max(9,w*0.05), fs1=fsBase*(aimMode&&AIM_VIEW?1.15:2.5), fs2=fsBase*0.65;
         const halo=sunMode?'rgba(255,255,255,.85)':'rgba(8,14,10,.75)';
         const pcol=sunMode?'#be0096':TRACER.bright;
         const scol=sunMode?'#2d2d37':'#e8eef6';
+        // With AIM on, the big yardage and the "plays" line are already sitting in
+        // the CENTER box at the top of the screen, so repeating them at three times
+        // the size across the line of play is noise twice over. Apex is the only
+        // figure here that appears nowhere else, so it is the only one that stays.
+        const quiet = aimMode && AIM_VIEW;
         const lines=[['apex '+Math.round(apexM(fdl)/0.3048)+' ft',fs2,scol]];
-        if(bits.length) lines.push([bits.join(' · '),fs2,scol]);
-        lines.push([Math.round(dcY)+' yds',fs1,pcol]);
+        if(!quiet){
+          if(bits.length) lines.push([bits.join(' · '),fs2,scol]);
+          lines.push([Math.round(dcY)+' yds',fs1,pcol]);
+        }
         // stack upward from the apex dot; flip below it when the frame top is too close
         const blockH=lines.reduce((s2,l)=>s2+l[1]*1.4,0);
         const flip=(apy2-fs1-blockH)<minY+2;
@@ -2334,14 +2611,166 @@ function renderMap(h,p,tb){
       +`<path d="M${(ax-asz*0.38).toFixed(1)} ${(ay-asz*0.15).toFixed(1)}L${ax.toFixed(1)} ${(ay-asz*0.7).toFixed(1)}L${(ax+asz*0.38).toFixed(1)} ${(ay-asz*0.15).toFixed(1)}" fill="none" stroke="var(--accent2)" stroke-width="${wsw}" stroke-linecap="round" stroke-linejoin="round"/></g>`
       +`<text x="${ax.toFixed(1)}" y="${(ay+asz*1.55).toFixed(1)}" text-anchor="middle" class="wind-spd" font-size="${wfs}" font-weight="700" fill="var(--accent2)">${wind.spd}</text>`;
   }
+  // ---- AIM overlay: drawn last, so it sits over the hole rather than under it ----
+  let aimSay='';
+  if(aimMode && AIM_VIEW && !greenView){
+    // `near` belongs to render(); this is renderMap(). Same question, asked here:
+    // is the player actually on this hole, or is the fix from the car park?
+    const holeLen = yds({lat:tb.lat,lng:tb.lng}, h.green.center);
+    const onHole = p && yds(p, h.green.center) < holeLen*1.6 + 120;
+    const from = onHole ? p : {lat:tb.lat, lng:tb.lng};
+    const pl = aimPlan(h, from);
+    if(pl){
+      aimSay = pl.say;
+      const A = rot(from);
+      // frame units per yard, measured rather than assumed — the projection's
+      // scale is not something this code should be guessing at
+      const pr = rot(ptToward(from, target(h), 100));
+      const upy = Math.hypot(pr[0]-A[0], pr[1]-A[1]) / 100;
+      // Type scale. Everything was one size, so the target, the bunkers and the
+      // club key all shouted equally and the eye had nowhere to land. The answer
+      // leads, the trouble follows, the key is a reference you glance at.
+      // Sun mode over the rendering is a pale, delicate map. The solid dark chips
+      // and the heavy dark casing on the line are right on near-black and land
+      // like ink blots on cream, so the light theme gets its own weight: light
+      // chips with a hairline edge, ink for the type, and a white casing instead
+      // of a black one. The aerial is a dark photograph in either mode, so it
+      // keeps the dark treatment.
+      const pale = sunMode && !satOn;
+      const CHIP = {leg:['url(#gLeg)','#123a5e'],   haz:['url(#gSand)','#4a3208'],
+                    wat:['url(#gWater)','#0d3550'], hot:['url(#gHot)','#5c0a1e'],
+                    aim:['url(#gAim)','#1b1206']};
+      const FS  = Math.max(3.2, w*0.040);
+      const F_AIM = FS*1.14, F_HAZ = FS*0.84, F_LEG = FS*0.78;
+      const PAD = FS*0.40, LH = FS*1.5;
+      // Seed the resolver with the furniture that floats OVER the map — the
+      // MARK SHOT control bottom-left and the SAT/AIM/GRN/PIN row along the top.
+      // Nudging labels away from them one at a time didn't hold; treating them as
+      // occupied space does, and it needs no special cases.
+      const put=[[minX, minY+ht*0.72, w*0.46, ht*0.28],        // MARK SHOT stack
+                 [minX+w*0.34, minY, w*0.66, ht*0.10],          // SAT / AIM / GRN / PIN
+                 [minX, minY+ht*0.88, w, ht*0.12]];             // the advice bar
+      const label=(x,y,txt,fill,ink,side,fs,hotEdge)=>{
+        fs = fs || FS;
+        const lh = fs*1.5, bw = txt.length*fs*0.58+fs*0.9;
+        let bx = side<0 ? x-bw-fs*0.5 : x+fs*0.5, by=y;
+        bx=Math.max(minX+1, Math.min(minX+w-bw-1, bx));
+        // Search, don't bounce. The old version stepped away from whichever box
+        // it hit and then clamped the result into the legal band — which on a
+        // busy hole dropped it straight back onto something else, seven times
+        // over on the worst of the eighteen. This walks outward from the wanted
+        // position and takes the first slot that is genuinely clear, and if the
+        // column is full it tries the other side of the feature before giving up.
+        const lo = minY+lh/2+1, hi = minY+ht*0.86-lh/2;   // never under the advice bar
+        const clear=(X,Y)=>!put.some(q=>X<q[0]+q[2]+PAD && X+bw+PAD>q[0]
+                                     && Y-lh/2<q[1]+q[3]+PAD && Y+lh/2+PAD>q[1]);
+        by=Math.max(lo,Math.min(hi,by));
+        if(!clear(bx,by)){
+          const alt=Math.max(minX+1, Math.min(minX+w-bw-1, side<0 ? x+fs*0.5 : x-bw-fs*0.5));
+          let done=false;
+          for(let k=1;k<=70 && !done;k++){
+            const d=k*lh*0.55;
+            for(const X of [bx,alt]) for(const Y of [by-d, by+d]){
+              if(Y>=lo && Y<=hi && clear(X,Y)){ bx=X; by=Y; done=true; break; }
+            }
+          }
+        }
+        put.push([bx,by-lh/2,bw,lh]);
+        const lead = (Math.abs(by-y)>lh*0.7)
+          ? `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${(bx+bw/2).toFixed(1)}" y2="${by.toFixed(1)}" stroke="${pale?ink:fill}" stroke-width="${(fs*0.13).toFixed(2)}" opacity="${pale?'.55':'.8'}"/>` : '';
+        const hair=Math.max(0.18, fs*0.05), y0=by-lh/2;
+        return lead
+          +`<rect x="${bx.toFixed(1)}" y="${y0.toFixed(1)}" width="${bw.toFixed(1)}" height="${lh.toFixed(1)}" rx="${(lh/2).toFixed(1)}" fill="${fill}" stroke="${ink}" stroke-opacity=".85" stroke-width="${hair.toFixed(2)}"/>`
+          +`<rect x="${(bx+hair*1.6).toFixed(1)}" y="${(y0+hair*1.6).toFixed(1)}" width="${(bw-hair*3.2).toFixed(1)}" height="${(lh-hair*3.2).toFixed(1)}" rx="${((lh-hair*3.2)/2).toFixed(1)}" fill="none" stroke="#ffffff" stroke-opacity=".62" stroke-width="${hair.toFixed(2)}"/>`
+          +`<text x="${(bx+bw/2).toFixed(1)}" y="${(by+fs*0.36).toFixed(1)}" text-anchor="middle" font-size="${fs.toFixed(1)}" font-weight="800" fill="${ink}">${txt}</text>`;
+      };
+      // ---- the club legend is laid out FIRST ----
+      // Not because it is drawn first (it isn't — it goes on top at the end), but
+      // because everything else has to know where it is. Placing it last meant the
+      // hazard labels had already taken the space and the legend sat on them.
+      const corners0=h.centerline.filter(v=>yds(from,v)>40 && yds(v,target(h))>40 && yds(v,target(h))<pl.rem-20)
+                                 .sort((x,y2)=>yds(y2,target(h))-yds(x,target(h)));
+      const lp=[from,...corners0,target(h)].map(q=>rot(q));
+      const M=rot(pl.aim);
+      // Sit the legend on the side the hole is not using, judged by where the line
+      // of play actually runs rather than by one point on it.
+      const lineX = lp.reduce((t2,q)=>t2+q[0],0)/lp.length;
+      const legLH = F_LEG*1.5;
+      const legW = Math.max.apply(null, pl.rings.map(c=>(`${c.club} ${c.y}`).length*F_LEG*0.58+F_LEG*0.9));
+      const legX = lineX > minX+w*0.5 ? minX+w*0.035 : minX+w-legW-w*0.035;
+      let legend='', legY = minY+ht*0.60;
+      for(const c of pl.rings){
+        const txt=`${c.club} ${c.y}`, bw=txt.length*F_LEG*0.58+F_LEG*0.9;
+        const lhair=Math.max(0.18, F_LEG*0.05);
+        legend+=`<rect x="${legX.toFixed(1)}" y="${(legY-legLH/2).toFixed(1)}" width="${bw.toFixed(1)}" height="${legLH.toFixed(1)}" rx="${(legLH/2).toFixed(1)}" fill="${CHIP.leg[0]}" stroke="${CHIP.leg[1]}" stroke-opacity=".85" stroke-width="${lhair.toFixed(2)}"/>`
+          +`<rect x="${(legX+lhair*1.6).toFixed(1)}" y="${(legY-legLH/2+lhair*1.6).toFixed(1)}" width="${(bw-lhair*3.2).toFixed(1)}" height="${(legLH-lhair*3.2).toFixed(1)}" rx="${((legLH-lhair*3.2)/2).toFixed(1)}" fill="none" stroke="#ffffff" stroke-opacity=".62" stroke-width="${lhair.toFixed(2)}"/>`
+          +`<text x="${(legX+bw/2).toFixed(1)}" y="${(legY+F_LEG*0.36).toFixed(1)}" text-anchor="middle" font-size="${F_LEG.toFixed(1)}" font-weight="800" fill="${CHIP.leg[1]}">${txt}</text>`;
+        put.push([legX, legY-legLH/2, bw, legLH]);     // now everything else avoids it
+        legY -= legLH + F_LEG*0.36;
+      }
+
+      // One gradient family across the layer — the same yellow-to-pink as the
+      // ball arc, so the marks read as one set rather than several. Hierarchy is
+      // carried by SIZE, which is why the three type sizes had to come first: if
+      // colour is shared, scale is the only thing left to rank them by.
+      // One gradient per role, each bright and each a different hue family, so
+      // colour ranks the marks again — that channel was lost when they all shared
+      // the ball arc's yellow-to-pink. Every gradient stays in the light half of
+      // its hue so dark type reads on it without exception.
+      const GRADS=[['gAim','#ffe14d','#ffab5e','#ff86c6'],      // target: the hero, warm
+                   ['gHot','#ffd0bf','#ff8a7a','#ff4d7d'],      // in play: coral to red
+                   ['gSand','#fff2cc','#ffd873','#ffb03a'],     // bunkers: sand
+                   ['gWater','#dcf5ff','#9adaf7','#5cb4e8'],    // water: cool
+                   ['gLeg','#e8fff6','#bfeaff','#8fd0ff']];     // the key: quietest
+      let a='<g class="aim-layer">'
+        + GRADS.map(([id,c0,c1,c2])=>`<linearGradient id="${id}" x1="0" y1="0" x2="1" y2="0.35">`
+            +`<stop offset="0%" stop-color="${c0}"/><stop offset="52%" stop-color="${c1}"/>`
+            +`<stop offset="100%" stop-color="${c2}"/></linearGradient>`).join('');
+      // reach arcs for the clubs in hand
+      for(const c of pl.rings){
+        // Two-tone arcs, and which tone leads depends on what is underneath —
+        // not on the theme. The aerial is a dark photograph whether the app is in
+        // sun or dark mode, so white leads over it. On the pale daytime rendering
+        // white is invisible and the ink has to lead instead, which is exactly
+        // what the first version got wrong.
+        const rr=(c.y*upy).toFixed(1), dash=`${(FS*0.5).toFixed(1)} ${(FS*0.5).toFixed(1)}`;
+        const under = pale ? 'rgba(255,255,255,.85)' : '#04140c';
+        const over  = pale ? '#123a5e' : '#fff';
+        a+=`<circle cx="${A[0].toFixed(1)}" cy="${A[1].toFixed(1)}" r="${rr}" fill="none" stroke="${under}" stroke-opacity="${pale?'.9':'.45'}" stroke-width="${(FS*0.17).toFixed(2)}" stroke-dasharray="${dash}"/>`
+          +`<circle cx="${A[0].toFixed(1)}" cy="${A[1].toFixed(1)}" r="${rr}" fill="none" stroke="${over}" stroke-opacity="${pale?'.62':'.78'}" stroke-width="${(FS*0.09).toFixed(2)}" stroke-dasharray="${dash}"/>`;
+      }
+      // the line of play
+      const dpath=lp.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join('');
+      a+=`<path d="${dpath}" fill="none" stroke="${pale?'#ffffff':'#04140c'}" stroke-opacity="${pale?'.9':'.5'}" stroke-width="${(FS*(pale?0.19:0.22)).toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`
+        +`<path d="${dpath}" fill="none" stroke="${pale?'#f0920d':'#ffab1a'}" stroke-width="${(FS*0.10).toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      // the target
+      a+=`<circle cx="${M[0].toFixed(1)}" cy="${M[1].toFixed(1)}" r="${(F_AIM*0.72).toFixed(1)}" fill="none" stroke="#fff" stroke-width="${(F_AIM*0.19).toFixed(2)}"/>`
+        +`<circle cx="${M[0].toFixed(1)}" cy="${M[1].toFixed(1)}" r="${(F_AIM*0.30).toFixed(1)}" fill="#ffab1a" stroke="#04140c" stroke-width="${(F_AIM*0.09).toFixed(2)}"/>`;
+      a+=label(M[0],M[1],`${Math.round(pl.reach)} · ${pl.shown.club}`,CHIP.aim[0],CHIP.aim[1],1,F_AIM);
+      // what each hazard costs, from here
+      for(const x of pl.hz){
+        const pts=x.z.points.map(q=>rot(q));
+        const cx=pts.reduce((t2,q)=>t2+q[0],0)/pts.length, cy=pts.reduce((t2,q)=>t2+q[1],0)/pts.length;
+        const hot=pl.inPlay.includes(x);
+        if(hot) a+=`<path d="${pts.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join('')}Z" fill="none" stroke="#ff5a3c" stroke-width="${(FS*0.16).toFixed(2)}"/>`;
+        const CH = hot ? CHIP.hot : (x.type==='water' ? CHIP.wat : CHIP.haz);
+        a+=label(cx,cy,`${Math.round(x.near)} · ${Math.round(x.far)}`,CH[0],CH[1], cx<A[0]?-1:1, hot?F_HAZ*1.08:F_HAZ, hot);
+      }
+      s+=a+legend+'</g>';   // legend last: laid out first, drawn on top
+    }
+  }
   const svg=$('map');
   svg.style.aspectRatio = `${w.toFixed(1)} / ${ht.toFixed(1)}`; // element matches viewBox: no letterbox
   svg.innerHTML=s;
   mapTransform={unrot, svg, base:[minX,minY,w,ht]};
   applyMapZoom(); // sets the viewBox (pinched view if active, else the full hole)
+  // The advice sentence takes the hint line when AIM is on. It is the whole
+  // point of the view and it belongs in words, not only in marks on a map.
   $('maphint').textContent = pinArm ? 'tap the green to drop today’s pin'
     : memArm ? 'tap the spot to pin a memory'
+    : aimSay ? aimSay
     : demo ? 'GPS off — tap anywhere to move' : `hole ${h.hole_number} — ${tee} tee`;
+  $('maphint').classList.toggle('aim', !!aimSay && !pinArm && !memArm);
 }
 
 /* ============ 3D HOLE VIEW: canvas heightfield, no dependencies ============ */
@@ -3030,7 +3459,7 @@ function init(data){
         for(const k of BKEYS){ if(k in data.store) localStorage.setItem(k, data.store[k]); }
         location.reload();
       // double-quoted on purpose: {{BRAND}} lands inside this string literal and
-      // golf clubs are full of apostrophes (Madden's, Cragun's, Deacon's).
+      // golf club names are full of apostrophes, which would close a single-quoted one.
       }catch(_){ $('scstats').textContent="that file isn’t a {{BRAND}} {{PRODUCT}} export — nothing changed"; }
     };
     r.readAsText(f); e.target.value='';
@@ -3066,7 +3495,24 @@ function init(data){
     $('grnBtn').classList.toggle('on', greenView);
     render();
   };
-  if(!TOPO) $('d3Btn').style.display='none';
+  // AIM sits second, right after SAT, because it is the view a lost player needs
+  // to find without hunting for it.
+  if(!AIM_VIEW) $('aimBtn').style.display='none';
+  else {
+    $('aimBtn').classList.toggle('on', aimMode);
+    $('aimBtn').onclick=()=>{
+      aimMode=!aimMode;
+      localStorage.setItem('{{STORE}}_aim', aimMode?'on':'off');
+      $('aimBtn').classList.toggle('on', aimMode);
+      render();
+    };
+  }
+  // The 3D control is retired wherever AIM ships — five controls is too many on a
+  // phone and the orbiting terrain model was the one nobody reached for. draw3D
+  // and its mesh are deliberately left in place: the same renderer, pointed down
+  // the hole from tee height, is the natural answer to the other half of the
+  // complaint ("determine where to hit"), and that is a camera, not a rewrite.
+  if(!TOPO || AIM_VIEW) $('d3Btn').style.display='none';
   $('d3Btn').onclick=open3D;
   wire3D(); wireMemoryAndPhotos(); wireBlExtras();
   initMapGestures();

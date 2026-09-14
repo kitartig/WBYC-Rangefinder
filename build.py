@@ -19,7 +19,26 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 brand_path = sys.argv[1] if len(sys.argv) > 1 else 'brands/wbyc.json'
 brand = json.load(open(brand_path, encoding='utf-8'))
-tpl = open('wbyc-rangefinder-template.html', encoding='utf-8').read()
+# ---------------- which engine does this brand build from? ----------------
+# A brand may PIN itself to a frozen snapshot in engine/ instead of the live
+# template. WBYC does, and the reason is structural rather than cautious.
+#
+# One engine with brands as configs is the right architecture — it is what stops
+# a club's identity leaking into another club's app. But it also means every edit
+# made while iterating on a demo lands in the file the member-facing app is built
+# from. On one day of work on a prospect, this template was edited a dozen times
+# and WBYC was rebuilt from it repeatedly as a side effect of testing.
+#
+# Forking WBYC onto its own permanent copy would isolate it and stop it improving
+# — the two would diverge and the fork would rot. Pinning gives both: WBYC sits
+# on a known-good engine and is untouched by demo work, and new work reaches it
+# when someone promotes it on purpose, with a behavioural diff to look at first.
+engine_file = brand.get('engine') or 'wbyc-rangefinder-template.html'
+if not os.path.exists(engine_file):
+    sys.exit(f"{brand_path}: pinned engine {engine_file} is missing")
+tpl = open(engine_file, encoding='utf-8').read()
+if brand.get('engine'):
+    print(f'  engine: pinned to {engine_file}')
 
 # ---------------- resolve the crest to a data URI ----------------
 crest_file = os.path.join('brands', brand['CREST_FILE'])
@@ -64,6 +83,24 @@ values = dict(brand)
 values['CREST_SRC'] = crest_uri
 values['CREST_TRIM_SRC'] = crest_trim_uri
 
+# A brand may supply a SECOND rendering of its mark for the entry screen. The
+# masthead sits on flat cream or flat black; the entry screen sits on a
+# photograph, and a mark tuned for one is not necessarily right on the other.
+# Midland's is the case: its crest runs bright at the crown and deep at the foot,
+# which on a photograph with a light sky above dark trees is low contrast at both
+# ends. The entry copy inverts that run. Same mark, matched to its background.
+trim_file = brand.get('CREST_TRIM_FILE')
+if trim_file:
+    _tp = os.path.join('brands', trim_file)
+    if not os.path.exists(_tp):
+        sys.exit(f'CREST_TRIM_FILE missing: {_tp}')
+    _tm = MIME.get(os.path.splitext(_tp)[1].lower()) or mimetypes.guess_type(_tp)[0]
+    if not _tm:
+        sys.exit(f'unknown CREST_TRIM_FILE image type: {_tp}')
+    values['CREST_TRIM_SRC'] = (f'data:{_tm};base64,'
+                                + base64.b64encode(open(_tp, 'rb').read()).decode())
+    print('  entry crest: separate artwork')
+
 # ---------------- entry screen: hero photograph and club line ----------------
 # The welcome screen's photograph. Optional on purpose: a brand with no photo of
 # its own gets an empty url(), a declaration the browser drops, and the entry
@@ -85,7 +122,7 @@ else:
 # of the same frame carrying the ball that peeks out from under the card. Both
 # optional, both empty for a brand that has no photography of its own.
 for _key, _tok in (('MID_FILE', 'MID_SRC'), ('GROUND_FILE', 'GROUND_SRC'),
-                   ('BALL_FILE', 'BALL_SRC')):
+                   ('BALL_FILE', 'BALL_SRC'), ('SKY_FILE', 'SKY_SRC')):
     _f = brand.get(_key)
     if _f:
         _p = os.path.join('brands', _f)
@@ -150,6 +187,34 @@ else:
 # rather than a token per tweak: brands want different accent colours, crest
 # sizes and control styling, and each of those as its own key would make every
 # config longer for no gain. Absent by default.
+# ---------------- GPS smoothing: opt-in, per brand ----------------
+# Median-of-window with outlier rejection and a positional deadband, in place of
+# the mean-of-five that shipped. It changes what a player sees on every hole, so
+# it is off unless a brand asks for it — an app already in someone's pocket does
+# not get new distance behaviour without that being a decision.
+_gps_marker = '/*__GPS_SMOOTH__*/false'
+if out.count(_gps_marker) != 1:
+    sys.exit(f'gps smoothing: expected one {_gps_marker}, found {out.count(_gps_marker)}')
+if brand.get('gps_smoothing'):
+    out = out.replace(_gps_marker, '/*__GPS_SMOOTH__*/true')
+    print('  gps smoothing: ON (median + outlier rejection + deadband)')
+
+# ---------------- AIM view: opt-in, per brand ----------------
+_aim_marker = '/*__AIM_VIEW__*/false'
+if out.count(_aim_marker) != 1:
+    sys.exit(f'aim view: expected one {_aim_marker}, found {out.count(_aim_marker)}')
+if brand.get('aim_view'):
+    out = out.replace(_aim_marker, '/*__AIM_VIEW__*/true')
+    print('  AIM view: ON (3D control retired for this brand)')
+
+# ---------------- open on the aerial, per brand ----------------
+_sat_marker = '/*__SAT_DEFAULT__*/false'
+if out.count(_sat_marker) != 1:
+    sys.exit(f'sat default: expected one {_sat_marker}, found {out.count(_sat_marker)}')
+if brand.get('sat_default'):
+    out = out.replace(_sat_marker, '/*__SAT_DEFAULT__*/true')
+    print('  SAT: on at first launch')
+
 _css_marker = '/*__BRAND_CSS__*/'
 if out.count(_css_marker) != 1:
     sys.exit(f'brand css: expected one {_css_marker}, found {out.count(_css_marker)}')
