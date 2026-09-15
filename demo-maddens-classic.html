@@ -575,8 +575,8 @@
      the foot. */
   #entry .mid{position:absolute;left:0;right:0;top:34%;bottom:0;pointer-events:none;
     background-repeat:no-repeat;background-position:50% 28%;background-size:cover;
-    -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,0) 0%,#000 24%,#000 58%,rgba(0,0,0,0) 90%);
-    mask-image:linear-gradient(180deg,rgba(0,0,0,0) 0%,#000 24%,#000 58%,rgba(0,0,0,0) 90%)}
+    -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,0) 0%,#000 6%,#000 58%,rgba(0,0,0,0) 90%);
+    mask-image:linear-gradient(180deg,rgba(0,0,0,0) 0%,#000 6%,#000 58%,rgba(0,0,0,0) 90%)}
   /* Real turf across the foot of the screen. Sized off the viewport WIDTH, not
      its height, so it always renders at the same scale as the ball patch below —
      the two come from one photograph and only blend while their blades match. */
@@ -614,8 +614,8 @@
   #entry .hero{position:relative;height:47vh;min-height:250px;flex:none;overflow:hidden;
     background-position:64% 66%;background-size:cover;background-repeat:no-repeat;
     filter:saturate(1.10) contrast(1.00) brightness(1.10);
-    -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 58%,rgba(0,0,0,.72) 80%,rgba(0,0,0,0) 100%);
-    mask-image:linear-gradient(180deg,#000 0%,#000 58%,rgba(0,0,0,.72) 80%,rgba(0,0,0,0) 100%)}
+    -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 58%,rgba(0,0,0,0.945) 64%,rgba(0,0,0,0.802) 70%,rgba(0,0,0,0.606) 76%,rgba(0,0,0,0.394) 82%,rgba(0,0,0,0.198) 88%,rgba(0,0,0,0.055) 94%,rgba(0,0,0,0) 100%);
+    mask-image:linear-gradient(180deg,#000 0%,#000 58%,rgba(0,0,0,0.945) 64%,rgba(0,0,0,0.802) 70%,rgba(0,0,0,0.606) 76%,rgba(0,0,0,0.394) 82%,rgba(0,0,0,0.198) 88%,rgba(0,0,0,0.055) 94%,rgba(0,0,0,0) 100%)}
   #entry .hero .veil{position:absolute;inset:0;
     background:radial-gradient(58% 25% at 50% 6%, rgba(6,16,11,.18), rgba(6,16,11,0) 78%),
                linear-gradient(180deg, rgba(5,14,9,.14) 0%, rgba(5,14,9,.04) 22%, rgba(5,14,9,0) 46%,
@@ -643,10 +643,20 @@
      bodily reads as a sticker turning, because the highlight goes round with it;
      holding the light still and letting only the markings travel is what makes
      it read as a ball. At this size — about 20px — that is the whole trick.
-     Travel is one ball-width. Rolling without slipping ties the spin to it:
-     turn = distance / radius, which over one diameter is 2 radians, 115deg. */
+     It comes out from behind the card and down into place, travelling right to
+     left. Rolling without slipping ties the spin to the horizontal part of that:
+     turn = distance / radius, which over one diameter is 2 radians, 115deg —
+     anticlockwise, because it is moving left. It starts far enough above the
+     card's lower edge to be hidden, so it emerges rather than simply appearing. */
+  /* The card is translucent over a heavily brightened backdrop blur, so anything
+     behind it prints through as a pale disc — a white ball crossing under it is
+     a smudge sliding over the cream. Clipping to the card's lower edge instead
+     means the ball is simply not drawn until it clears, which is what emerging
+     from behind something actually looks like, and costs nothing. */
+  #entry .ballclip{position:absolute;left:0;right:0;top:100%;height:16vw;
+    overflow:hidden;pointer-events:none}
   #entry .ball{position:absolute;left:36%;translate:-50% 0;
-    bottom:-3.5vw;width:5.2vw;max-width:25px;aspect-ratio:1;pointer-events:none;
+    top:-1.7vw;width:5.2vw;max-width:25px;aspect-ratio:1;pointer-events:none;
     animation:ballroll 1s cubic-bezier(.16,.84,.44,1) .45s both}
   #entry .ball[style*="url()"]{display:none}   /* a brand with no ball of its own */
   #entry .ball b{position:absolute;inset:0;border-radius:50%;
@@ -661,8 +671,8 @@
     border-radius:50%;background:radial-gradient(50% 50% at 50% 50%,
       rgba(16,30,11,.70) 0%, rgba(16,30,11,.40) 50%, rgba(16,30,11,0) 100%);
     animation:ballcast 1s cubic-bezier(.16,.84,.44,1) .45s both}
-  @keyframes ballroll{from{transform:translateX(-5.2vw)} to{transform:translateX(0)}}
-  @keyframes ballspin{from{rotate:-115deg}            to{rotate:0deg}}
+  @keyframes ballroll{from{transform:translate(5.2vw,-4.2vw)} to{transform:translate(0,0)}}
+  @keyframes ballspin{from{rotate:115deg}                     to{rotate:0deg}}
   @keyframes ballcast{from{scale:1.3 .78;opacity:.55} to{scale:1 1;opacity:1}}
   @media (prefers-reduced-motion:reduce){
     #entry .ball,#entry .ball b,#entry .ball i{animation:none}}
@@ -778,7 +788,7 @@
   <img class="crest" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5OTIgMTAwMCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJNYWRkZW4ncyBvbiBHdWxsIExha2UiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJtZFBpbmUiIHgxPSIwLjEiIHkxPSIwIiB4Mj0iMC4zNSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMxZjc0YmQiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjM4IiBzdG9wLWNvbG9yPSIjMTZiNTk4Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzZjZmY5ZSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHBhdGggZD0iTTcyNy4xNCA5OTkuMDdDNzI0LjY1IDk5OC4wMyA3MTIuMjggOTk1LjIzIDcwNS40OSA5OTQuMTdDNzAyLjU3IDk5My43MSA2OTQuNTYgOTkyLjA3IDY4Ny42OCA5OTAuNTNDNjgwLjggOTg4Ljk4IDY3My4yMiA5ODcuNCA2NzAuODQgOTg3LjAyQzY1OS45NCA5ODUuMjcgNjQ3LjI1IDk4MS43NSA2NDYuMDkgOTgwLjE1QzY0NS4xMyA5NzguODQgNjQ0Ljg1IDk3MC4xIDY0NC44NSA5NDEuNjZDNjQ0Ljg1IDkwOS40OCA2NDQuNjYgOTA0LjY2IDY0My4zNCA5MDMuMzRDNjQxLjk4IDkwMS45OCA2MzAuNCA5MDEuODMgNTMwLjI5IDkwMS44M0M0NDkuMTIgOTAxLjgzIDQxOC4xMSA5MDEuNTMgNDE2LjM2IDkwMC43NEM0MTIuMTEgODk4LjggNDEyLjIyIDg5Ny44MSA0MTkuMTUgODc2LjMyQzQyMC4zNCA4NzIuNjIgNDIyLjk0IDg2NC4xNyA0MjQuOTEgODU3LjU2QzQyNi44OSA4NTAuOTQgNDI5Ljc1IDg0MS45MyA0MzEuMjkgODM3LjUzQzQzNC4yNiA4MjkuMDEgNDM0Ljc5IDgyNC4wMSA0MzIuOTIgODIyLjE0QzQzMS4yNiA4MjAuNDggMzUxLjIzIDgyMC40OCAzNDkuNTcgODIyLjE0QzM0OC43IDgyMy4wIDM0OC40MSA4MzQuODkgMzQ4LjQxIDg2OS43MUMzNDguNDEgOTIzLjE2IDM0OS4wIDkxOS43OCAzMzkuODcgOTE4Ljg0QzMzNi45NiA5MTguNTQgMzI5Ljc4IDkxNy4yMSAzMjMuOTMgOTE1LjlDMzAzLjM3IDkxMS4yNyAyODQuMzMgOTA3LjMzIDI3Ni43MSA5MDYuMTNDMjcyLjQ3IDkwNS40NyAyNjguMzYgOTA0LjY5IDI2Ny41NiA5MDQuNEMyNjYuNzcgOTA0LjEgMjYzLjYzIDkwMy4zOCAyNjAuNTkgOTAyLjc4QzI1MS41OCA5MDEuMDEgMjUyLjE3IDkwMy44MiAyNTIuMTcgODYyLjAzQzI1Mi4xNyA4MzAuMzEgMjUxLjk2IDgyNC45NyAyNTAuNjcgODIzLjEyTDI0OS4xNyA4MjAuOThMMTI2Ljc1IDgyMC45N0M1OS40MiA4MjAuOTYgMy4zNiA4MjAuNjkgMi4xNyA4MjAuMzhDLTAuNDIgODE5LjY4IC0wLjc2IDgxNS44OCAxLjQgODExLjY4QzIuMTcgODEwLjE4IDMuNjggODA2LjU3IDQuNzYgODAzLjY2QzExLjY0IDc4NS4xMiAxOS42MyA3NjMuMTQgMjAuNjkgNzU5Ljg3QzIxLjM3IDc1Ny43NSAyMy45NiA3NTAuMzggMjYuNDQgNzQzLjVDMjguOTIgNzM2LjYyIDMzLjU4IDcyMy42MyAzNi43OSA3MTQuNjNDNDQuNzcgNjkyLjI4IDQ3LjE3IDY4NS42NCA1MS45MyA2NzIuNzZDNTQuMTcgNjY2LjY3IDU2LjU5IDY1OS42NyA1Ny4yOSA2NTcuMkM1Ny45OSA2NTQuNzIgNTkuMDYgNjUxLjc4IDU5LjY2IDY1MC42NUM2MC4yNiA2NDkuNTIgNjIuMyA2NDQuMTggNjQuMTkgNjM4Ljc5QzY2LjA3IDYzMy4zOSA2OC44MyA2MjUuNTEgNzAuMzEgNjIxLjI3QzcxLjc5IDYxNy4wNCA3NC4zNiA2MDkuODkgNzYuMDMgNjA1LjM5Qzc3LjcgNjAwLjg5IDgwLjMgNTkzLjc0IDgxLjggNTg5LjUxQzgzLjMgNTg1LjI3IDg2LjExIDU3Ny40OCA4OC4wNCA1NzIuMThDODkuOTcgNTY2Ljg5IDkyLjU4IDU1OS41MyA5My44NCA1NTUuODJDOTUuMDkgNTUyLjEyIDk3LjkgNTQ0LjMyIDEwMC4wOCA1MzguNUMxMDIuMjYgNTMyLjY4IDEwNi45IDUxOS45IDExMC4zOSA1MTAuMTFDMTEzLjg5IDUwMC4zMSAxMTguMjIgNDg4LjE5IDEyMC4wMyA0ODMuMTZDMTIxLjg0IDQ3OC4xMyAxMjQuNTYgNDcwLjU1IDEyNi4wNyA0NjYuMzFDMTMwLjU1IDQ1My43MiAxMzMuMjcgNDQ2LjIgMTQxLjAzIDQyNC45M0MxNDUuMDggNDEzLjgxIDE0OS40MSA0MDEuNjggMTUwLjY2IDM5Ny45OEMxNTEuOSAzOTQuMjcgMTU0LjA3IDM4OC4yMSAxNTUuNDcgMzg0LjVDMTU2Ljg3IDM4MC44IDE1OS40NyAzNzMuNjUgMTYxLjI0IDM2OC42MkMxNjMuMDIgMzYzLjU5IDE2Ni40OCAzNTQuMDcgMTY4LjkzIDM0Ny40NUMxNzEuMzkgMzQwLjgzIDE3NC4xOSAzMzIuODIgMTc1LjE2IDMyOS42NEMxNzYuMTIgMzI2LjQ3IDE3OC43MSAzMTkuMSAxODAuOSAzMTMuMjhDMTgzLjEgMzA3LjQ2IDE4Ny43NCAyOTQuNjggMTkxLjIzIDI4NC44OUMxOTQuNzEgMjc1LjEgMTk4LjgyIDI2My42MiAyMDAuMzYgMjU5LjM4QzIwMS44OSAyNTUuMTUgMjA0LjQgMjQ4LjIyIDIwNS45MiAyNDMuOThDMjA3LjQ0IDIzOS43NSAyMTAuNyAyMzAuODcgMjEzLjE2IDIyNC4yNUMyMTUuNjEgMjE3LjY0IDIxOS4wOSAyMDcuODkgMjIwLjg4IDIwMi42QzIyMi42OCAxOTcuMzEgMjI2LjM3IDE4Ni45MSAyMjkuMDkgMTc5LjVDMjMxLjgxIDE3Mi4wOSAyMzUuMjggMTYyLjU2IDIzNi43OSAxNTguMzNDMjM4LjMxIDE1NC4wOSAyNDEuMTIgMTQ2LjI5IDI0My4wNCAxNDEuMEMyNDQuOTYgMTM1LjcxIDI0OC42NSAxMjUuMzEgMjUxLjI0IDExNy45QzI1My44MyAxMTAuNDkgMjU3LjkzIDk5LjAxIDI2MC4zNSA5Mi40QzI2Mi43NyA4NS43OCAyNjYuMTkgNzYuMjUgMjY3Ljk3IDcxLjIyQzI2OS43NCA2Ni4xOSAyNzQuMyA1My42MyAyNzguMSA0My4zMUMyODEuOTEgMzIuOTkgMjg1LjU2IDIyLjgxIDI4Ni4yMyAyMC42OUMyOTAuNTIgNy4xIDI5My44NCAtMC4wIDI5NS44OSAtMC4wQzI5OC4xOSAtMC4wIDI5Ny40MyAtMS43MiAzMDguNjUgMjguODdDMzEyLjA1IDM4LjE0IDMxNi4zNSA0OS44MyAzMTguMiA1NC44NkMzMjAuMDYgNTkuODkgMzIzLjY4IDY5Ljg1IDMyNi4yNSA3Ny4wQzMyOC44MiA4NC4xNCAzMzMuMTYgOTYuMDUgMzM1Ljg5IDEwMy40NkMzMzguNjMgMTEwLjg4IDM0Mi45NyAxMjIuNzkgMzQ1LjU1IDEyOS45M0MzNDguMTIgMTM3LjA4IDM1My4xIDE1MC43MiAzNTYuNiAxNjAuMjVDMzYzLjE5IDE3OC4xNSAzNjYuNDggMTg3LjE5IDM3NS42OSAyMTIuN0MzODAuNzQgMjI2LjcyIDM4NC4xNyAyMzYuMDEgMzkyLjM0IDI1Ny45NEMzOTQuMjIgMjYyLjk3IDM5Ni43NyAyNzAuMTIgMzk4LjAxIDI3My44MkMzOTkuMjUgMjc3LjUzIDQwMS44MyAyODQuNjcgNDAzLjc2IDI4OS43QzQwNS42OCAyOTQuNzMgNDA4LjQ3IDMwMi4zMSA0MDkuOTYgMzA2LjU0QzQxMS40NCAzMTAuNzggNDE0LjI4IDMxOC41OCA0MTYuMjYgMzIzLjg3QzQyMS43MSAzMzguNDUgNDI2LjQ1IDM1MS40NCA0MzQuMzQgMzczLjQ0QzQzNi4xNCAzNzguNDYgNDQwLjM0IDM4OS45NCA0NDMuNjcgMzk4Ljk0QzQ0Ny4wIDQwNy45NCA0NTEuMTEgNDE5LjIgNDUyLjgyIDQyMy45N0M0NTQuNTIgNDI4LjczIDQ1OC44NyA0NDAuNjQgNDYyLjQ3IDQ1MC40M0M0NzMuNjggNDgwLjg4IDQ3Ny40NSA0OTEuMiA0NzguODEgNDk1LjE5QzQ3OS41NCA0OTcuMzEgNDgyLjE1IDUwNC40NSA0ODQuNjEgNTExLjA3QzQ4Ny4wOCA1MTcuNjkgNDkxLjQ2IDUyOS44MSA0OTQuMzQgNTM4LjAyQzUwMi40IDU2MC45NiA1MDQuNjUgNTYxLjQ1IDUxMS4wNSA1NDEuNjhDNTE1LjM2IDUyOC4zOCA1MjMuNyA1MDMuMSA1MjUuNDQgNDk4LjA4QzUyNi41NyA0OTQuODIgNTMwLjUzIDQ4Mi44NCA1NTguNjkgMzk3LjVDNTY5LjYgMzY0LjQxIDU3OS4zNCAzMzUuMTggNTgwLjMzIDMzMi41M0M1ODEuMzMgMzI5Ljg4IDU4Ni41NiAzMTQuMDggNTkxLjk3IDI5Ny40QzU5Ny4zOCAyODAuNzMgNjAzLjAxIDI2My42MiA2MDQuNDggMjU5LjM4QzYwNS45NSAyNTUuMTUgNjEyLjg0IDIzNC4zNiA2MTkuOCAyMTMuMTlDNjI2Ljc2IDE5Mi4wMSA2MzMuNDUgMTcxLjg3IDYzNC42OCAxNjguNDNDNjM1LjkxIDE2NC45OSA2NDEuNTUgMTQ3Ljg4IDY0Ny4yMiAxMzAuNDFDNjUyLjg5IDExMi45NSA2NTguNTYgOTUuODQgNjU5LjgxIDkyLjRDNjYxLjA2IDg4Ljk2IDY2Mi4zNiA4NS4wNiA2NjIuNjkgODMuNzNDNjYzLjAzIDgyLjQxIDY2Ni4wNCA3My4zMiA2NjkuMzkgNjMuNTJDNjcyLjc0IDUzLjczIDY3Ny4yOCA0MC4wOSA2NzkuNDcgMzMuMjFDNjgxLjY2IDI2LjMyIDY4NC4yNyAxOC41MyA2ODUuMjYgMTUuODhDNjg2LjI2IDEzLjIzIDY4Ny43NiA4LjU4IDY4OC42MSA1LjUzQzY4OS44OSAwLjkxIDY5MC40OSAwLjAgNjkyLjI4IDAuMDFDNjk0Ljc3IDAuMDEgNjk1Ljk5IDMuMSA3MDcuODQgMzkuNDZDNzExLjg5IDUxLjkgNzE2LjAgNjQuMjQgNzE2Ljk3IDY2Ljg5QzcxNy45NCA2OS41NCA3MjAuMTQgNzYuMjUgNzIxLjg2IDgxLjgxQzcyMy41OCA4Ny4zNyA3MjYuNDUgOTYuMDMgNzI4LjI0IDEwMS4wNkM3MzAuMDMgMTA2LjA5IDczMi4wOSAxMTIuMzcgNzMyLjgyIDExNS4wMUM3MzMuNTUgMTE3LjY2IDczNy42IDEzMC4wIDc0MS44MiAxNDIuNDRDNzQ2LjA0IDE1NC44OCA3NTIuNjMgMTc0LjgxIDc1Ni40OCAxODYuNzJDNzYwLjMyIDE5OC42MyA3NjQuMjcgMjEwLjU0IDc2NS4yNSAyMTMuMTlDNzY2LjIzIDIxNS44MyA3NzAuMzIgMjI4LjE4IDc3NC4zMyAyNDAuNjJDNzc4LjM1IDI1My4wNiA3ODIuODUgMjY2LjcgNzg0LjM0IDI3MC45M0M3ODUuODQgMjc1LjE3IDc5Mi43OSAyOTYuMTcgNzk5LjggMzE3LjYxQzgwNi44IDMzOS4wNSA4MTMuNTIgMzU5LjQxIDgxNC43MyAzNjIuODVDODE1Ljk0IDM2Ni4yOSA4MjQuMzcgMzkxLjg0IDgzMy40NyA0MTkuNjNDODQyLjU3IDQ0Ny40MyA4NTAuNjUgNDcxLjcxIDg1MS40NCA0NzMuNkM4NTIuMjMgNDc1LjQ5IDg1My44OSA0ODAuNDcgODU1LjE0IDQ4NC42N0M4NTcuNTQgNDkyLjc3IDg2MC44MyA1MDIuOCA4NjUuMjMgNTE1LjRDODY2LjcxIDUxOS42MyA4NzUuMTYgNTQ1LjE5IDg4NC4wMSA1NzIuMThDODkyLjg2IDU5OS4xOCA5MDEuMTEgNjI0LjA5IDkwMi4zNSA2MjcuNTNDOTAzLjU4IDYzMC45NyA5MDcuNjYgNjQzLjMxIDkxMS40IDY1NC45NkM5MTUuMTQgNjY2LjYgOTE4LjY3IDY3Ny40MyA5MTkuMjMgNjc5LjAyQzkxOS43OSA2ODAuNjEgOTIzLjczIDY5Mi41MiA5MjcuOTkgNzA1LjQ5QzkzMi4yNSA3MTguNDYgOTM3LjE0IDczMi45NiA5MzguODYgNzM3LjczQzk0MC41OCA3NDIuNDkgOTQyLjI4IDc0Ny42OSA5NDIuNjUgNzQ5LjI4Qzk0My4wMSA3NTAuODcgOTQ0LjMyIDc1NC45OCA5NDUuNTYgNzU4LjQyQzk0Ni44IDc2MS44NiA5NTAuOTMgNzc0LjQyIDk1NC43NCA3ODYuMzNDOTU4LjU1IDc5OC4yNCA5NjIuMDcgODA5LjAgOTYyLjU3IDgxMC4yNUM5NjMuMDYgODExLjQ5IDk2Ni40NiA4MjEuNDUgOTcwLjExIDgzMi4zOEM5NzMuNzYgODQzLjMyIDk3Ny4yIDg1My41NiA5NzcuNzQgODU1LjE1Qzk3OS40NCA4NjAuMTIgOTg0LjMgODc1LjAxIDk4Ny4wMSA4ODMuNTRDOTg4LjQ0IDg4OC4wNCA5OTAuMCA4OTIuMTMgOTkwLjQ3IDg5Mi42NEM5OTIuMyA4OTQuNTcgOTkxLjQxIDg5OC42IDk4OC44OSA4OTkuNzVDOTg3LjA3IDkwMC41OCA5NTUuMDkgOTAwLjg3IDg2NC45MiA5MDAuODdDNzcxLjY5IDkwMC44NyA3NDMuMTQgOTAxLjE0IDc0Mi4yNSA5MDIuMDJDNzQxLjM5IDkwMi44OSA3NDEuMSA5MTQuNjcgNzQxLjEgOTQ5LjE0Qzc0MS4xIDEwMDEuOTQgNzQxLjM2IDEwMDAuMDMgNzMzLjk2IDk5OS45M0M3MzEuMjcgOTk5LjkgNzI4LjIgOTk5LjUxIDcyNy4xNCA5OTkuMDdaIiBmaWxsPSJ1cmwoI21kUGluZSkiLz4KPC9zdmc+Cg==" alt="MADDEN'S">
   <div class="stage">
     <div class="cardwrap">
-    <div class="ball" style="background-image:url()"><i></i><b></b></div>
+    <div class="ballclip"><div class="ball" style="background-image:url()"><i></i><b></b></div></div>
     <div class="mortise"><div class="inner">
       <div class="eyebrow">The Classic at Madden's</div>
       <div class="script">Welcome</div>
