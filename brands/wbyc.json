@@ -8,7 +8,8 @@
   "DIARY_BUTTON": "My Bear's Log",
   "TRACKS_HINT": "Tap the bear tracks to see the round.",
   "CREST_FILE": "assets/wbyc-burgee.webp",
-  "WELCOME_FILE": "assets/wbyc-welcome.jpg",
+  "WELCOME_FILE": "assets/wbyc-welcome-fg.webp",
+  "SKY_FILE": "assets/wbyc-sky.webp",
   "MID_FILE": "assets/wbyc-mid.webp",
   "GROUND_FILE": "assets/wbyc-ground.webp",
   "BALL_FILE": "assets/wbyc-ball.webp",
@@ -24,5 +25,13 @@
     "bump_sw": true
   },
   "club_full": "White Bear Yacht Club",
-  "site_url": "wbyc-rangefinder.netlify.app"
+  "site_url": "wbyc-rangefinder.netlify.app",
+  "seal_subject": "the club's bear, from the burgee",
+  "tagline": "Striving to be the best part of your day.",
+  "gps_smoothing": true,
+  "_rollout": "7 Sep 2026 — GPS smoothing enabled (median window + accuracy-based outlier rejection + positional deadband). AIM deliberately NOT enabled in this step: two changes at once on the app Kit plays off would make a bad reading impossible to attribute. Rollback: backups/wbyc-rangefinder.PRE-SMOOTHING.*.html | AIM enabled after the smoothing round. Retires the 3D control (renderer kept). Rollback: ./rollback-wbyc.sh",
+  "engine": "engine/engine-20260914-2129.html",
+  "_pinned": "Pinned to engine/engine-20260908.html so demo work on the live template cannot reach the app Kit plays off. Promote deliberately with ./promote-wbyc-engine.sh, which shows a behavioural diff before switching.",
+  "guide_engine": "engine/guide-20260914-2129.html",
+  "aim_view": true
 }
